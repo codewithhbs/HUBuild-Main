@@ -194,13 +194,6 @@ exports.buyMemberShip = async (req, res) => {
         const { providerId } = req.params;
         const { couponCode } = req.body;
 
-        if (!couponCode) {
-            return res.status(400).json({
-                success: false,
-                message: "Coupon Code is required"
-            });
-        }
-
         const provider = await Provider.findById(providerId);
         if (!provider) {
             return res.status(400).json({
@@ -222,34 +215,37 @@ exports.buyMemberShip = async (req, res) => {
 
         console.log("Selected Membership:", memberShip);
 
-        // Check for Provider's Coupon
-        const providerCoupon = await Provider.findOne({ couponCode }).populate("discount");
-
-        // Check for Admin Coupon
-        const adminCoupon = await AdminCoupon.findOne({ couponCode });
-
         let discount = 0;
+        let discountAmount = 0;
+        let finalAmount = planPrice; // Default to full plan price
 
-        if (providerCoupon && providerCoupon.discount) {
-            discount = providerCoupon.discount.discountPercent || 0;
-        } else if (adminCoupon) {
-            discount = adminCoupon.discount || 0;
+        if (couponCode) {
+            // Check for Provider's Coupon
+            const providerCoupon = await Provider.findOne({ couponCode }).populate("discount");
+
+            // Check for Admin Coupon
+            const adminCoupon = await AdminCoupon.findOne({ couponCode });
+
+            if (providerCoupon && providerCoupon.discount) {
+                discount = providerCoupon.discount.discountPercent || 0;
+            } else if (adminCoupon) {
+                discount = adminCoupon.discount || 0;
+            }
+
+            if (discount > 0) {
+                console.log("Applying Discount:", discount, "%");
+                discountAmount = (planPrice * discount) / 100;
+                finalAmount = planPrice - discountAmount;
+            } else {
+                console.log("Invalid or no coupon applied. Full price used.");
+            }
         } else {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid Coupon Code"
-            });
+            console.log("No coupon provided. Full price used.");
         }
-
-        console.log("Applying Discount:", discount, "%");
-
-        // Calculate Discounted Amount
-        const discountAmount = (planPrice * discount) / 100;
-        const finalAmount = planPrice - discountAmount;
 
         // Razorpay Order Options
         const razorpayOptions = {
-            amount: finalAmount * 100 || 5000000, // Ensure it's in paise
+            amount: finalAmount * 100, // Convert to paise
             currency: 'INR',
             payment_capture: 1,
         };
@@ -287,6 +283,7 @@ exports.buyMemberShip = async (req, res) => {
         });
     }
 };
+
 
 
 exports.membershipPaymentVerify = async (req, res) => {

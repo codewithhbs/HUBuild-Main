@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, Send } from 'lucide-react';
 import logo from './Help_You_Build__1_-removebg-preview (1).png';
 import './footer.css';
+import { GetData } from '../utils/sessionStoreage';
 
 const quickLinks = [
-  { to: '/member-registration', text: 'Become A Partner' },
+  { to: '/member-registration', text: 'Become A Partner', key: 'partner' },
   { to: '/about', text: 'About Us' },
   { to: '/blog', text: 'Blog' },
   { to: '/contact', text: 'Contact Us' },
@@ -28,6 +29,17 @@ const legalLinks = [
 
 const Footer = () => {
   const [email, setEmail] = useState('');
+  const [token, setToken] = useState(null)
+
+  useEffect(() => {
+    // const GetToken = () => {
+    const data = GetData('token');
+    if (data) {
+      setToken(data);
+    }
+    // };
+
+  }, [])
 
   const handleNewsletterSubmit = (e) => {
     e.preventDefault();
@@ -63,16 +75,18 @@ const Footer = () => {
           <div className="footer-widget">
             <h3>Quick Links</h3>
             <ul className="footer-links">
-              {quickLinks.map((link) => (
-                <li key={link.to}>
-                  <Link to={link.to}>{link.text}</Link>
-                </li>
-              ))}
+              {quickLinks
+                .filter((link) => !(token && link.key === 'partner')) // Remove "Become A Partner" if token exists
+                .map((link) => (
+                  <li key={link.to}>
+                    <Link to={link.to}>{link.text}</Link>
+                  </li>
+                ))}
             </ul>
           </div>
 
           {/* Legal Links */}
-       
+
 
           {/* Services */}
           <div className="footer-widget">

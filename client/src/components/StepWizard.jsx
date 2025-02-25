@@ -5,6 +5,7 @@ import { useGeolocated } from "react-geolocated";
 import { setData } from "../utils/sessionStoreage";
 import "./wizard.css";
 import { useSearchParams } from "react-router-dom";
+import Swal from 'sweetalert2'
 
 const StepWizard = () => {
     const [searchParams] = useSearchParams();
@@ -55,7 +56,27 @@ const StepWizard = () => {
     const validatePhone = () => {
         const phoneRegex = /^[0-9]{10}$/;
         if (!phoneRegex.test(memberData.mobileNumber)) {
-            toast.error("Mobile number must be exactly 10 digits.");
+            // toast.error("Mobile number must be exactly 10 digits.");
+            Swal.fire({
+                title: 'Error!',
+                text: "Mobile number must be exactly 10 digits.",
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
+            return false;
+        }
+        return true;
+    };
+
+    const validatePassword = () => {
+        if (memberData.password.length < 7) {
+            // toast.error("Password must be at least 7 characters long.");
+            Swal.fire({
+                title: 'Error!',
+                text: "Password must be at least 7 characters long.",
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
             return false;
         }
         return true;
@@ -118,8 +139,9 @@ const StepWizard = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!validatePhone()) return;
+        if (!validatePhone() || !validatePassword()) return;
         setLoading(true);
+
         try {
             const res = await axios.post("https://api.helpubuild.co.in/api/v1/register-provider", memberData);
             toast.success(res.data.message);
@@ -132,7 +154,13 @@ const StepWizard = () => {
             // Proceed to payment after registration
             await handlePayment(res.data.user._id);
         } catch (error) {
-            toast.error(error?.response?.data?.message || "Please try again later in register");
+            // toast.error(error?.response?.data?.message || "Please try again later in register");
+            Swal.fire({
+                title: 'Error!',
+                text: error?.response?.data?.message || "Please try again later in register",
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
         } finally {
             setLoading(false);
         }
@@ -152,11 +180,23 @@ const StepWizard = () => {
             if (res.data.success) {
                 toast.success(res.data.message);
             } else {
-                toast.error("Invalid coupon code.");
+                // toast.error("Invalid coupon code.");
+                Swal.fire({
+                    title: 'Error!',
+                    text: "Invalid coupon code.",
+                    icon: 'error', // use lowercase
+                    confirmButtonText: 'Okay'
+                });
             }
         } catch (error) {
             console.error("Error checking coupon:", error);
-            toast.error(error?.response?.data?.message || "Please try again later");
+            // toast.error(error?.response?.data?.message || "Please try again later");
+            Swal.fire({
+                title: 'Error!',
+                text: error?.response?.data?.message || "Please try again later",
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
         } finally {
             setLoading(false);
         }

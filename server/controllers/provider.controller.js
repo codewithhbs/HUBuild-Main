@@ -27,7 +27,7 @@ exports.CreateProvider = async (req, res) => {
 
         if (existingEmail) {
             return res.status(403).json({
-                message: 'Eamil is already exists with another account'
+                message: 'Email is already exists with another account'
             })
         }
         if (existingMobile) {
@@ -95,9 +95,7 @@ exports.CreateProvider = async (req, res) => {
         const providerNumber = newProvider.mobileNumber
         const message = `Hello,  
 
-Welcome to HelpUBuild! 🎉 We're excited to have you on board.  
-
-Below are your login details. Please review them and get started!`
+Welcome to HelpUBuild! 🎉 We're excited to have you on board.`
 
         await SendWhatsapp(providerNumber, message)
         // Send token for authentication
