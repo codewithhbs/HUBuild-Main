@@ -62,6 +62,14 @@ morgan.token('origin', (req) => req.headers.origin || 'Unknown Origin');
 
 app.use(morgan(':method :url :status :response-time ms - Origin: :origin'));
 
+app.use((req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    next();
+});
+
+
 // Middleware to capture response status and log it
 app.use((req, res, next) => {
     res.on('finish', () => {
@@ -69,6 +77,7 @@ app.use((req, res, next) => {
     });
     next();
 });
+
 io.on('connection', (socket) => {
     console.log('A new client connected:', socket.id);
 

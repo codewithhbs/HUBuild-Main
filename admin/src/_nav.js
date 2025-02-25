@@ -9,7 +9,7 @@ import {
   cilChatBubble,  // All Chat
   cilWallet,      // Withdraw Request
 } from '@coreui/icons'
-import { CNavItem } from '@coreui/react'
+import { CNavGroup, CNavItem } from '@coreui/react'
 
 const _nav = [
   {
@@ -77,6 +77,30 @@ const _nav = [
     name: 'Withdraw Request',
     to: '/withdraw/all_withdraw',
     icon: <CIcon icon={cilWallet} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Membership',
+    to: '/membership/all_membership',
+    icon: <CIcon icon={cilWallet} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavGroup,
+    name: 'Refferal',
+    to: '#',
+    icon: <CIcon icon={cilText} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Globel Referal Discount',
+        to: '/globel-ref-dis/update-globel-ref-dis',
+      },
+      {
+        component: CNavItem,
+        name: 'Admin Coupon',
+        to: '/admin-coupon/all_admin_coupon',
+      },
+    ],
   },
 ]
 

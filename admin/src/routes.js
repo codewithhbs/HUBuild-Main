@@ -14,6 +14,13 @@ import AllChatRoom from './views/ChatRoom/AllChatRoom'
 import AllProvider from './views/Provider/AllProvider'
 import AllWithdraw from './views/Withdraw/AllWithdraw'
 import ProviderDetails from './views/Provider/ProviderDetails'
+import AllMembership from './views/Membership/AllMembership'
+import AddMembership from './views/Membership/AddMembership'
+import EditMembership from './views/Membership/EditMembership'
+import EditGlobelDisPer from './views/GlobelDisPer/EditGlobelDisPer'
+import AllAdminCoupon from './views/AdminCoupon/AllAdminCoupon'
+import AddAdminCoupon from './views/AdminCoupon/AddAdminCoupon'
+import EditAdminCoupon from './views/AdminCoupon/EditAdminCoupon'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
@@ -180,6 +187,25 @@ const routes = [
   // withdraw routes here 
   { path: '/withdraw', name: 'Withdraw Request', element: Cards, exact: true },
   { path: '/withdraw/all_withdraw', name: 'All Withdraw Request', element: AllWithdraw },
+
+  // membership routes here 
+  { path: '/membership', name: 'Membership', element: Cards, exact: true },
+  { path: '/membership/all_membership', name: 'All Membership', element: AllMembership },
+  { path: '/membership/add_membership', name: 'Add Membership', element: AddMembership },
+  { path: '/membership/edit_membership/:id', name: 'Edit Membership', element: EditMembership },
+  
+  // globel dis route here 
+  
+  { path: '/globel-ref-dis', name: 'Globel Referal Discount', element: Cards, exact: true },
+  { path: '/globel-ref-dis/update-globel-ref-dis', name: 'Edit Globel Referal Discount', element: EditGlobelDisPer },
+  
+  // globel dis route here 
+  
+  { path: '/admin-coupon', name: 'Admin Coupon', element: Cards, exact: true },
+  { path: '/admin-coupon/all_admin_coupon', name: 'All Admin Coupon', element: AllAdminCoupon },
+  { path: '/admin-coupon/add_admin_coupon', name: 'Add Admin Coupon', element: AddAdminCoupon },
+  { path: '/admin-coupon/edit_admin_coupon/:id', name: 'Edit Admin Coupon', element: EditAdminCoupon },
+
 ]
 
 export default routes

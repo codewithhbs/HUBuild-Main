@@ -1,6 +1,7 @@
 const Provider = require('../models/providers.model')
 const User = require('../models/user.Model')
 const ChatAndPayment = require('../models/chatAndPayment.Model')
+const SendWhatsapp = require('../utils/SendWhatsapp')
 require('dotenv').config()
 
 // const razorpayInstance = new Razorpay({
@@ -38,6 +39,13 @@ exports.createChatWithNew = async (req, res) => {
             providerId,
             room: room
         })
+        const user = await User.findById(userId)
+        const number = user.number;
+        const message = `Chat is initialized with ${user?.name}.  
+
+Go ahead and wait for the user's message. ⏳`;
+
+        await SendWhatsapp(number,message)
         await newChat.save();
         return res.status(201).json({
             success: true,

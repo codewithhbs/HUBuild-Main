@@ -10,10 +10,19 @@ const axios = require('axios')
 require('dotenv').config()
 const { validatePaymentVerification, validateWebhookSignature } = require('razorpay/dist/utils/razorpay-utils');
 const { default: mongoose } = require("mongoose");
+const SendWhatsapp = require("../utils/SendWhatsapp");
+const GlobelUserRefDis = require("../models/globelUserRefDis.model");
+// const { SendWhatsapp } = require("../utils/SendWhatsapp");
+// const SendWhatsapp = require("../utils/SendWhatsapp");
 const razorpayInstance = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
     key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
+
+// Generate a unique referral code
+const generateReferralCode = (userId) => {
+    return `REF${userId.toString().slice(-5)}${Math.floor(1000 + Math.random() * 9000)}`;
+};
 
 exports.registeruser = async (req, res) => {
     try {
@@ -42,16 +51,20 @@ exports.registeruser = async (req, res) => {
                 existingUser.Password = Password
                 existingUser.expiresAt = expiresAt
 
-                const emailContent = {
-                    email: email,
-                    subject: "Verify Your Email Address",
-                    message: `Hello ${name},\n\n` +
-                        `Your password has been updated. Please verify your email address using the OTP below:\n\n` +
-                        `OTP: ${otp}\n` +
-                        `This OTP is valid for 2 minutes (expires at: ${new Date(expiresAt).toISOString()}).\n\n` +
-                        `Please verify your email address by clicking the link below:\n\n`,
-                };
-                await sendEmail(emailContent);
+
+                const message = `Hello ${name},  
+
+                Your password has been successfully updated. To complete the process, please verify your email using the OTP below:  
+                
+                🔹 OTP: ${otp}  
+                🕒 This OTP is valid for 2 minutes (expires at: ${new Date(expiresAt).toISOString()}).  
+                
+                To verify your email, please click the link below:  
+                `;
+
+
+                await SendWhatsapp(PhoneNumber, message)
+                // await sendEmail(emailContent);
                 await existingUser.save()
                 return res.status(200).json({ success: true, message: "A new verification email has been sent. Please check your inbox." });
             }
@@ -70,18 +83,28 @@ exports.registeruser = async (req, res) => {
             cPassword,
         });
 
-        const emailContent = {
-            email: email,
-            subject: "Welcome to Our Service - Verify Your Email",
-            message: `Hello ${name},\n\n` +
-                `Thank you for registering with us! To complete your registration, please verify your email address using the OTP below:\n\n` +
-                `OTP: ${otp}\n` +
-                `This OTP is valid for 2 minutes (expires at: ${new Date(expiresAt).toISOString()}).\n\n` +
-                `After verifying your email, you'll be all set to enjoy our services!\n\n` +
-                `Best regards,\nYour Service Team\n\n`,
-        };
-        await sendEmail(emailContent);
+        const couponDiscount = await GlobelUserRefDis.find();
+        if (!couponDiscount ) {
+            newUser.referralDiscount = 10
+        }
+        const firstDis = couponDiscount[0];
+        newUser.referralCode = generateReferralCode(newUser._id);
+        
+        newUser.referralDiscount = firstDis._id
         await newUser.save();
+
+        const message = `Hello ${name},  
+Thank you for registering with us! To complete your registration, please verify your Phone Number using the OTP below:  
+
+🔹 OTP: ${otp}  
+🕒 This OTP is valid for 2 minutes (expires at: ${new Date(expiresAt).toISOString()})  
+
+Once verified, you'll have full access to our services.  
+
+Best regards,  
+Your Service Team`;
+
+        await SendWhatsapp(PhoneNumber, message);
 
         res.status(201).json({ success: true, data: newUser.expiresAt, message: "User registered successfully! Please check your email for verification." });
     } catch (error) {
@@ -117,14 +140,14 @@ exports.verifyEmail = async (req, res) => {
 
         // console.log("Fetch Account:", account)
         let accountOtp, otpExpiresAt, verificationMessage, newPassword;
-        
+
         if (type === 'email' && accountType === "User") {
             accountOtp = account.otp;
             otpExpiresAt = account.expiresAt;
             verificationMessage = "Email verified successfully.";
         } else if (type === 'password') {
             accountOtp = account.resetPasswordOtp;
-            console.log("otp",accountOtp)
+            console.log("otp", accountOtp)
             otpExpiresAt = account.resetPasswordExpiresAt;
             verificationMessage = "OTP verified for password reset.";
             newPassword = account.newPassword;
@@ -132,7 +155,7 @@ exports.verifyEmail = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid verification type or unauthorized email verification for providers." });
         }
 
-        console.log("Stored OTP:", accountOtp, "User entered OTP:", otp);
+        // console.log("Stored OTP:", accountOtp, "User entered OTP:", otp);
 
         if (!accountOtp) {
             return res.status(400).json({ success: false, message: "OTP not found or expired, request a new one." });
@@ -178,17 +201,17 @@ exports.Changepassword = async (req, res) => {
         if (!password) return res.status(400).json({ success: false, message: "Please enter a new password" });
 
         // Find user by email
-        const account = await Provider.findOne({ email:email });
+        const account = await Provider.findOne({ email: email });
         console.log(account)
         if (!account) return res.status(404).json({ success: false, message: "User not found" });
 
         const accountOtp = account.resetPasswordOtp;
-        console.log("accountOtp",accountOtp)
+        console.log("accountOtp", accountOtp)
         if (!accountOtp) {
             return res.status(400).json({ success: false, message: "OTP not found or expired, request a new one." });
         }
         const otpExpiresAt = new Date(account.resetPasswordExpiresAt);
-        
+
         console.log("Stored OTP:", accountOtp, "User entered OTP:", otp);
 
         // Validate OTP
@@ -196,9 +219,9 @@ exports.Changepassword = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid OTP." });
         }
 
-     
 
-   
+
+
         account.password = password;
 
         // Clear OTP fields
@@ -239,7 +262,7 @@ exports.resendOtp = async (req, res) => {
         }
 
         const { otp, expiresAt } = generateOtp(6, 120000);
-        let emailContent;
+        let message;
 
         if (type === 'email') {
             if (account.isVerified) {
@@ -248,34 +271,34 @@ exports.resendOtp = async (req, res) => {
             account.otp = otp;
             account.expiresAt = expiresAt;
 
-            emailContent = {
-                email: email,
-                subject: "Verify Your Email Address",
-                message: `Hello ${account.name},\n\n` +
-                    `Please verify your email address using the OTP below:\n\n` +
-                    `OTP: ${otp}\n` +
-                    `This OTP is valid for 2 minutes (expires at: ${new Date(expiresAt).toISOString()}).\n\n` +
-                    `Thank you for joining us!`,
-            };
+            const message = `Hello ${account.name},  
+
+Please verify your email address using the OTP below:  
+
+🔹 OTP: ${otp}  
+🕒 This OTP is valid for 2 minutes (expires at: ${new Date(expiresAt).toISOString()}).  
+
+Thank you for joining us! We're excited to have you on board.`;
+
         } else if (type === 'password') {
             account.resetPasswordOtp = otp;
             account.resetPasswordExpiresAt = expiresAt;
 
-            emailContent = {
-                email: email,
-                subject: "Password Reset Verification OTP",
-                message: `Hello ${account.name},\n\n` +
-                    `You requested to reset your password. Use the OTP below to verify your request:\n\n` +
-                    `OTP: ${otp}\n` +
-                    `This OTP is valid for 2 minutes (expires at: ${new Date(expiresAt).toISOString()}).\n\n` +
-                    `If you did not request a password reset, please ignore this email.`,
-            };
+            const message = `Hello ${account.name},  
+
+You requested to reset your password. Please use the OTP below to verify your request:  
+
+🔹 OTP: ${otp}  
+🕒 This OTP is valid for 2 minutes (expires at: ${new Date(expiresAt).toISOString()}).  
+
+If you did not request a password reset, please ignore this message. Your account remains secure.`;
+
         } else {
             return res.status(400).json({ success: false, message: "Invalid resend type." });
         }
-
+        const number = account.PhoneNumber;
         // Send the email and save the updated OTP and expiration
-        await sendEmail(emailContent);
+        await SendWhatsappMessage(number, message);
         await account.save();
 
         return res.status(200).json({ success: true, message: `A new OTP has been sent to your email.` });
@@ -373,7 +396,7 @@ exports.login = async (req, res) => {
             return res.status(400).json({ success: false, message: "The password you entered is incorrect. Please try again." });
         }
 
-       
+
         if (user.isBanned) {
             return res.status(403).json({
                 success: false,
@@ -461,23 +484,25 @@ exports.forgotPassword = async (req, res) => {
         user.resetPasswordOtp = otp;
         user.resetPasswordExpiresAt = expiresAt;
         user.newPassword = newPassword
-        const emailContent = {
-            email: email,
-            subject: "Password Reset Request",
-            message: `Hello,\n\n` +
-                `We received a request to reset the password for your ${isProvider ? "provider" : "user"} account. Please use the OTP below to proceed with your password reset:\n\n` +
-                `OTP: ${otp}\n` +
-                `This OTP is valid for 2 minutes (expires at: ${new Date(expiresAt).toISOString()}).\n\n`,
-        };
+        const message = `Hello,  
 
-        await sendEmail(emailContent);
+        We received a request to reset the password for your ${isProvider ? "provider" : "user"} account.  
+        
+        Please use the OTP below to proceed with your password reset:  
+        
+        🔹 OTP: ${otp}  
+        🕒 This OTP is valid for 2 minutes (expires at: ${new Date(expiresAt).toISOString()}).`;
+
+        const number = user.PhoneNumber;
+
+        await SendWhatsapp(number, message);
         await user.save();
 
         console.log("save user", user)
 
         return res.status(200).json({
             success: true,
-            message: "A password reset email has been sent. Please check your inbox for further instructions."
+            message: "A password reset Whatsapp has been sent. Please check your inbox for further instructions."
         });
     } catch (error) {
         console.error("Forgot password error:", error);
@@ -952,7 +977,16 @@ exports.chatStart = async (userId, astrologerId) => {
         provider.lastChatTransitionId = newChatTransitionId;
 
         // console.log("newChatTransition", newChatTransition)
+        const number = provider?.mobileNumber;
+        // const message = `New chat transition created with id ${newChatTransitionId} for user ${user?.name} and provider ${provider?.name}.`;
+        const message = `Hello,  
 
+You have received a new message! The ${user?.name} is waiting for your reply.  
+
+⏳ Please respond quickly to continue the conversation.  
+
+Keep the chat going! 🚀`;
+        await SendWhatsapp(number, message)
         await user.save();
         await provider.save();
 

@@ -48,7 +48,7 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         default: "user",
-        enum: ['user','admin']
+        enum: ['user', 'admin']
     },
     resetPasswordOtp: {
         type: String,
@@ -60,7 +60,7 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    newPassword:{
+    newPassword: {
         type: String
     },
     about: {
@@ -106,7 +106,7 @@ const userSchema = new mongoose.Schema({
         },
         deductionAmount: { type: Number },
         Date: { type: Date, default: Date.now },
-    },],
+    }],
     lastChatTransitionId: {
         type: String
     }

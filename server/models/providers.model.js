@@ -221,7 +221,41 @@ const ProviderProfileSchema = new mongoose.Schema({
     is_on_chat: {
         type: Boolean,
         default: false
-    }
+    },
+    couponCode: {
+        type: String
+    },
+    discount: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "GlobelUserRefDis",
+    },
+    referralIsActive: {
+        type: Boolean,
+        default: true
+    },
+    isMember: {
+        type: Boolean,
+        default: false
+    },
+    memberShip: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "MemberShip",
+    },
+
+
+    razorpayOrderId: {
+        type: String
+    },
+    transactionId: {
+        type: String
+    },
+    PaymentStatus: {
+        type: String,
+        default: 'pending'
+    },
+    paymentMethod: {
+        type: String
+    },
 });
 
 // Password hashing

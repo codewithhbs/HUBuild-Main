@@ -1,5 +1,5 @@
 import "./App.css";
-import React,{ useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -48,24 +48,24 @@ function ScrollToTop() {
       top: 0,
       behavior: 'smooth',
     });
-  }, [location.pathname]); 
+  }, [location.pathname]);
   return null;
 }
 
 function App() {
-  const [fcmToken,setFcmToken] = useState(null)
+  // const [fcmToken,setFcmToken] = useState(null)
   useEffect(() => {
     AOS.init({
       duration: 1000, // Animation duration in milliseconds
       once: true, // Whether animation should happen only once
     });
   }, []);
-  React.useEffect(()=>{
+  React.useEffect(() => {
     generateToken();
-    onMessage(messaging,(payload) => {
+    onMessage(messaging, (payload) => {
       console.log(payload);
     })
-  },[])
+  }, [])
   return (
     <BrowserRouter>
       <ScrollToTop />

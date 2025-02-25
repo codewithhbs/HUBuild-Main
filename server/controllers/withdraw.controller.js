@@ -1,5 +1,6 @@
 const Withdraw = require('../models/withdraw.model')
-const Provider = require('../models/providers.model')
+const Provider = require('../models/providers.model');
+const SendWhatsapp = require('../utils/SendWhatsapp');
 
 exports.createWithdrawal = async (req, res) => {
     try {
@@ -39,6 +40,14 @@ exports.createWithdrawal = async (req, res) => {
             });
         }
 
+        if(!findProvider?.bankDetail){
+            return res.status(400).json({
+                success: false,
+                message: 'Bank details not found',
+                error: 'Bank details not found',
+            });
+        }
+
         findProvider.walletAmount -= amount;
 
         // Create a new withdrawal request
@@ -50,6 +59,15 @@ exports.createWithdrawal = async (req, res) => {
             providerWalletAmount,
             commissionPercent
         });
+
+        const providerName = findProvider?.name;
+        const AdminNumber = process.env.ADMIN_NUMBER
+        const message = `New withdrawal request from ${providerName}.  
+
+Please review the request on the admin panel and approve the withdrawal. ✅`;
+
+
+        await SendWhatsapp(AdminNumber, message)
 
         await findProvider.save();
         // Save the request to the database
@@ -124,7 +142,15 @@ exports.updateWithdrawStatus = async (req, res) => {
 
         // If the withdraw status is approved, deduct the amount from the provider's wallet
         if (status === 'Approved') {
+            const providerNumber = findProvider?.mobileNumber;
+            const message = `Withdrawal request failed! ❌  
+
+You do not have sufficient balance to make a withdrawal. Please check your account balance and try again.`;
+
             if (findProvider.walletAmount < findWithdraw.amount) {
+                await SendWhatsapp(providerNumber, message)
+                findWithdraw.status = 'Rejected';
+                await findWithdraw.save();
                 return res.status(400).json({
                     success: false,
                     message: 'Insufficient wallet balance',
@@ -135,6 +161,11 @@ exports.updateWithdrawStatus = async (req, res) => {
             // findProvider.walletAmount -= findWithdraw.amount; // Deduct the amount
             // await findProvider.save(); // Save updated provider
 
+            message = `Your withdrawal request has been approved! ✅  
+
+The amount has been credited to your bank account. Please check your account for confirmation.`;
+
+            await SendWhatsapp(providerNumber, message)
             // Update the status of the withdraw request
             findWithdraw.status = status;
             await findWithdraw.save();
@@ -150,6 +181,12 @@ exports.updateWithdrawStatus = async (req, res) => {
 
             findWithdraw.status = status;
 
+            const providerNumber = findProvider?.mobileNumber;
+            const message = `Your withdrawal request has been rejected. ❌  
+
+The admin will contact you regarding this matter. Please stay tuned for further updates.`;
+
+            await SendWhatsapp(providerNumber, message)
             await findProvider.save();
             await findWithdraw.save();
             return res.status(200).json({

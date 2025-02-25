@@ -17,6 +17,9 @@ const { createWithdrawal, updateWithdrawStatus, deleteWithdrawRequest, getWithdr
 const { createCommission, updateCommission, getSingleCommission, getAllCommissions, deleteCommission } = require('../controllers/commission.controller');
 const { createProviderService, getAllProviderService, getProviderServiceById, updateProviderService, deleteProviderService, findbyProvider } = require('../controllers/providerService.controller');
 const { createCall, call_status } = require('../controllers/call.controller');
+const { createMemberShip, getAllMemberShip, getSingleMemberShip, updateMemberShip, deleteMemberShip, checkCouponCode, buyMemberShip, membershipPaymentVerify } = require('../controllers/memberShip.controller');
+const { createGlobelUserRefDis, getAllGlobelUserRefDis, updateGlobelUserRef, deleteGlobelUserRef, getSingleGlobelUserRef } = require('../controllers/globelUserRefDis.controller');
+const { createAdminCoupon, getAllAdminCoupon, getSingleAdminCoupon, updateAdminCoupon, deleteAdminCoupon } = require('../controllers/adminCoupon.controller');
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 const router = express.Router();
@@ -214,6 +217,29 @@ router.post('/call_status-call', call_status)
 
 router.post('/provider_status/:provider_id', getProviderStatus)
 
+router.post('/create_membership', createMemberShip)
+router.get('/get_all_membership', getAllMemberShip)
+router.get('/get_single_membership/:id', getSingleMemberShip)
+router.put('/update_membership/:id', updateMemberShip)
+router.delete('/delete_membership/:id', deleteMemberShip)
 
+// globel user discount router here
+router.post('/create_globel_discount', createGlobelUserRefDis)
+router.get('/all_globel_discounts',getAllGlobelUserRefDis)
+router.get('/globel_discount/:id',getSingleGlobelUserRef)
+router.put('/update_globel_discount/:id',updateGlobelUserRef)
+router.delete('/delete_globel_discount/:id',deleteGlobelUserRef)
+
+// admin coupon routes here 
+router.post('/create_admin_coupon',createAdminCoupon)
+router.get('/all_admin_coupon',getAllAdminCoupon)
+router.get('/admin_coupon/:id',getSingleAdminCoupon)
+router.put('/update_admin_coupon/:id',updateAdminCoupon)
+router.delete('/delete_admin_coupon/:id',deleteAdminCoupon)
+
+// coupon check and member ship router here
+router.post('/check_coupon_code',checkCouponCode)
+router.post('/buy_membership/:providerId',buyMemberShip)
+router.post('/membership_payment_verify',membershipPaymentVerify)
 
 module.exports = router;

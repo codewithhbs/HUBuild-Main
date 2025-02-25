@@ -1,9 +1,9 @@
 const PortfolioModel = require("../models/Portfolio.model");
 const providersModel = require("../models/providers.model");
-const { UploaViaFeildNameImages, deleteImageFromCloudinary } = require("../utils/Cloudnary");
-const sendEmail = require("../utils/SendEmail");
+const { deleteImageFromCloudinary } = require("../utils/Cloudnary");
 const sendToken = require("../utils/SendToken");
-const bcrypt = require('bcrypt');
+const SendWhatsapp = require("../utils/SendWhatsapp");
+const GlobelUserRefDis = require("../models/globelUserRefDis.model");
 const Cloudinary = require('cloudinary').v2;
 require('dotenv').config();
 
@@ -13,9 +13,13 @@ Cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
 });
 
+const generateReferralCode = (providerId) => {
+    return `REF${providerId.toString().slice(-5)}${Math.floor(1000 + Math.random() * 9000)}`;
+};
+
 exports.CreateProvider = async (req, res) => {
     try {
-      
+
         const { type, name, email, password, DOB, age, language, mobileNumber, gstDetails, coaNumber, expertiseSpecialization, location } = req.body;
         const existingMobile = await providersModel.findOne({ mobileNumber });
         const existingEmail = await providersModel.findOne({ email });
@@ -69,17 +73,33 @@ exports.CreateProvider = async (req, res) => {
             // qualificationProof: uploadedFiles.qualificationProof
         });
 
+        const couponDiscount = await GlobelUserRefDis.find();
+        if (!couponDiscount) {
+            newProvider.discount = 10
+        }
+        const firstDis = couponDiscount[0];
+        newProvider.couponCode = generateReferralCode(newProvider._id);
+
+        newProvider.discount = firstDis._id
+
         // Save the provider
         await newProvider.save();
 
         // Send welcome email
-        const emailOptions = {
-            email: email,
-            subject: "Welcome to HelpUBuild",
-            message: "Hello, Welcome to HelpUBuild! We are excited to have you on board. Please find your login details below.",
-        }
-        await sendEmail(emailOptions);
+        // const emailOptions = {
+        //     email: email,
+        //     subject: "Welcome to HelpUBuild",
+        //     message: "Hello, Welcome to HelpUBuild! We are excited to have you on board. Please find your login details below.",
+        // }
+        // await sendEmail(emailOptions);
+        const providerNumber = newProvider.mobileNumber
+        const message = `Hello,  
 
+Welcome to HelpUBuild! 🎉 We're excited to have you on board.  
+
+Below are your login details. Please review them and get started!`
+
+        await SendWhatsapp(providerNumber, message)
         // Send token for authentication
         sendToken(newProvider, res, 201, "Account Created successfully");
 
@@ -674,16 +694,9 @@ exports.accountVerification = async (req, res) => {
         if (accountVerified === 'Rejected') {
             findProvider.accountVerified = accountVerified;
             findProvider.verificationRejectReason = verificationRejectReason;
-            const email = findProvider?.email;
 
-            // Send welcome email
-            const emailOptions = {
-                email: email,
-                subject: "Account Rejected",
-                message: `${verificationRejectReason}`,
-            }
-
-            await sendEmail(emailOptions);
+            const providerNumber = findProvider?.mobileNumber;
+            SendWhatsapp(providerNumber, verificationRejectReason)
 
             await findProvider.save();
             return res.status(200).json({
@@ -694,6 +707,9 @@ exports.accountVerification = async (req, res) => {
 
         findProvider.accountVerified = accountVerified;
         findProvider.verificationRejectReason = '';
+        const message = `Your account has been verified successfully.`;
+        const providerNumber = findProvider?.mobileNumber;
+        SendWhatsapp(providerNumber, message)
         await findProvider.save();
         return res.status(200).json({
             success: true,

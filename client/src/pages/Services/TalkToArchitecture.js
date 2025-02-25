@@ -439,96 +439,61 @@ function TalkToArchitect() {
         </div>
         <div className='section architecture-section-2 mb-5'>
           <div className="container-fluid architecture-section-p">
-            <div className='row'>
+            <div className='profile-card-box'>
               {currentProviders && currentProviders.map((item, index) => (
-                <div className='col-12 col-md-6 col-lg-6 col-xl-4' key={index}>
-                  <div className="card-custom align-items-center justify-content-between my-2">
-                    <Link to={`/architect-profile/${item._id}`} className="card-detail align-items-center">
-                      <div className='forProfileWidth' style={{ display: 'flex' }}>
-                        <Link to={`/architect-profile/${item._id}`} className='profile-image text-center'>
-                          <img
-                            src={item?.photo?.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || 'User')}&background=random`}
-                            onError={(e) => e.target.src = 'https://via.placeholder.com/60'}
-                            alt="Profile"
-                            className="profile-img me-4"
-                          />
-                          <StarRating rating={item.averageRating || 0} />
-                          {/* <p className="text-small text-muted mb-1 me-4">{item.Orders}</p> */}
-                        </Link>
-                        <div className='profile-content'>
-                          <h5 className="mb-1">
-                            {item.name ? (
-                              <Link to={`/architect-profile/${item._id}`}>{item.name}</Link>
-                            ) : (
-                              "Not Available"
-                            )}
-                          </h5>
-
-                          <p className="text-small text-muted mb-1">
-                            {item.type ? item.type : "Not Available"}
-                          </p>
-
-                          <p className="text-small text-muted mb-1">
-                            {item.yearOfExperience ? (
-                              <span className='archi-language-tag'>{`${item.yearOfExperience} year`}</span>
-                            ) : (
-                              "Not Available"
-                            )}
-                          </p>
-
-                          <p className="text-small text-muted mb-1">
-                            {item.language && item.language.length > 0 ? (
-                              item.language.map((lang, index) => (
-                                <span key={index} className="archi-language-tag">
-                                  {lang}
-                                  {index < item.language.length - 1 ? ", " : ""}
-                                </span>
-                              ))
-                            ) : (
-                              "Not Available"
-                            )}
-                          </p>
-
-                          <p className="text-small text-muted mb-1">
-                            {item.expertiseSpecialization && item.expertiseSpecialization.length > 0 ? (
-                              item.expertiseSpecialization.map((specialization, index) => (
-                                <span key={index} className="archi-language-tag">
-                                  {specialization}
-                                  {index < item.expertiseSpecialization.length - 1 ? ", " : ""}
-                                </span>
-                              ))
-                            ) : (
-                              "Not Available"
-                            )}
-                          </p>
-
-                          <p className="text-small text-muted mb-1">
-                            {item.pricePerMin ? (
-                              <span className='archi-language-tag'>{`₹ ${item.pricePerMin}/min`}</span>
-                            ) : (
-                              "Not Available"
-                            )}
-                          </p>
-                          {/* <h1>{handleFilterProviderService(item._id)}</h1> */}
-                          <p style={{whiteSpace:'nowrap'}} className="text-small text-muted mb-1">
-                            {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds ${handleFilterProviderService(item._id) || 'Sq. Yrds'} * 900`}
-                          </p>
-
-                          {/* <p className="text-small text-muted mb-1">{`100/sq.yd. ${handleFilterProviderService(item._id) || ''} * 900`}</p> */}
-                        </div>
-                      </div>
-                      <div className="text-end contact-btn">
-                        <div className='col-xl-12 col-lg-12 col-md-12 col-12 col-sm-12'>
-                          <div className='connect-area'>
-                            <button style={{ fontSize: '15px', padding: '3px', width: '52%' }} disabled={!item.callStatus} className={`btn samebtn ${item.callStatus === true ? 'profile-chat-btn' : 'profile-call-btn'}`}><i class="fa-solid fa-phone-volume"></i> Call</button>
-                            <button onClick={() => handleActiveTime("Chat", item)} style={{ fontSize: '15px', padding: '3px', width: '52%' }} disabled={!item.chatStatus} className={`btn samebtn mt-2 ${item.chatStatus === true ? 'profile-chat-btn' : 'profile-call-btn'}`}><i class="fa-regular fa-comments"></i> Chat</button>
-                            <button style={{ fontSize: '15px', padding: '3px', width: '52%', visibility: "hidden" }} disabled={!item.meetStatus} className={`btn samebtn mt-2 ${item.meetStatus === true ? 'profile-chat-btn' : 'profile-call-btn'}`}><i class="fa-solid fa-video"></i> Video</button>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
+                <Link to={`/architect-profile/${item._id}`} class="profile-card" key={index}>
+                  {/* <!-- Left Section (Profile) --> */}
+                  <div class="left-section">
+                    <img src={item?.photo?.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || 'User')}&background=random`} alt="Profile" onError={(e) => e.target.src = 'https://via.placeholder.com/60'} class="profile-img" />
+                    {/* <div class="stars">★★★★★</div> */}
+                    <StarRating rating={item.averageRating || 0} />
+                    <h5 className="formarginzero">
+                      {item.name ? (
+                        <Link to={`/architect-profile/${item._id}`}>{item.name}</Link>
+                      ) : (
+                        "Not Available"
+                      )}
+                    </h5>
+                    <p className="formarginzero">{item.type ? item.type : "Profile Update"}</p>
+                    <p className="formarginzero">Languages:  {item.language && item.language.length > 0 ? (
+                      item.language.map((lang, index) => (
+                        <span key={index} className="archi-language-tag">
+                          {lang}
+                          {index < item.language.length - 1 ? ", " : ""}
+                        </span>
+                      ))
+                    ) : (
+                      "Not Available"
+                    )}</p>
+                    <p className="formarginzero">{item.expertiseSpecialization && item.expertiseSpecialization.length > 0 ? (
+                      item.expertiseSpecialization.map((specialization, index) => (
+                        <span key={index} className="archi-language-tag">
+                          {specialization}
+                          {index < item.expertiseSpecialization.length - 1 ? ", " : ""}
+                        </span>
+                      ))
+                    ) : (
+                      "Not Updated"
+                    )}</p>
+                    <p class="pricing formarginzero">
+                      {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds ${handleFilterProviderService(item._id) || 'Sq. Yrds'} * 900`}
+                    </p>
                   </div>
-                </div>
+
+                  {/* <!-- Right Section (Buttons & Experience) --> */}
+                  <div class="right-section">
+                    <div style={{padding:'0px'}} class="buttons chat-call-btn">
+                      <button class="chat">Chat 💬</button>
+                      <button class="call">Call 📞</button>
+                    </div>
+                    <p class="price">{`₹ ${item.pricePerMin}/min`}</p>
+                    <p class="experience">{item.yearOfExperience ? (
+                      <span className='archi-language-tag'>{`${item.yearOfExperience}`}</span>
+                    ) : (
+                      "Not Available"
+                    )} Years Experience</p>
+                  </div>
+                </Link>
               ))}
             </div>
             {/* Pagination */}
