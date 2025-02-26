@@ -154,9 +154,9 @@ const VerifyEmail = () => {
     return (
         <div className="container d-flex justify-content-center align-items-center pt-5 pb-5">
             <div className="card p-5 text-center shadow-lg rounded-4" style={{ maxWidth: '420px', width: '100%' }}>
-                <h4 className="mb-3 text-dark fw-bold">Email Verification</h4>
+                <h4 className="mb-3 text-dark fw-bold">Phone Number Verification</h4>
                 <p className="text-muted">
-                    Enter the one-time password (OTP) sent to <strong>{email}</strong> to verify your account.
+                    Enter the one-time password (OTP) sent to <strong>{email}</strong> to verify your number.
                 </p>
 
                 <div id="otp" style={{ display: 'flex' }} className=" justify-content-center mb-4">

@@ -53,21 +53,21 @@ exports.registeruser = async (req, res) => {
                 existingUser.expiresAt = expiresAt
 
 
-                const message = `Hello ${name},  
+                const message = `Hello ${name},
 
-                Your password has been successfully updated. To complete the process, please verify your email using the OTP below:  
-                
-                🔹 OTP: ${otp}  
-                🕒 This OTP is valid for 2 minutes (expires at: ${new Date(expiresAt).toISOString()}).  
-                
-                To verify your email, please click the link below:  
+It looks like you already have an account with us! To access your account and enjoy our services, please verify your account using the OTP below:
+
+🔹 OTP: ${otp}
+🕒 This OTP is valid for 2 minutes (expires at: ${new Date(expiresAt).toISOString()}).
+
+Verify your account now and start exploring all the benefits we offer! 🚀  
                 `;
 
 
                 await SendWhatsapp(PhoneNumber, message)
                 // await sendEmail(emailContent);
                 await existingUser.save()
-                return res.status(200).json({ success: true, message: "A new verification email has been sent. Please check your inbox." });
+                return res.status(200).json({ success: true, message: "A new verification message has been sent on whatsapp. Please check your Whatsapp.", data: existingUser });
             }
         }
 
@@ -128,10 +128,10 @@ exports.verifyEmail = async (req, res) => {
         if (!otp) return res.status(400).json({ success: false, message: "Please enter the OTP" });
 
         let accountType = "User";
-        let account = await User.findOne({ email });
+        let account = await User.findOne({ PhoneNumber:email });
 
         if (!account) {
-            account = await Provider.findOne({ email });
+            account = await Provider.findOne({ mobileNumber:email });
             accountType = "Provider";
         }
 
@@ -248,18 +248,20 @@ exports.Changepassword = async (req, res) => {
 
 exports.resendOtp = async (req, res) => {
     try {
-        const { type } = req.params;
+        const { type } = req.params; // Ensure 'type' is being passed correctly (it might be req.query.type)
         const { email } = req.body;
+
+        console.log("Email:", email);
 
         if (!email) {
             return res.status(400).json({ success: false, message: "Please provide an email." });
         }
 
-        let account = await User.findOne({ email });
+        let account = await User.findOne({ PhoneNumber:email });
         let accountType = "User";
 
         if (!account) {
-            account = await Provider.findOne({ email });
+            account = await Provider.findOne({ mobileNumber:email });
             accountType = "Provider";
         }
 
@@ -277,43 +279,45 @@ exports.resendOtp = async (req, res) => {
             account.otp = otp;
             account.expiresAt = expiresAt;
 
-            const message = `Hello ${account.name},  
+            message = `Hello ${account.name},  
 
-Please verify your email address using the OTP below:  
+            You already have an account with us! Please verify your email using the OTP below:  
 
-🔹 OTP: ${otp}  
-🕒 This OTP is valid for 2 minutes (expires at: ${new Date(expiresAt).toISOString()}).  
+            🔹 OTP: ${otp}  
+            🕒 This OTP is valid for 2 minutes (expires at: ${new Date(expiresAt).toISOString()}).  
 
-Thank you for joining us! We're excited to have you on board.`;
+            Verify your account now and enjoy our services! 🚀`;
 
         } else if (type === 'password') {
             account.resetPasswordOtp = otp;
             account.resetPasswordExpiresAt = expiresAt;
 
-            const message = `Hello ${account.name},  
+            message = `Hello ${account.name},  
 
-You requested to reset your password. Please use the OTP below to verify your request:  
+            You requested to reset your password. Please use the OTP below to verify your request:  
 
-🔹 OTP: ${otp}  
-🕒 This OTP is valid for 2 minutes (expires at: ${new Date(expiresAt).toISOString()}).  
+            🔹 OTP: ${otp}  
+            🕒 This OTP is valid for 2 minutes (expires at: ${new Date(expiresAt).toISOString()}).  
 
-If you did not request a password reset, please ignore this message. Your account remains secure.`;
-
+            If you did not request a password reset, please ignore this message. Your account remains secure.`;
         } else {
             return res.status(400).json({ success: false, message: "Invalid resend type." });
         }
-        const number = account.PhoneNumber;
-        // Send the email and save the updated OTP and expiration
-        await SendWhatsappMessage(number, message);
+
+        // Save the updated OTP details
         await account.save();
 
-        return res.status(200).json({ success: true, message: `A new OTP has been sent to your email.` });
+        const number = account.PhoneNumber;
+        await SendWhatsapp(number, message);
+
+        return res.status(200).json({ success: true, message: `A new OTP has been sent to your registered contact.` });
 
     } catch (error) {
         console.error("Error during OTP resend:", error);
         return res.status(500).json({ success: false, message: "An error occurred while resending OTP. Please try again later." });
     }
 };
+
 
 
 exports.updateProfile = async (req, res) => {
