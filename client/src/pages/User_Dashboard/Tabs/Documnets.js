@@ -3,6 +3,7 @@ import axios from 'axios';
 import { GetData } from '../../../utils/sessionStoreage';
 import toast from 'react-hot-toast';
 import './documents.css';
+import Swal from 'sweetalert2';
 
 export const Documents = () => {
   const Data = GetData('user');
@@ -71,14 +72,26 @@ export const Documents = () => {
           },
         }
       );
-      toast.success(res.data.message || 'Documents updated successfully!');
+      // toast.success(res.data.message || 'Documents updated successfully!');
+      Swal.fire({
+        title: 'Success!',
+        text: res.data.message || 'Documents updated successfully!',
+        icon: 'success', // use lowercase
+        confirmButtonText: 'Okay'
+      });
     } catch (error) {
       console.error('Error updating documents:', error);
-      toast.error(
-        error?.response?.data?.errors?.[0] ||
-        error?.response?.data?.message ||
-        'Failed to update documents. Please try again later.'
-      );
+      // toast.error(
+      //   error?.response?.data?.errors?.[0] ||
+      //   error?.response?.data?.message ||
+      //   'Failed to update documents. Please try again later.'
+      // );
+      Swal.fire({
+        title: 'Error!',
+        text: error?.response?.data?.errors?.[0] || error?.response?.data?.message || 'Failed to update documents. Please try again later.',
+        icon: 'error', // use lowercase
+        confirmButtonText: 'Okay'
+      });
     } finally {
       setLoading(false);
     }

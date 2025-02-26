@@ -4,6 +4,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { setData } from '../../utils/sessionStoreage';
 import { Link, redirect } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 
 function Login() {
@@ -74,7 +75,13 @@ function Login() {
         } catch (error) {
             console.log(error)
             console.log('An err or occurred. Please try again.')
-            toast.error(error?.response?.data?.message)
+            // toast.error(error?.response?.data?.message)
+            Swal.fire({
+                title: 'Error!',
+                text: error?.response?.data?.message || 'An err or occurred. Please try again.',
+                icon: 'success', // use lowercase
+                confirmButtonText: 'Cool'
+            });
         }
     };
 

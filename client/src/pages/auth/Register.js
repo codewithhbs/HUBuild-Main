@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import Swal from 'sweetalert2'
 function Register() {
     const [formData, setFormData] = useState({
         // Gender: '',
@@ -31,12 +32,18 @@ function Register() {
         setloading(true)
         if (formData.Password !== formData.cPassword) {
             setloading(false)
-            return toast.error("Password does not match")
+            // return toast.error("Password does not match")
+            return Swal.fire({
+                title: 'Error!',
+                text: "Password does not match",
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
         }
 
         try {
             const res = await axios.post('https://api.helpubuild.co.in/api/v1/register', formData)
-           
+
             toast.success(res.data.message)
 
             window.location.href = `/otp-verification/user?email=${formData.email}&expires=${res.data?.data}&redirect=${redirectPath}`
@@ -44,7 +51,13 @@ function Register() {
         } catch (error) {
             console.log(error?.response?.data);
             setloading(false)
-            toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Invalid Error")
+            // toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Invalid Error")
+            Swal.fire({
+                title: 'Error!',
+                text: error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Invalid Error",
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
         }
     }
 

@@ -78,7 +78,7 @@ code {
 .profile-card-box {
   display: flex;
   align-items: center;
-  background-color: #f4f4f4;
+  /* background-color: #f4f4f4; */
   width: 100%;
   column-gap: 15px;
   padding: 2% 4%;
@@ -167,7 +167,7 @@ code {
 }
 
 .call {
-  background: #000;
+  /* background: #000; */
   color: #fff;
 }
 

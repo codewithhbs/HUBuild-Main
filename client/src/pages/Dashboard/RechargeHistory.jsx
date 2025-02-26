@@ -19,7 +19,7 @@ function RechargeHistory() {
             setRechargeHistory(history.reverse() || []);
         } catch (error) {
             console.log('Internal server error in fetching User');
-            toast.error('Unable to fetch recharge history. Please try again later.');
+            // toast.error('Unable to fetch recharge history. Please try again later.');
         }
     };
 

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast'
 import { setData } from '../../utils/sessionStoreage';
+import Swal from 'sweetalert2';
 
 const VerifyEmail = () => {
     const location = new URLSearchParams(window.location.search)
@@ -70,7 +71,13 @@ const VerifyEmail = () => {
 
         const isValidOtp = otp.every((digit) => digit !== '' && !isNaN(digit));
         if (!isValidOtp) {
-            toast.error('Please enter all 6 digits of the OTP');
+            // toast.error('Please enter all 6 digits of the OTP');
+            Swal.fire({
+                title: 'Error!',
+                text: 'Please enter all 6 digits of the OTP',
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
             return;
         }
 
@@ -83,17 +90,24 @@ const VerifyEmail = () => {
                 email,
                 otp: otpString,
             });
-            toast.success(response.data.message);
+            // toast.success(response.data.message);
+
             const { token, user } = response.data
             setData('token', token)
             setData('islogin', token ? true : false)
             setData('user', user)
             window.location.href = '/'
         } catch (error) {
-            toast.error(
-                error?.response?.data?.message ||
-                'Failed to verify OTP. Please try again.'
-            );
+            // toast.error(
+            //     error?.response?.data?.message ||
+            //     'Failed to verify OTP. Please try again.'
+            // );
+            Swal.fire({
+                title: 'Error!',
+                text: error?.response?.data?.message || 'Failed to verify OTP. Please try again.',
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
         } finally {
             setLoading(false);
         }
@@ -110,15 +124,27 @@ const VerifyEmail = () => {
                     email,
                 });
                 // alert(response.data.message);
-                toast.success(response.data.message);
+                // toast.success(response.data.message);
+                Swal.fire({
+                    title: 'Success!',
+                    text: response.data.message,
+                    icon: 'success', // use lowercase
+                    confirmButtonText: 'Cool'
+                });
                 setCanResend(false); // Disable the button after resending
                 setTimer(180); // Reset the timer for 3 minutes
             } catch (error) {
                 console.log("Internal server error", error)
-                toast.error(
-                    error?.response?.data?.message ||
-                    'Failed to resend OTP. Please try again later.'
-                );
+                // toast.error(
+                //     error?.response?.data?.message ||
+                //     'Failed to resend OTP. Please try again later.'
+                // );
+                Swal.fire({
+                    title: 'Error!',
+                    text: error?.response?.data?.message || "Failed to resend OTP. Please try again later.",
+                    icon: 'error', // use lowercase
+                    confirmButtonText: 'Cool'
+                });
             } finally {
                 setLoading(false);
             }
@@ -133,7 +159,7 @@ const VerifyEmail = () => {
                     Enter the one-time password (OTP) sent to <strong>{email}</strong> to verify your account.
                 </p>
 
-                <div id="otp" style={{display: 'flex'}} className=" justify-content-center mb-4">
+                <div id="otp" style={{ display: 'flex' }} className=" justify-content-center mb-4">
                     {otp.map((digit, index) => (
                         <input
                             key={index}

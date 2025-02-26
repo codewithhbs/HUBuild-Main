@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { GetData } from '../../utils/sessionStoreage';
 import toast from 'react-hot-toast';
+import Swal from 'sweetalert2';
 
 function ProfileUpdate() {
     const Data = GetData('user');
@@ -83,12 +84,24 @@ function ProfileUpdate() {
                     },
                 }
             );
-            toast.success('Profile updated successfully!');
+            // toast.success('Profile updated successfully!');
+            Swal.fire({
+                title: 'Profile Updated!',
+                text: response.data.message || 'Profile updated successfully!',
+                icon: 'success', // use lowercase
+                confirmButtonText: 'Okay'
+            });
         } catch (error) {
             console.log("Internal server error in updating", error);
-            toast.error(
-                error?.response?.data?.message || 'Failed to update profile. Please try again.'
-            );
+            // toast.error(
+            //     error?.response?.data?.message || 'Failed to update profile. Please try again.'
+            // );
+            Swal.fire({
+                title: 'Error!',
+                text: error?.response?.data?.message || 'Failed to update profile. Please try again.',
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
         } finally {
             setLoading(false);
         }

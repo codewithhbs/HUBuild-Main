@@ -10,6 +10,7 @@ import './userdashboard.css';
 import Wallet from './Wallet.js';
 import Withdraw from './Withdraw.js';
 import Reviews from '../../components/Reviews.js';
+import Swal from 'sweetalert2';
 
 const UserDashboard = () => {
   const [files, setFiles] = useState([]);
@@ -91,7 +92,13 @@ const UserDashboard = () => {
         },
 
       });
-      toast.success('Portfolio uploaded successfully');
+      // toast.success('Portfolio uploaded successfully');
+      Swal.fire({
+        title: 'Success!',
+        text: 'Portfolio uploaded successfully',
+        icon: 'success', // use lowercase
+        confirmButtonText: 'Okay'
+      });
       setUploading(false);
       window.location.reload()
     } catch (error) {
@@ -144,13 +151,25 @@ const UserDashboard = () => {
 
     if (!amount || parseFloat(amount) <= 0) {
       // setError("Please enter a valid amount.");
-      toast.error("Please enter a valid amount.");
+      // toast.error("Please enter a valid amount.");
+      Swal.fire({
+        title: 'Error!',
+        text: "Please enter a valid amount.",
+        icon: 'error', // use lowercase
+        confirmButtonText: 'Okay'
+      });
       return;
     }
 
     if (parseFloat(amount) > walletAmount) {
       // setError("Insufficient wallet balance.");
-      toast.error("Insufficient wallet balance.");
+      // toast.error("Insufficient wallet balance.");
+      Swal.fire({
+        title: 'Error!',
+        text: "Insufficient wallet balance.",
+        icon: 'error', // use lowercase
+        confirmButtonText: 'Okay'
+      });
       return;
     }
 
@@ -165,17 +184,29 @@ const UserDashboard = () => {
       });
 
       if (response.data.success) {
-        toast.success(response.data.message);
+        // toast.success(response.data.message);
         setAmount("");
         setCommission(0);
         setFinalAmount(0);
       } else {
         // setError(response.data.message);
-        toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later");
+        // toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later");
+        Swal.fire({
+          title: 'Error!',
+          text: error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later",
+          icon: 'error', // use lowercase
+          confirmButtonText: 'Okay'
+        });
       }
     } catch (error) {
       console.log("Failed to create withdrawal request. Please try again.", error)
-      toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later");
+      // toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later");
+      Swal.fire({
+        title: 'Error!',
+        text: error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later",
+        icon: 'error', // use lowercase
+        confirmButtonText: 'Okay'
+      });
     }
   };
 

@@ -54,12 +54,24 @@ function StatusPage() {
                 })
 
             } else {
-                toast.error('Failed to update status');
+                // toast.error('Failed to update status');
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Failed to update status',
+                    icon: 'error', // use lowercase
+                    confirmButtonText: 'Okay'
+                });
                 setStatuses(previousStatuses); // Revert to previous state on failure
             }
         } catch (error) {
             console.log('Internal server error', error);
-            toast.error('Error updating status');
+            // toast.error('Error updating status');
+            Swal.fire({
+                    title: 'Error!',
+                    text: 'Error updating status',
+                    icon: 'error', // use lowercase
+                    confirmButtonText: 'Okay'
+                  });
             setStatuses(previousStatuses); // Revert to previous state on failure
         }
     };

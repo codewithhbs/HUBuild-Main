@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { toast } from 'react-hot-toast';
+import Swal from 'sweetalert2';
 const UploadGallery = ({ isShow, token }) => {
     const [files, setFiles] = useState([]);
     const [uploading, setUploading] = useState(false);
@@ -27,7 +28,13 @@ const UploadGallery = ({ isShow, token }) => {
                 },
 
             });
-            toast.success("Successfully uploaded Gallery Images")
+            // toast.success("Successfully uploaded Gallery Images")
+            Swal.fire({
+                title: 'Success!',
+                text: "Successfully uploaded Gallery Images",
+                icon: 'success', // use lowercase
+                confirmButtonText: 'Okay'
+            });
             window.location.reload()
 
             // console.log('Upload success:', response.data);

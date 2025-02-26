@@ -705,6 +705,7 @@ exports.accountVerification = async (req, res) => {
 
         findProvider.accountVerified = accountVerified;
         findProvider.verificationRejectReason = '';
+        findProvider.isProfileComplete = true;
         const message = `Your account has been verified successfully.`;
         const providerNumber = findProvider?.mobileNumber;
         SendWhatsapp(providerNumber, message)

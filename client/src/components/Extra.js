@@ -15,7 +15,7 @@ const Extra = () => {
             setImage(filterData)
         } catch (error) {
             console.log("Internal server error")
-            toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later")
+            // toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later")
         }
     }
 

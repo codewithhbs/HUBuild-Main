@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { GetData } from '../../../utils/sessionStoreage';
 import toast from 'react-hot-toast';
+import Swal from 'sweetalert2';
 
 function BankDetail() {
     const Data = GetData('user');
@@ -47,11 +48,23 @@ function BankDetail() {
         try {
             const response = await axios.put(`https://api.helpubuild.co.in/api/v1/update-bank-detail/${UserId}`, bankDetail);
             if (response.data.success) {
-                toast.success('Bank details updated successfully');
+                // toast.success('Bank details updated successfully');
+                Swal.fire({
+                    title: 'Profile Updated!',
+                    text: 'Bank details updated successfully',
+                    icon: 'success', // use lowercase
+                    confirmButtonText: 'Okay'
+                });
             }
         } catch (error) {
             console.error('Error updating bank details:', error);
-            toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later");
+            // toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later");
+            Swal.fire({
+                title: 'Error!',
+                text: error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later",
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
         } finally {
             setLoading(false);
         }

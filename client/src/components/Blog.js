@@ -24,7 +24,7 @@ const Blog = () => {
       // setData
     } catch (error) {
       console.log("Internal server error in getting blogs");
-      toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later")
+      // toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later")
     }
   }
 

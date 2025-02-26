@@ -40,15 +40,15 @@ exports.createWithdrawal = async (req, res) => {
             });
         }
 
-        if(!findProvider?.bankDetail){
+        if (!findProvider?.bankDetail || Object.keys(findProvider.bankDetail).length === 0 || !findProvider.bankDetail.accountNumber) {
             return res.status(400).json({
                 success: false,
-                message: 'Bank details not found',
-                error: 'Bank details not found',
+                message: 'Bank details not found. Please add complete bank details first.',
+                error: 'Bank details not found. Please add complete bank details first.',
             });
         }
-
-        findProvider.walletAmount -= amount;
+        
+        // findProvider.walletAmount -= amount;
 
         // Create a new withdrawal request
         const newRequest = new Withdraw({
@@ -60,13 +60,18 @@ exports.createWithdrawal = async (req, res) => {
             commissionPercent
         });
 
+        const providerNumber = findProvider?.mobileNumber;
         const providerName = findProvider?.name;
         const AdminNumber = process.env.ADMIN_NUMBER
-        const message = `New withdrawal request from ${providerName}.  
+        const providerMessage = `Your withdrawal request for an amount of ${amount} has been successfully created.
+
+Please wait for admin approval. ✅`;
+        const message = `New Withdrawal request from ${providerName} for amount ${amount} has been created. 
 
 Please review the request on the admin panel and approve the withdrawal. ✅`;
 
 
+        await SendWhatsapp(providerNumber, providerMessage)
         await SendWhatsapp(AdminNumber, message)
 
         await findProvider.save();
@@ -93,15 +98,14 @@ exports.updateWithdrawStatus = async (req, res) => {
     try {
         const { id } = req.params; // Withdraw request ID
         const { status, providerId } = req.body; // Status and Provider ID from the request body
-        // console.log("i am hit", status, providerId)
 
         // Find the withdraw request by ID
         const findWithdraw = await Withdraw.findById(id);
         if (!findWithdraw) {
             return res.status(400).json({
                 success: false,
-                message: 'Error in finding withdraw request',
-                error: 'Error in finding withdraw request',
+                message: 'Withdraw request not found',
+                error: 'Withdraw request not found',
             });
         }
 
@@ -109,8 +113,8 @@ exports.updateWithdrawStatus = async (req, res) => {
         if (!providerId) {
             return res.status(400).json({
                 success: false,
-                message: 'Provider Id is required',
-                error: 'Provider Id is required',
+                message: 'Provider ID is required',
+                error: 'Provider ID is required',
             });
         }
         if (!status) {
@@ -131,8 +135,8 @@ exports.updateWithdrawStatus = async (req, res) => {
             });
         }
 
-        const withdrawStatus = findWithdraw.status;
-        if (withdrawStatus === 'Approved' || withdrawStatus === 'Rejected') {
+        // Check if the withdraw request is already processed
+        if (findWithdraw.status === 'Approved' || findWithdraw.status === 'Rejected') {
             return res.status(400).json({
                 success: false,
                 message: 'Withdraw request is already approved or rejected',
@@ -140,17 +144,19 @@ exports.updateWithdrawStatus = async (req, res) => {
             });
         }
 
-        // If the withdraw status is approved, deduct the amount from the provider's wallet
+        const providerNumber = findProvider?.mobileNumber;
+        const withdrawAmount = findWithdraw.amount;
+
         if (status === 'Approved') {
-            const providerNumber = findProvider?.mobileNumber;
-            const message = `Withdrawal request failed! ❌  
+            if (findProvider.walletAmount < withdrawAmount) {
+                const message = `Withdrawal request failed! ❌  
 
 You do not have sufficient balance to make a withdrawal. Please check your account balance and try again.`;
+                await SendWhatsapp(providerNumber, message);
 
-            if (findProvider.walletAmount < findWithdraw.amount) {
-                await SendWhatsapp(providerNumber, message)
                 findWithdraw.status = 'Rejected';
                 await findWithdraw.save();
+
                 return res.status(400).json({
                     success: false,
                     message: 'Insufficient wallet balance',
@@ -158,62 +164,51 @@ You do not have sufficient balance to make a withdrawal. Please check your accou
                 });
             }
 
-            // findProvider.walletAmount -= findWithdraw.amount; // Deduct the amount
-            // await findProvider.save(); // Save updated provider
+            // Deduct the amount from provider's wallet
+            findProvider.walletAmount -= withdrawAmount;
+            await findProvider.save();
 
-            message = `Your withdrawal request has been approved! ✅  
+            // Send approval message
+            const message = `Your withdrawal request has been approved! ✅  
 
 The amount has been credited to your bank account. Please check your account for confirmation.`;
+            await SendWhatsapp(providerNumber, message);
 
-            await SendWhatsapp(providerNumber, message)
-            // Update the status of the withdraw request
-            findWithdraw.status = status;
+            findWithdraw.status = 'Approved';
             await findWithdraw.save();
-            return res.status(200).json({
-                success: true,
-                message: 'Withdraw status updated',
-                data: findWithdraw,
-            });
-        }
-
-        if (status === 'Rejected') {
-            findProvider.walletAmount += findWithdraw.amount; // Deduct the amount
-
-            findWithdraw.status = status;
-
-            const providerNumber = findProvider?.mobileNumber;
+        } else if (status === 'Rejected') {
+            // Send rejection message
             const message = `Your withdrawal request has been rejected. ❌  
 
 The admin will contact you regarding this matter. Please stay tuned for further updates.`;
+            await SendWhatsapp(providerNumber, message);
 
-            await SendWhatsapp(providerNumber, message)
-            await findProvider.save();
+            findWithdraw.status = 'Rejected';
             await findWithdraw.save();
-            return res.status(200).json({
-                success: true,
-                message: 'Withdraw status updated',
-                data: findWithdraw,
+        } else {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid status provided',
+                error: 'Invalid status provided',
             });
         }
 
-        // Update the status of the withdraw request
-        findWithdraw.status = status;
-        await findWithdraw.save();
-
         return res.status(200).json({
             success: true,
-            message: 'Withdraw status updated',
+            message: `Withdraw status updated to ${status}`,
             data: findWithdraw,
         });
+
     } catch (error) {
         console.error('Internal server error', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Internal server error',
             error: error.message,
         });
     }
 };
+
 
 exports.deleteWithdrawRequest = async (req, res) => {
     try {

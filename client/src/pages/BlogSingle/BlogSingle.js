@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { GetData } from "../../utils/sessionStoreage";
+import Swal from "sweetalert2";
 
 const BlogSingle = () => {
   const location = new URLSearchParams(window.location.href);
@@ -40,23 +41,41 @@ const BlogSingle = () => {
 
   const handleComment = async (e) => {
     e.preventDefault();
-    if(!UserData){
-      return toast.error('Please login to comment')
+    if (!UserData) {
+      // return toast.error('Please login to comment')
+      return Swal.fire({
+        title: 'Error!',
+        text: 'Please login to comment',
+        icon: 'error', // use lowercase
+        confirmButtonText: 'Okay'
+      });
     }
-    const newFormData ={
+    const newFormData = {
       ...formData,
       userId: UserData?._id,
       blogId: id
     }
     try {
       const res = await axios.post('https://api.helpubuild.co.in/api/v1/create-blog-comment', newFormData)
-      toast.success("Comment added successfully");
+      // toast.success("Comment added successfully");
+      Swal.fire({
+        title: 'Success!',
+        text: "Comment added successfully",
+        icon: 'success', // use lowercase
+        confirmButtonText: 'Okay'
+      });
       setFormData({
         comment: ""
       })
     } catch (error) {
       console.log("Internal server error", error)
-      toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later");
+      // toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later");
+      Swal.fire({
+        title: 'Error!',
+        text: error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later",
+        icon: 'error', // use lowercase
+        confirmButtonText: 'Okay'
+      });
     }
   }
 

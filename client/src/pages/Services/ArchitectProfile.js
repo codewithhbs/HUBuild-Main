@@ -9,6 +9,7 @@ import ModelOfPriceAndTime from './ModelOfPriceAndTime';
 import CallLoader from './CallLoader';
 import ReviewAdd from './ReviewAdd';
 import RatingSummary from './RatingSummary';
+import Swal from 'sweetalert2';
 // import { GetData } from '../../utils/sessionStoreage'
 
 function ArchitectProfile() {
@@ -113,13 +114,31 @@ function ArchitectProfile() {
 
     const handleActiveTime = async (Chat) => {
         if (!UserData) {
-            return toast.error('Login first')
+            // return toast.error('Login first')
+            return Swal.fire({
+                title: 'Error!',
+                text: 'Login first',
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
         }
         if (UserData.role === 'provider') {
-            return toast.error("Access Denied: Providers are not authorized to access this feature.");
+            // return toast.error("Access Denied: Providers are not authorized to access this feature.");
+            return Swal.fire({
+                title: 'Error!',
+                text: "Access Denied: Providers are not authorized to access this feature.",
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
         }
         if (!profile.pricePerMin || profile.pricePerMin <= 0) {
-            return toast.error("Chat cannot be started. Provider pricing information is unavailable or invalid.");
+            // return toast.error("Chat cannot be started. Provider pricing information is unavailable or invalid.");
+            return Swal.fire({
+                title: 'Error!',
+                text: "Chat cannot be started. Provider pricing information is unavailable or invalid.",
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
         }
         if (Chat === 'Chat') {
 
@@ -132,7 +151,14 @@ function ArchitectProfile() {
                 window.location.href = '/chat'
             } catch (error) {
                 console.log("Internal server error", error)
-                toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later")
+                // toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later")
+                Swal.fire({
+                    title: 'Error!',
+                    text: error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later",
+                    icon: 'error', // use lowercase
+                    confirmButtonText: 'Okay'
+                });
+
             }
         }
     }
@@ -211,7 +237,13 @@ function ArchitectProfile() {
     const showModelOfPrice = async () => {
         if (UserData && profile) {
             if (UserData.role === 'provider') {
-                return toast.error("Access Denied: Providers are not authorized to access this feature.");
+                // return toast.error("Access Denied: Providers are not authorized to access this feature.");
+                return Swal.fire({
+                    title: 'Error!',
+                    text: "Access Denied: Providers are not authorized to access this feature.",
+                    icon: 'error', // use lowercase
+                    confirmButtonText: 'Okay'
+                });
             } else {
                 await handleFetchUser()
                 console.log("seconds", user)
@@ -222,7 +254,13 @@ function ArchitectProfile() {
                 }, 1400)
             }
         } else {
-            toast.error("Please login to calculate maximum time for call")
+            // toast.error("Please login to calculate maximum time for call")
+            Swal.fire({
+                title: 'Error!',
+                text: "Please login to calculate maximum time for call",
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
         }
     }
     const handleClose = () => {
@@ -236,15 +274,27 @@ function ArchitectProfile() {
         setCallLoader(true)
         if (!UserData) {
             window.location.href = `/login?redirect=${window.location.href}`
-            return toast.error('Login first')
+            // return toast.error('Login first')
+            return Swal.fire({
+                title: 'Error!',
+                text: 'Login first',
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
         }
         try {
             const data = await fetchProviderData(id);  // Ensure `await` is used
-            console.log("Data", data);
+            // console.log("Data", data);
 
             if (!data.success) {
                 setCallLoader(false);
-                return toast.error(data.message || "Provider is not available");
+                // return toast.error(data.message || "Provider is not available");
+                return Swal.fire({
+                    title: 'Error!',
+                    text: data.message || "Provider is not available",
+                    icon: 'error', // use lowercase
+                    confirmButtonText: 'Okay'
+                });
             }
         } catch (error) {
             console.error("Error fetching provider data:", error);
@@ -576,16 +626,16 @@ function ArchitectProfile() {
                     <div className='container-fluid architecture-section-p'>
                         <div className='row mt-4'>
                             <div className='col-lg-6'>
-                             
+
                                 <RatingSummary
-                                profile={profile}
-                                reviews={reviews}
-                                ratingPercentages={ratingPercentages}
+                                    profile={profile}
+                                    reviews={reviews}
+                                    ratingPercentages={ratingPercentages}
                                 />
 
                             </div>
                             <div className='col-lg-6'>
-                                
+
                                 <div className="user-reviews-container">
                                     <div className="reviews-header">
                                         <h3>User Reviews</h3>

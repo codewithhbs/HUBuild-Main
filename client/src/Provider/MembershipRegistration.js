@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import Select from 'react-select';
 import { useGeolocated } from "react-geolocated";
 import { setData } from '../utils/sessionStoreage';
+import Swal from 'sweetalert2';
 
 function MembershipRegistration() {
     const { coords, isGeolocationAvailable, isGeolocationEnabled } = useGeolocated({
@@ -79,7 +80,13 @@ function MembershipRegistration() {
 
     const validateAge = () => {
         if (parseInt(memberData.age) <= 22) {
-            toast.error('Age must be greater than 22');
+            // toast.error('Age must be greater than 22');
+            Swal.fire({
+                title: 'Error!',
+                text: 'Age must be greater than 22',
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
             return false;
         }
         return true;
@@ -88,11 +95,23 @@ function MembershipRegistration() {
     const validatePhone = () => {
         const phoneRegex = /^[0-9]{10}$/;
         if (!phoneRegex.test(memberData.mobileNumber)) {
-            toast.error('Mobile number must be exactly 10 digits.');
+            // toast.error('Mobile number must be exactly 10 digits.');
+            Swal.fire({
+                title: 'Error!',
+                text: 'Mobile number must be exactly 10 digits.',
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
             return false;
         }
         if (parseInt(memberData.age) <= 22) {
-            toast.error('Age must be greater than 22.');
+            // toast.error('Age must be greater than 22.');
+            Swal.fire({
+                title: 'Error!',
+                text: 'Age must be greater than 22.',
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
             return false;
         }
         return true;
@@ -124,16 +143,28 @@ function MembershipRegistration() {
         setLoading(true);
         try {
             const res = await axios.post('https://api.helpubuild.co.in/api/v1/register-provider', makeFormData());
-           
-            toast.success(res.data.message);
-            const { token ,user} = res.data;
+
+            // toast.success(res.data.message);
+            Swal.fire({
+                title: 'Success!',
+                text: res.data.message,
+                icon: 'success', // use lowercase
+                confirmButtonText: 'Okay'
+            });
+            const { token, user } = res.data;
             setData('token', token);
             setData('islogin', token ? true : false)
             setData('user', JSON.stringify(user))
-            window.location.href="/"
+            window.location.href = "/"
         } catch (error) {
             console.error('Error during registration:', error);
-            toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later");
+            // toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later");
+            Swal.fire({
+                title: 'Error!',
+                text: error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later",
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
         } finally {
             setLoading(false);
         }

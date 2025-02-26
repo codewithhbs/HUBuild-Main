@@ -90,12 +90,18 @@ const Profile = () => {
         title: 'Profile Updated!',
         text: response.data.message,
         icon: 'success', // use lowercase
-        confirmButtonText: 'Cool'
+        confirmButtonText: 'Okay'
       });
    
     } catch (error) {
       console.log('Error updating profile:', error.response?.data || error.message);
-      toast.error(error?.response?.data?.message || 'Failed to update profile. Please try again.');
+      // toast.error(error?.response?.data?.message || 'Failed to update profile. Please try again.');
+      Swal.fire({
+        title: 'Error!',
+        text: error?.response?.data?.message || 'Failed to update profile. Please try again.',
+        icon: 'error', // use lowercase
+        confirmButtonText: 'Okay'
+      });
     } finally {
       setLoading(false);
     }

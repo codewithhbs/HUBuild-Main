@@ -484,7 +484,7 @@ function TalkToArchitect() {
                   <div class="right-section">
                     <div style={{padding:'0px'}} class="buttons chat-call-btn">
                       <button class="chat">Chat 💬</button>
-                      <button class="call">Call 📞</button>
+                      <button style={{backgroundColor:'black'}} class="call">Call 📞</button>
                     </div>
                     <p class="price">{`₹ ${item.pricePerMin}/min`}</p>
                     <p class="experience">{item.yearOfExperience ? (

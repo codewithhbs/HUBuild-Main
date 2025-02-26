@@ -11,6 +11,7 @@ require('dotenv').config()
 const { validatePaymentVerification, validateWebhookSignature } = require('razorpay/dist/utils/razorpay-utils');
 const { default: mongoose } = require("mongoose");
 const SendWhatsapp = require("../utils/SendWhatsapp");
+const bcrypt = require('bcrypt');
 const GlobelUserRefDis = require("../models/globelUserRefDis.model");
 // const { SendWhatsapp } = require("../utils/SendWhatsapp");
 // const SendWhatsapp = require("../utils/SendWhatsapp");
@@ -84,12 +85,12 @@ exports.registeruser = async (req, res) => {
         });
 
         const couponDiscount = await GlobelUserRefDis.find();
-        if (!couponDiscount ) {
+        if (!couponDiscount) {
             newUser.referralDiscount = 10
         }
         const firstDis = couponDiscount[0];
         newUser.referralCode = generateReferralCode(newUser._id);
-        
+
         newUser.referralDiscount = firstDis._id
         await newUser.save();
 
@@ -193,52 +194,57 @@ exports.verifyEmail = async (req, res) => {
 
 exports.Changepassword = async (req, res) => {
     try {
-        const { email, otp, password } = req.body;
+        const { mobileNumber, otp, password } = req.body;
         console.log("Received data:", req.body);
 
-        if (!email) return res.status(400).json({ success: false, message: "Please enter an email" });
+        if (!mobileNumber) return res.status(400).json({ success: false, message: "Please enter a Mobile Number" });
         if (!otp) return res.status(400).json({ success: false, message: "Please enter the OTP" });
         if (!password) return res.status(400).json({ success: false, message: "Please enter a new password" });
 
-        // Find user by email
-        const account = await Provider.findOne({ email: email });
-        console.log(account)
-        if (!account) return res.status(404).json({ success: false, message: "User not found" });
+        let account = await User.findOne({ PhoneNumber: mobileNumber });
+        let isProvider = false;
+
+        if (!account) {
+            account = await Provider.findOne({ mobileNumber: mobileNumber });
+            isProvider = true;
+        }
+
+        if (!account) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
 
         const accountOtp = account.resetPasswordOtp;
-        console.log("accountOtp", accountOtp)
         if (!accountOtp) {
             return res.status(400).json({ success: false, message: "OTP not found or expired, request a new one." });
         }
-        const otpExpiresAt = new Date(account.resetPasswordExpiresAt);
 
-        console.log("Stored OTP:", accountOtp, "User entered OTP:", otp);
-
-        // Validate OTP
         if (accountOtp !== otp) {
             return res.status(400).json({ success: false, message: "Invalid OTP." });
         }
 
+        // Hash the new password before saving
+        // const salt = await bcrypt.genSalt(10);
+        // const hashedPassword = await bcrypt.hash(password, salt);
 
+        if (isProvider) {
+            account.password = password; // Provider's password field
+        } else {
+            account.Password = password; // User's password field
+        }
 
-
-        account.password = password;
-
-        // Clear OTP fields
-        // account.resetPasswordOtp = null;
-        // account.resetPasswordExpiresAt = null;
+        account.resetPasswordOtp = null;
+        account.resetPasswordExpiresAt = null;
 
         await account.save();
-        console.log("Password updated successfully:", account);
 
         const verificationMessage = "Password changed successfully.";
         await sendToken(account, res, 200, verificationMessage);
-
     } catch (error) {
         console.error("Error during password change:", error);
         return res.status(500).json({ success: false, message: "An error occurred during password change." });
     }
 };
+
 
 exports.resendOtp = async (req, res) => {
     try {
@@ -458,51 +464,47 @@ exports.logout = (req, res) => {
 
 exports.forgotPassword = async (req, res) => {
     try {
-        const { email, newPassword } = req.body;
+        const { mobileNumber, newPassword } = req.body;
 
-        if (!email) {
-            return res.status(400).json({ success: false, message: "Please provide your email address." });
+        if (!mobileNumber) {
+            return res.status(400).json({ success: false, message: "Please provide your phone number." });
         }
 
-        let user = await User.findOne({ email });
+        let user = await User.findOne({ PhoneNumber: mobileNumber });
         let isProvider = false;
 
         if (!user) {
-            user = await Provider.findOne({ email });
+            user = await Provider.findOne({ mobileNumber: mobileNumber });
             isProvider = true;
         }
 
         if (!user) {
             return res.status(404).json({
                 success: false,
-                message: `No account found with that email address${isProvider ? " for provider" : " for user"}.`
+                message: `No account found with that phone number${isProvider ? " for provider" : " for user"}.`
             });
         }
-
 
         const { otp, expiresAt } = generateOtp(6, 120000);
         user.resetPasswordOtp = otp;
         user.resetPasswordExpiresAt = expiresAt;
-        user.newPassword = newPassword
-        const message = `Hello,  
+        user.newPassword = newPassword;
 
+        const message = `Hello,  
+        
         We received a request to reset the password for your ${isProvider ? "provider" : "user"} account.  
         
         Please use the OTP below to proceed with your password reset:  
         
-        🔹 OTP: ${otp}  
-        🕒 This OTP is valid for 2 minutes (expires at: ${new Date(expiresAt).toISOString()}).`;
+        \ud83d\udd39 OTP: ${otp}  
+        \ud83d\udd52 This OTP is valid for 2 minutes (expires at: ${new Date(expiresAt).toISOString()}).`;
 
-        const number = user.PhoneNumber;
-
-        await SendWhatsapp(number, message);
+        await SendWhatsapp(mobileNumber, message);
         await user.save();
-
-        console.log("save user", user)
 
         return res.status(200).json({
             success: true,
-            message: "A password reset Whatsapp has been sent. Please check your inbox for further instructions."
+            message: "A password reset OTP has been sent via WhatsApp. Please check your inbox for further instructions."
         });
     } catch (error) {
         console.error("Forgot password error:", error);
@@ -512,7 +514,6 @@ exports.forgotPassword = async (req, res) => {
         });
     }
 };
-
 
 //==============Admin Works ==================//
 exports.getAllUsers = async (req, res) => {

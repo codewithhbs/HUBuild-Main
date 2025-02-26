@@ -6,6 +6,7 @@ import './userdashboard.css';
 import Settings from './Settings';
 import crown from './crown.png'
 import { Modal, Button, Form } from 'react-bootstrap';
+import Swal from 'sweetalert2';
 
 function Dashboard() {
   const [myProfile, setMyProfile] = useState(null);
@@ -48,9 +49,21 @@ function Dashboard() {
 
   const handleOpenModel = async () => {
     if (!token) {
-      return toast.error('Login First!');
+      // return toast.error('Login First!');
+      return Swal.fire({
+        title: 'Error!',
+        text: 'Login First!',
+        icon: 'error', // use lowercase
+        confirmButtonText: 'Okay'
+      });;
     } else if (UserData?.role === 'provider') {
-      return toast.error(`You are a provider. You don't have access.`);
+      // return toast.error(`You are a provider. You don't have access.`);
+      return Swal.fire({
+        title: 'Error!',
+        text: `You are a provider. You don't have access.`,
+        icon: 'error', // use lowercase
+        confirmButtonText: 'Okay'
+      });
     }
     setShowModal(true);
   };
@@ -77,7 +90,13 @@ function Dashboard() {
 
   const handleMakePayment = async () => {
     if (!amount || amount <= 0) {
-      return toast.error('Please enter a valid amount');
+      // return toast.error('Please enter a valid amount');
+      return Swal.fire({
+        title: 'Error!',
+        text: 'Please enter a valid amount',
+        icon: 'error', // use lowercase
+        confirmButtonText: 'Okay'
+      });
     }
     // toast.success(`Proceeding with payment of ₹${amount}`);
     // handleCloseModel();
@@ -125,7 +144,13 @@ function Dashboard() {
 
     } catch (error) {
       console.log("Internal server error", error)
-      toast.error(error?.response?.data?.message || 'Failed to Reacharge. Please try again.');
+      // toast.error(error?.response?.data?.message || 'Failed to Reacharge. Please try again.');
+      Swal.fire({
+        title: 'Error!',
+        text: error?.response?.data?.message || 'Failed to Reacharge. Please try again.',
+        icon: 'error', // use lowercase
+        confirmButtonText: 'Okay'
+      });
     }
   };
 
