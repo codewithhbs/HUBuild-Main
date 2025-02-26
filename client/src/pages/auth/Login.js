@@ -79,8 +79,8 @@ function Login() {
             Swal.fire({
                 title: 'Error!',
                 text: error?.response?.data?.message || 'An err or occurred. Please try again.',
-                icon: 'success', // use lowercase
-                confirmButtonText: 'Cool'
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
             });
         }
     };
