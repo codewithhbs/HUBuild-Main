@@ -39,6 +39,10 @@ exports.registeruser = async (req, res) => {
             return res.status(400).json({ success: false, errors });
         }
 
+        const checkNumber = await User.findOne({ PhoneNumber });
+        if (checkNumber) {
+            return res.status(400).json({ success: false, message: "Phone number already registered" });
+        }
 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
