@@ -40,6 +40,7 @@ import PrivacyPolicy from "./pages/Policies/PrivacyPolicy";
 import Cancellation from "./pages/Policies/Cancellation";
 import Disclaimer from "./pages/Policies/Disclaimer";
 import TermCondition from "./pages/Policies/Term&Condition";
+import PartnerLogin from "./pages/auth/PartnerLogin";
 // Scroll to top component
 function ScrollToTop() {
   const location = useLocation();
@@ -89,6 +90,7 @@ function App() {
         <Route path="/profile" element={<UserDashboard />} />
 
         <Route path="/login" element={<Login />} />
+        <Route path="/partner-login" element={<PartnerLogin />} />
         <Route path="/otp-verification/user" element={<VerifyEmail />} />
         <Route path="/talk-to-interior" element={<TalkToInterior />} />
         {/* <Route path="/member-registration" element={<MembershipRegistration />} /> */}

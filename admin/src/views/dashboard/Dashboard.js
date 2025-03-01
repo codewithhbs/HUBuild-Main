@@ -89,7 +89,8 @@ const Dashboard = () => {
         commission: data.totalCommission
       });
     } catch (error) {
-      toast.error('Failed to load withdraw data');
+      // toast.error('Failed to load withdraw data');
+      console.log("Failed to load withdraw data", error);
     }
   };
 

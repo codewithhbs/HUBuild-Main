@@ -36,25 +36,25 @@ const Ser = () => {
 
                         <div class="row">
                             <div className='col-md-6'>
-                                <div className='info-box bg-white px-4 py-4 my-3' >
+                                <div className='info-box px-4 py-4 my-3' >
                                     <div className='info-title'><h4 className=' sub-heading'>Chat with an Expert</h4></div>
                                     <p class="para">Get personalized advice from experienced professionals to kick-start your project with clarity.</p>
                                 </div>
                             </div>
                             <div className='col-md-6'>
-                                <div className='info-box bg-white px-4 py-4 my-3'>
+                                <div className='info-box px-4 py-4 my-3'>
                                     <div className='info-title'><h4 className=' sub-heading'>Plan Your Idea</h4></div>
                                     <p class="para"> We help you brainstorm and refine your concept to make it actionable and impactful.</p>
                                 </div>
                             </div>
                             <div className='col-md-6'>
-                                <div className='info-box bg-white px-4 py-4 my-3'>
+                                <div className='info-box px-4 py-4 my-3'>
                                     <div className='info-title'><h4 className=' sub-heading'>Set Your Budget</h4></div>
                                     <p class="para">Allocate your resources effectively with a well-structured budget to maximize your outcomes.</p>
                                 </div>
                             </div>
                             <div className='col-md-6'>
-                                <div className='info-box bg-white px-4 py-4 my-3'>
+                                <div className='info-box px-4 py-4 my-3'>
                                     <div className='info-title'><h4 className=' sub-heading'>Execute</h4></div>
                                     <p class="para">Turn your plan into reality with a step-by-step execution process guided by our expert support.</p>
                                 </div>

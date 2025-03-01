@@ -433,8 +433,8 @@ function ArchitectProfile() {
 
                             <div className='col-xl-4 col-lg-4 col-md-6 col-12'>
                                 <div className='connect-area'>
-                                    <button onClick={() => showModelOfPrice()} className={`btn ${profile.callStatus === true ? 'profile-chat-btn' : 'profile-call-btn'}`} disabled={!profile.callStatus} ><i class="fa-solid fa-phone-volume"></i> Call</button>
-                                    <button onClick={() => handleActiveTime("Chat")} disabled={!profile.chatStatus} className={`btn mt-2 ${profile.chatStatus === true ? 'profile-chat-btn' : 'profile-call-btn'}`}><i class="fa-regular fa-comments"></i> Chat</button>
+                                    <button onClick={() => showModelOfPrice()} className={` ${profile.callStatus === true ? 'profile-chat-btn' : 'profile-call-btn'}`} disabled={!profile.callStatus} ><i class="fa-solid fa-phone-volume"></i> Call</button>
+                                    <button onClick={() => handleActiveTime("Chat")} disabled={!profile.chatStatus} className={` mt-2 ${profile.chatStatus === true ? 'profile-chat-btn' : 'profile-call-btn'}`}><i class="fa-regular fa-comments"></i> Chat</button>
                                     {/* <button className={`btn mt-2 ${profile.meetStatus === true ? 'profile-chat-btn' : 'profile-call-btn'}`} disabled={!profile.meetStatus}><i class="fa-solid fa-video"></i> Video</button> */}
                                 </div>
                             </div>

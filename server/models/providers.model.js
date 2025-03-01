@@ -257,6 +257,12 @@ const ProviderProfileSchema = new mongoose.Schema({
     paymentMethod: {
         type: String
     },
+    updateOtp:{
+        type: String
+    },
+    updateOtpExpiresAt: {
+        type: Date
+    }
 });
 
 // Password hashing

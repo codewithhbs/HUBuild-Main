@@ -11,6 +11,8 @@ const Profile = () => {
   const UserId = UserData?._id;
   const role = UserData?.type
 
+  console.log("role",role)
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -92,7 +94,7 @@ const Profile = () => {
         icon: 'success', // use lowercase
         confirmButtonText: 'Okay'
       });
-   
+
     } catch (error) {
       console.log('Error updating profile:', error.response?.data || error.message);
       // toast.error(error?.response?.data?.message || 'Failed to update profile. Please try again.');
@@ -173,9 +175,7 @@ const Profile = () => {
               onChange={handleChange}
             />
           </div>
-        </div>
-        <div className="row mb-3">
-          <div className="col-md-6">
+          <div className="col-md-6 mt-2">
             <label htmlFor="mobileNumber" className="form-label">
               Mobile Number
             </label>
@@ -190,7 +190,7 @@ const Profile = () => {
           </div>
           {
             role === 'Architect' && (
-              <div className="col-md-6">
+              <div className="col-md-6 mt-2">
                 <label htmlFor="coaNumber" className="form-label">
                   COA Number
                 </label>
@@ -205,10 +205,7 @@ const Profile = () => {
               </div>
             )
           }
-
-        </div>
-        <div className="row mb-3">
-          <div className="col-md-6">
+          <div className="col-md-6 mt-2">
             <label htmlFor="pricePerMin" className="form-label">
               Price Per Minute
             </label>
@@ -221,9 +218,9 @@ const Profile = () => {
               onChange={handleChange}
             />
           </div>
-          <div className="col-md-6 mb-3">
+          <div className="col-md-6 mt-2">
             <label htmlFor="location" className="form-label">
-              Billing address
+              Address
             </label>
             <input
               type="text"
@@ -234,7 +231,7 @@ const Profile = () => {
               onChange={handleChange}
             />
           </div>
-          <div className="col-md-6">
+          <div className="col-md-6 mt-2">
             <label htmlFor="yearOfExperience" className="form-label">
               Year Of Experience
             </label>

@@ -1,7 +1,7 @@
 const express = require('express');
 const { registeruser, getAllUsers, getSingleUserById, updateProfile, login, logout, deleteAccount, banUserToggle, verifyEmail, resendOtp, forgotPassword, getUserById, createPayment, PaymentVerify, getSingleUser, updateUserPassword, getTotalRechargeAmount, Changepassword } = require('../controllers/user.Controller');
 const { protect } = require('../middlewares/Protect');
-const { CreateProvider, GetMyProfile, addPortfolio, getAllProvider, getSingleProvider, updateProvider, updateDocuments, updatePassword, updateAvailable, updateBankDetail, updateIsBanned, deleteprovider, accountVerification, getProviderStatus } = require('../controllers/provider.controller');
+const { CreateProvider, GetMyProfile, addPortfolio, getAllProvider, getSingleProvider, updateProvider, updateDocuments, updatePassword, updateAvailable, updateBankDetail, updateIsBanned, deleteprovider, accountVerification, getProviderStatus, sendOtpForUpdateDetail, verifyOtpForUpdateDetail } = require('../controllers/provider.controller');
 const multer = require('multer');
 const { getAllChat } = require('../controllers/ChatController');
 const { createReview, getAllReview, getReviewByProviderId } = require('../controllers/review.Controller');
@@ -241,5 +241,9 @@ router.delete('/delete_admin_coupon/:id',deleteAdminCoupon)
 router.post('/check_coupon_code',checkCouponCode)
 router.post('/buy_membership/:providerId',buyMemberShip)
 router.post('/membership_payment_verify',membershipPaymentVerify)
+
+// verify before update things routes 
+router.post('/otp_send_before_update',sendOtpForUpdateDetail)
+router.post('/verify_otp_before_update',verifyOtpForUpdateDetail)
 
 module.exports = router;

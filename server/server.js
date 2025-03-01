@@ -107,7 +107,7 @@ io.on('connection', (socket) => {
             // Notify the client about successful room joining
             socket.emit('room_joined', { message: 'Welcome back. Start chat', room });
             // Respond with success to the callback
-            callback({ success: true, message: 'Welcome back. Start chat' });
+            callback({ success: true, message: 'Welcome back. Start chat', status: true });
         } catch (error) {
             console.error('Error in join_room event:', error);
             socket.emit('error_message', { message: 'An error occurred while joining the room' });

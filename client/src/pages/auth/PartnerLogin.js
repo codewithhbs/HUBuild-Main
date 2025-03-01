@@ -6,8 +6,7 @@ import { setData } from '../../utils/sessionStoreage';
 import { Link, redirect } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
-
-function Login() {
+const PartnerLogin = () => {
     const [logindata, setLoginData] = useState({
         any: '',
         password: ''
@@ -154,14 +153,11 @@ function Login() {
                                                         Login Now
                                                     </button>
                                                 </div>
-                                                <a className="small text-white" href="/forget-password">Forgot password?
-                                                </a>
-                                                <p className=" mt-3 pb-lg-2 text-white">
-                                                    Don't have an account? {""}
-                                                    <a href={`/user-register`} className="text-warning">
-                                                        Register here
+                                                <div className='' style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '14px' }}>
+                                                    <a className="small text-white" href="/forget-password">Forgot password?
                                                     </a>
-                                                </p>
+                                                    <Link to={'/member-registration'} style={{ backgroundColor: '#F0AF36' }} className='btn text-white'>Become a Partner</Link>
+                                                </div>
                                             </form>
                                         </div>
                                     </div>
@@ -176,4 +172,4 @@ function Login() {
     )
 }
 
-export default Login
+export default PartnerLogin

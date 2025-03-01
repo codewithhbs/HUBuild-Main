@@ -132,10 +132,10 @@ exports.verifyEmail = async (req, res) => {
         if (!otp) return res.status(400).json({ success: false, message: "Please enter the OTP" });
 
         let accountType = "User";
-        let account = await User.findOne({ PhoneNumber:email });
+        let account = await User.findOne({ PhoneNumber: email });
 
         if (!account) {
-            account = await Provider.findOne({ mobileNumber:email });
+            account = await Provider.findOne({ mobileNumber: email });
             accountType = "Provider";
         }
 
@@ -261,11 +261,11 @@ exports.resendOtp = async (req, res) => {
             return res.status(400).json({ success: false, message: "Please provide an email." });
         }
 
-        let account = await User.findOne({ PhoneNumber:email });
+        let account = await User.findOne({ PhoneNumber: email });
         let accountType = "User";
 
         if (!account) {
-            account = await Provider.findOne({ mobileNumber:email });
+            account = await Provider.findOne({ mobileNumber: email });
             accountType = "Provider";
         }
 

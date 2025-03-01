@@ -12,6 +12,14 @@ code {
     monospace;
 }
 
+*{
+  box-sizing: border-box;
+}
+
+a{
+  text-decoration: none !important;
+}
+
 .profileRecharge {
   color: #13853a;
   border: 1px solid #13853a;

@@ -4,11 +4,6 @@ import ProfileUpdate from './ProfileUpdate';
 import RechargeHistory from './RechargeHistory';
 import ChatDeductionHistory from './ChatDeductionHistory';
 import UserForgetPassword from './UserForgetPassword';
-// import Profile from './Tabs/Profile';
-// import { Documnets } from './Tabs/Documnets';
-// import Password from './Tabs/Password';
-// import Enquiry from './Tabs/Enquiry';
-// import ShareProfile from './Tabs/ShareProfile';
 
 function Settings({ myProfile }) {
     const tabs = [
@@ -47,7 +42,7 @@ function Settings({ myProfile }) {
             {/* Tab Content */}
             <div className="tab-content">
                 {activeTab === 1 && <ProfileUpdate />}
-                {activeTab === 2 && <RechargeHistory/>}
+                {activeTab === 2 && <RechargeHistory />}
                 {activeTab === 3 && <ChatDeductionHistory />}
                 {activeTab === 4 && <UserForgetPassword />}
                 {/* {activeTab === 5 && <></>} */}

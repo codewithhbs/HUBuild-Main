@@ -4,6 +4,7 @@ const { deleteImageFromCloudinary } = require("../utils/Cloudnary");
 const sendToken = require("../utils/SendToken");
 const SendWhatsapp = require("../utils/SendWhatsapp");
 const GlobelUserRefDis = require("../models/globelUserRefDis.model");
+const generateOtp = require("../utils/GenreateOtp");
 const Cloudinary = require('cloudinary').v2;
 require('dotenv').config();
 
@@ -791,3 +792,72 @@ exports.getProviderStatus = async (req, res) => {
         });
     }
 };
+
+exports.sendOtpForUpdateDetail = async (req, res) => {
+    try {
+        const { mobileNumber } = req.body;
+        const findProvider = await providersModel.findOne({ mobileNumber: mobileNumber });
+        if (!findProvider) {
+            return res.status(404).json({
+                success: false,
+                message: 'Provider not found.',
+            })
+        }
+        const { otp, expiresAt } = generateOtp(6, 120000)
+        findProvider.updateOtp = otp;
+        findProvider.updateOtpExpiresAt = expiresAt;
+        await findProvider.save();
+        const message = `Your otp for update detail is ${otp}.`
+        const sendOtp = await SendWhatsapp(mobileNumber, message);
+        return res.status(200).json({
+            success: true,
+            message: "Otp send successfully",
+        })
+    } catch (error) {
+        console.log("Internal server errror", error)
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error.message
+        })
+    }
+}
+
+exports.verifyOtpForUpdateDetail = async (req, res) => {
+    try {
+        const { mobileNumber, otp } = req.body;
+        const findProvider = await providersModel.findOne({ mobileNumber: mobileNumber });
+        if (!findProvider) {
+            return res.status(404).json({
+                success: false,
+                message: 'Provider not found.',
+            })
+        }
+        if (findProvider.updateOtp !== otp) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid otp.',
+            })
+        }
+        if (Date.now() > findProvider.updateOtpExpiresAt) {
+            return res.status(400).json({
+                success: false,
+                message: 'Otp expired.',
+            })
+        }
+        findProvider.updateOtp = null;
+        findProvider.updateOtpExpiresAt = null;
+        await findProvider.save();
+        return res.status(200).json({
+            success: true,
+            message: "Otp verified successfully",
+        })
+    } catch (error) {
+        console.log("Internal server error", error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error.message
+        })
+    }
+}

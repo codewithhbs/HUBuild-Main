@@ -24,6 +24,7 @@ const ChatDemo = () => {
     const [IsChatBoxActive, setIsChatBoxActive] = useState(false)
     const [isProviderConnected, setIsProviderConnected] = useState(false);
     const [timeLeft, setTimeLeft] = useState(0)
+    const [isActive, setIsActive] = useState(false);
 
     // console.log("message",UserData._id)
     const id = UserData?._id || ''
@@ -60,6 +61,8 @@ const ChatDemo = () => {
                 // Check if socket connection was successful and join room was acknowledged
                 if (response.success) {
                     setIsChatBoxActive(true);  // Only activate the chat box after successful response
+                    console.log('response:', response);
+                    setIsActive(response.status);
                     toast.success(response.message);
                 } else {
                     console.error(response.message);  // Log the error message
@@ -76,7 +79,7 @@ const ChatDemo = () => {
         socket.connect();
 
         socket.on('connect', () => {
-            // console.log('Connected!', socket.id);
+            console.log('Connected!', socket.id);
             setSocketId(socket.id);
         });
 
@@ -309,7 +312,7 @@ const ChatDemo = () => {
         // return window.location.href = '/login'
         return <AccessDenied />
     }
-    console.log(socket)
+    // console.log(socket)
     return (
         <section className=' hitesh_styling' style={{ backgroundColor: '#CDC4F9' }}>
             <div className="container py-5">

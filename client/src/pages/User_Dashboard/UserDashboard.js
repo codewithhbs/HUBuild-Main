@@ -4,7 +4,6 @@ import { GetData } from '../../utils/sessionStoreage';
 import { useDropzone } from 'react-dropzone';
 import Portfolio from './Portfolio';
 import UploadGallery from './UploadGallery';
-import { toast } from 'react-hot-toast';
 import Settings from './Settings.js';
 import './userdashboard.css';
 import Wallet from './Wallet.js';
@@ -23,6 +22,7 @@ const UserDashboard = () => {
   const [myProfile, setMyProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('Gallery')
+  const [mobileNumber, setMobileNumber] = useState('')
 
   const [walletAmount, setWalletAmount] = useState(0);
 
@@ -48,6 +48,7 @@ const UserDashboard = () => {
       const { data } = await axios.get(`https://api.helpubuild.co.in/api/v1/get-single-provider/${providerId}`);
       // console.log(data)
       setMyProfile(data.data);
+      setMobileNumber(data.data.mobileNumber)
       const formattedAmount = data.data.walletAmount.toFixed(2);
 
       setWalletAmount(formattedAmount);
@@ -210,6 +211,60 @@ const UserDashboard = () => {
     }
   };
 
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
+  // const mobileNumber = myProfile.mobileNumber
+
+  const sendOtp = async () => {
+    try {
+      const response = await axios.post('https://api.helpubuild.co.in/api/v1/otp_send_before_update', { mobileNumber });
+      if (response.data.success) {
+        setOtpSent(true);
+        setTimeout(() => {
+          document.getElementById('otpModal').style.display = 'block';
+        }, 200);
+      } else {
+        alert(response.data.message);
+      }
+    } catch (error) {
+      console.error('Error sending OTP:', error);
+      alert('Failed to send OTP. Try again.');
+    }
+  };
+
+  // Function to verify OTP
+  const verifyOtp = async () => {
+    try {
+      const response = await axios.post('https://api.helpubuild.co.in/api/v1/verify_otp_before_update', { mobileNumber, otp });
+      if (response.data.success) {
+        setIsOtpVerified(true);
+        setActiveTab(3); // Open BankDetail after OTP verification
+        setOtpSent(false);
+        setOtp('');
+        closeOtpModal();
+        setTimeout(() => {
+          document.getElementById('withdrawalModal').style.display = 'block';
+        }, 200);
+      } else {
+        alert(response.data.message);
+      }
+    } catch (error) {
+      console.error('Error verifying OTP:', error);
+      alert('OTP verification failed.');
+    }
+  };
+
+  // Close OTP Modal
+  const closeOtpModal = () => {
+    document.getElementById('otpModal').style.display = 'none';
+  };
+
+  const closeWithdrawModal = () => {
+    document.getElementById('withdrawalModal').style.display = 'none';
+  };
+
+
   if (token === null) {
     return <div className="container my-5 text-center">
       <div className="w-100">
@@ -227,6 +282,7 @@ const UserDashboard = () => {
       </a>
     </div>
   }
+
   if (loading) {
     return <div>Loading...</div>
   }
@@ -249,6 +305,7 @@ const UserDashboard = () => {
     </div>
 
   }
+  
   return (
     <div className='userdashboard-body-bg'>
       <div className="w-100 mx-auto py-5 h-100 px-2">
@@ -331,7 +388,7 @@ const UserDashboard = () => {
                       <div className="available-balance medium-device-balance"> Available balance: <main class="balance-avail"> ₹ {walletAmount} </main></div>
                     </div>
                     {/* <div style={{display:'flex',gap:'10px'}}> */}
-                    <a data-bs-toggle="modal" data-bs-target="#withdrawalModal" className="profileRecharge">Withdrawal</a>
+                    <a onClick={() => sendOtp()} className="profileRecharge">Withdrawal</a>
 
                     {/* </div> */}
                   </div>
@@ -383,10 +440,7 @@ const UserDashboard = () => {
                   >
                     Logout  <i className="fas fa-sign-out-alt text-body"></i>
                   </button>
-
                 </div>
-
-
               </div>
             </div>
           </div>
@@ -670,11 +724,13 @@ const UserDashboard = () => {
       </div>
 
       <div
-        className="modal fade"
+        className="modal fade show"
         id="withdrawalModal"
+        style={{ display: 'none' }}
         tabIndex="-1"
         aria-labelledby="withdrawalModalLabel"
         aria-hidden="true"
+        aria-modal="true"
       >
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
@@ -685,8 +741,7 @@ const UserDashboard = () => {
               <button
                 type="button"
                 className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
+                onClick={closeWithdrawModal}
               ></button>
             </div>
             <form onSubmit={handleSubmit}>
@@ -727,7 +782,7 @@ const UserDashboard = () => {
                 <button
                   type="button"
                   className="btn btn-secondary"
-                  data-bs-dismiss="modal"
+                  onClick={closeWithdrawModal}
                 >
                   Close
                 </button>
@@ -739,6 +794,33 @@ const UserDashboard = () => {
           </div>
         </div>
       </div>
+
+      {otpSent && (
+        <div id="otpModal" className="modal fade show" style={{ display: 'block' }} aria-modal="true">
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h4 className="modal-title">OTP Verification</h4>
+                <button type="button" className="btn-close" onClick={closeOtpModal}></button>
+              </div>
+              <div className="modal-body">
+                <p>An OTP has been sent to your registered mobile number: <strong>{mobileNumber}</strong></p>
+                <input
+                  type="text"
+                  className="form-control mt-2 border"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  placeholder="Enter OTP"
+                />
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-secondary" onClick={closeOtpModal}>Cancel</button>
+                <button className="btn btn-primary" onClick={verifyOtp}>Verify OTP</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

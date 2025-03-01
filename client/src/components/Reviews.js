@@ -67,7 +67,7 @@ const Reviews = () => {
                 Our clients rave about our exceptional service, innovative designs, and the seamless experience we provide, ensuring their vision comes to life.
               </p>
               <div style={{ padding: '20px' }} className="row">
-                <div className="col-lg-12 col-md-12 d-flex align-items-center">
+                <div style={{display: 'flex'}} className="col-lg-12 col-md-12 align-items-center">
                   {reviews.length > 0 && (
                     <div
                       style={{ width: '100%', marginBottom: '20px' }}

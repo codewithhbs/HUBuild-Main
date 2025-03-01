@@ -247,12 +247,21 @@ const Header = () => {
                             Profile
                           </Link>
                         ) : (
-                          <Link onClick={handleLinkClick}
-                            className={`as_btn ${active === "/Login" ? "active" : ""}`}
-                            to="/login"
-                          >
-                            Login
-                          </Link>
+                          // <Link onClick={handleLinkClick}
+                          //   className={`as_btn ${active === "/Login" ? "active" : ""}`}
+                          //   to="/login"
+                          // >
+                          //   Login
+                          // </Link>
+                          <div class="dropdown">
+                            <button class="btn dropdown-toggle" style={{backgroundColor:'#EAB936', color:'white'}} type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              Login
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                              <a class="dropdown-item" href="/login">Login as User</a>
+                              <a class="dropdown-item" href="/partner-login">Login as Partner</a>
+                            </div>
+                          </div>
                         )}
                       </li>
                     </ul>

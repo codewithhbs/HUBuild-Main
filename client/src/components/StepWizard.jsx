@@ -7,7 +7,7 @@ import "./wizard.css";
 import { useSearchParams } from "react-router-dom";
 import Swal from 'sweetalert2'
 
-const StepWizard = () => {
+const   StepWizard = () => {
     const [searchParams] = useSearchParams();
     const referralCode = searchParams.get("ref");
     console.log("referralCode", referralCode)
@@ -20,6 +20,8 @@ const StepWizard = () => {
         password: "",
         couponCode: "",
     });
+    const [couponDetail, setCouponDetail] = useState(null);
+    const [couponMessage, setCouponMessage] = useState("");
 
     const [isPasswordShow, setIsPasswordShow] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -178,6 +180,8 @@ const StepWizard = () => {
                 couponCode: memberData.couponCode,
             });
             if (res.data.success) {
+                setCouponMessage(res.data.message);
+                setCouponDetail(res.data.data);
                 toast.success(res.data.message);
             } else {
                 // toast.error("Invalid coupon code.");
@@ -201,6 +205,8 @@ const StepWizard = () => {
             setLoading(false);
         }
     };
+
+    console.log("couponDetail",couponDetail)
 
     return (
         <div className="container mt-5 mb-5">
@@ -241,6 +247,35 @@ const StepWizard = () => {
                             <button type="button" className="btn btn-outline-primary" onClick={handleCheckCouponCode}>Apply</button>
                         </div>
                     </div>
+                      {/* Display Coupon Details Based on Message */}
+                      {couponDetail && (
+                        <div className="col-lg-12">
+                            <div className="alert alert-success mt-3">
+                                <h5>Coupon Details</h5>
+                                {couponMessage.includes("Refer by admin") && (
+                                    <>
+                                        <p>
+                                            <strong>Coupon Code:</strong> {couponDetail.couponCode}
+                                        </p>
+                                        <p>
+                                            <strong>Discount:</strong> {couponDetail.discount}%
+                                        </p>
+                                    </>
+                                )}
+
+                                {couponMessage.includes("Refer by provider") && (
+                                    <>
+                                        <p>
+                                            <strong>Coupon Code:</strong> {couponDetail.couponCode}
+                                        </p>
+                                        <p>
+                                            <strong>Discount:</strong> {couponDetail?.discount?.discountPercent}%
+                                        </p>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
                 <button type="submit" className="btn btn-success">{loading ? "Loading..." : "Register"}</button>
             </form>

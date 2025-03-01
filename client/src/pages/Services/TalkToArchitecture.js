@@ -305,7 +305,7 @@ function TalkToArchitect() {
                       {
                         role === 'user' ? (
                           <div className='architectur-bar'>
-                            <div className="available-balance medium-device-balance"> Available balance: <main class="balance-avail"> ₹ {walletAmount} </main></div>
+                            <div className="available-balance medium-device-balance"> Available balance: <main className="balance-avail"> ₹ {walletAmount} </main></div>
                           </div>
                         ) : (<></>)
                       }
@@ -316,7 +316,7 @@ function TalkToArchitect() {
                               <a onClick={handleOpenModel} className="medium-device-recharge">Recharge</a>
                             ) : (<></>)
                           }
-                          {/* <button className="filter_short-btn"><i class="fa fa-filter"></i> Filter </button> */}
+                          {/* <button className="filter_short-btn"><i className="fa fa-filter"></i> Filter </button> */}
                           <button
                             type="button"
                             className="btn filter-short-by"
@@ -441,11 +441,11 @@ function TalkToArchitect() {
           <div className="container-fluid architecture-section-p">
             <div className='profile-card-box'>
               {currentProviders && currentProviders.map((item, index) => (
-                <Link to={`/architect-profile/${item._id}`} class="profile-card" key={index}>
+                <Link to={`/architect-profile/${item._id}`} className="profile-card" key={index}>
                   {/* <!-- Left Section (Profile) --> */}
-                  <div class="left-section">
-                    <img src={item?.photo?.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || 'User')}&background=random`} alt="Profile" onError={(e) => e.target.src = 'https://via.placeholder.com/60'} class="profile-img" />
-                    {/* <div class="stars">★★★★★</div> */}
+                  <div className="left-section">
+                    <img src={item?.photo?.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || 'User')}&background=random`} alt="Profile" onError={(e) => e.target.src = 'https://via.placeholder.com/60'} className="profile-img" />
+                    {/* <div className="stars">★★★★★</div> */}
                     <StarRating rating={item.averageRating || 0} />
                     <h5 className="formarginzero">
                       {item.name ? (
@@ -475,19 +475,19 @@ function TalkToArchitect() {
                     ) : (
                       "Not Updated"
                     )}</p>
-                    <p class="pricing formarginzero">
-                      {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds ${handleFilterProviderService(item._id) || 'Sq. Yrds'} * 900`}
+                    <p className="pricing formarginzero">
+                      {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds ${handleFilterProviderService(item._id) || 'Sq. Yrds'} * 900`}
                     </p>
                   </div>
 
                   {/* <!-- Right Section (Buttons & Experience) --> */}
-                  <div class="right-section">
-                    <div style={{padding:'0px'}} class="buttons chat-call-btn">
-                      <button class="chat">Chat 💬</button>
-                      <button style={{backgroundColor:'black'}} class="call">Call 📞</button>
+                  <div className="right-section">
+                    <div style={{padding:'0px'}} className="buttons chat-call-btn">
+                      <button disabled={!item.chatStatus} className={`${item.chatStatus === true ? 'profile-chat-btn' : 'profile-call-btn'}`}>Chat <i className="fa-regular fa-comments"></i></button>
+                      <button disabled={!item.callStatus} className={`${item.callStatus === true ? 'profile-chat-btn' : 'profile-call-btn'}`}>Call <i className="fa-solid fa-phone-volume"></i></button>
                     </div>
-                    <p class="price">{`₹ ${item.pricePerMin}/min`}</p>
-                    <p class="experience">{item.yearOfExperience ? (
+                    <p className="price">{`₹ ${item.pricePerMin}/min`}</p>
+                    <p className="experience">{item.yearOfExperience ? (
                       <span className='archi-language-tag'>{`${item.yearOfExperience}`}</span>
                     ) : (
                       "Not Available"

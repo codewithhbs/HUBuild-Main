@@ -483,8 +483,8 @@ const Vastu = () => {
                   {/* <!-- Right Section (Buttons & Experience) --> */}
                   <div class="right-section">
                     <div style={{ padding: '0px' }} class="buttons chat-call-btn">
-                      <button class="chat">Chat 💬</button>
-                      <button style={{ backgroundColor: 'black' }} class="call">Call 📞</button>
+                    <button disabled={!item.chatStatus} className={`${item.chatStatus === true ? 'profile-chat-btn' : 'profile-call-btn'}`}>Chat <i className="fa-regular fa-comments"></i></button>
+                    <button disabled={!item.callStatus} className={`${item.callStatus === true ? 'profile-chat-btn' : 'profile-call-btn'}`}>Call <i className="fa-solid fa-phone-volume"></i></button>
                     </div>
                     <p class="price">{`₹ ${item.pricePerMin}/min`}</p>
                     <p class="experience">{item.yearOfExperience ? (

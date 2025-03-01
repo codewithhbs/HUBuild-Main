@@ -421,8 +421,9 @@ i.fa.fa-search {
 }
 
 .profile-chat-btn {
-  border: 2px solid #059b38;
+  border: 2px solid #059b38 !important;
   border-radius: 150px;
+  background-color: white !important;
 }
 
 .profile-chat-btn i {
