@@ -41,6 +41,7 @@ import Cancellation from "./pages/Policies/Cancellation";
 import Disclaimer from "./pages/Policies/Disclaimer";
 import TermCondition from "./pages/Policies/Term&Condition";
 import PartnerLogin from "./pages/auth/PartnerLogin";
+import MobileCard from "./pages/Services/MobileCard";
 // Scroll to top component
 function ScrollToTop() {
   const location = useLocation();
@@ -76,6 +77,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/blog" element={<Blog_Page />} />
+        <Route path="/mobile_card" element={<MobileCard />} />
         <Route path="/Architecture" element={<Architecture />} />
         <Route path="/talk-to-architect" element={<TalkToArchitect />} />
         <Route path="/architect-profile/:id" element={<ArchitectProfile />} />

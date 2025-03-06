@@ -250,3 +250,10 @@ a{
 .formarginzero{
   margin: 0px !important;
 }
+
+.redBorder{
+  border:1px solid red !important;
+}
+.greenBorder{
+  border:1px solid green !important;
+}

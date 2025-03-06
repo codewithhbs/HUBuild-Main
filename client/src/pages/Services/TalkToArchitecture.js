@@ -454,8 +454,9 @@ function TalkToArchitect() {
                         "Not Available"
                       )}
                     </h5>
-                    <p className="formarginzero">{item.type ? item.type : "Profile Update"}</p>
-                    <p className="formarginzero">Languages:  {item.language && item.language.length > 0 ? (
+                    {/* <p className="formarginzero">{item.type ? item.type : "Profile Update"}</p> */}
+                    {/* <p className="formarginzero">Languages:  {item.language && item.language.length > 0 ? ( */}
+                    <p className="formarginzero">{item.language && item.language.length > 0 ? (
                       item.language.map((lang, index) => (
                         <span key={index} className="archi-language-tag">
                           {lang}
@@ -476,21 +477,22 @@ function TalkToArchitect() {
                       "Not Updated"
                     )}</p>
                     <p className="pricing formarginzero">
-                      {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds ${handleFilterProviderService(item._id) || 'Sq. Yrds'} * 900`}
+                      {/* {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds ${handleFilterProviderService(item._id) || 'Sq. Yrds'} * 900`} */}
+                      {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds`}
                     </p>
                   </div>
 
                   {/* <!-- Right Section (Buttons & Experience) --> */}
                   <div className="right-section">
                     <div style={{padding:'0px'}} className="buttons chat-call-btn">
-                      <button disabled={!item.chatStatus} className={`${item.chatStatus === true ? 'profile-chat-btn' : 'profile-call-btn'}`}>Chat <i className="fa-regular fa-comments"></i></button>
-                      <button disabled={!item.callStatus} className={`${item.callStatus === true ? 'profile-chat-btn' : 'profile-call-btn'}`}>Call <i className="fa-solid fa-phone-volume"></i></button>
+                      <button disabled={!item.chatStatus} className={`${item.chatStatus === true ? 'profile-chat-btn greenBorder' : 'profile-call-btn redBorder'}`}>Chat <i className="fa-regular fa-comments"></i></button>
+                      <button disabled={!item.callStatus} className={`${item.callStatus === true ? 'profile-chat-btn greenBorder' : 'profile-call-btn redBorder'}`}>Call <i className="fa-solid fa-phone-volume"></i></button>
                     </div>
                     <p className="price">{`₹ ${item.pricePerMin}/min`}</p>
                     <p className="experience">{item.yearOfExperience ? (
                       <span className='archi-language-tag'>{`${item.yearOfExperience}`}</span>
                     ) : (
-                      "Not Available"
+                      ""
                     )} Years Experience</p>
                   </div>
                 </Link>

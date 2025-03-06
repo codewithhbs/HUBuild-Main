@@ -10,6 +10,7 @@ const quickLinks = [
   { to: '/about', text: 'About Us' },
   { to: '/blog', text: 'Blog' },
   { to: '/contact', text: 'Contact Us' },
+  { to: '/mobile_card', text: 'Mobile Card' },
 ];
 
 
