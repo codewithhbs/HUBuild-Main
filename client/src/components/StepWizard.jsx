@@ -33,7 +33,7 @@ const   StepWizard = () => {
 
     const fetchCurrentLocation = async () => {
         try {
-            const res = await axios.post("http://localhost:5000/Fetch-Current-Location", {
+            const res = await axios.post("https://api.helpubuild.co.in/Fetch-Current-Location", {
                 lat: coords.latitude,
                 lng: coords.longitude,
             });
@@ -103,7 +103,7 @@ const   StepWizard = () => {
             }
 
             // Fetch order details from backend
-            const res = await axios.post(`http://localhost:5000/api/v1/buy_membership/${providerId}`, {
+            const res = await axios.post(`https://api.helpubuild.co.in/api/v1/buy_membership/${providerId}`, {
                 couponCode: memberData.couponCode,
             });
 
@@ -119,7 +119,7 @@ const   StepWizard = () => {
                     name: "Help U Build",
                     description: "Buying Membership",
                     order_id: order.id,
-                    callback_url: "http://localhost:5000/api/v1/membership_payment_verify",
+                    callback_url: "https://api.helpubuild.co.in/api/v1/membership_payment_verify",
                     prefill: {
                         name: providerData.name,
                         email: providerData.email,
@@ -145,7 +145,7 @@ const   StepWizard = () => {
         setLoading(true);
 
         try {
-            const res = await axios.post("http://localhost:5000/api/v1/register-provider", memberData);
+            const res = await axios.post("https://api.helpubuild.co.in/api/v1/register-provider", memberData);
             toast.success(res.data.message);
             setData("token", res.data.token);
             setData("islogin", !!res.data.token);
@@ -176,7 +176,7 @@ const   StepWizard = () => {
 
         setLoading(true);
         try {
-            const res = await axios.post("http://localhost:5000/api/v1/check_coupon_code", {
+            const res = await axios.post("https://api.helpubuild.co.in/api/v1/check_coupon_code", {
                 couponCode: memberData.couponCode,
             });
             if (res.data.success) {

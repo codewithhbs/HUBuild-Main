@@ -9,7 +9,8 @@ import Swal from 'sweetalert2';
 const PartnerLogin = () => {
     const [logindata, setLoginData] = useState({
         any: '',
-        password: ''
+        password: '',
+        loginFrom: 'provider'
     });
     const location = new URLSearchParams(window.location.search)
     const redirectPath = location.get('redirect') || {}
@@ -29,7 +30,7 @@ const PartnerLogin = () => {
 
         e.preventDefault()
         try {
-            const { data } = await axios.post('http://localhost:5000/api/v1/login', logindata, {
+            const { data } = await axios.post('https://api.helpubuild.co.in/api/v1/login', logindata, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*`',

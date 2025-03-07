@@ -46,8 +46,8 @@ const Header = () => {
 
     try {
       const url = UserData?.role === "provider"
-        ? `http://localhost:5000/api/v1/get-chat-by-providerId/${UserData._id}`
-        : `http://localhost:5000/api/v1/get-chat-by-userId/${UserData._id}`;
+        ? `https://api.helpubuild.co.in/api/v1/get-chat-by-providerId/${UserData._id}`
+        : `https://api.helpubuild.co.in/api/v1/get-chat-by-userId/${UserData._id}`;
 
       const { data } = await axios.get(url);
       const fullData = data.data
@@ -79,7 +79,7 @@ const Header = () => {
     // Check if the user role is 'user' or 'provider' and call the corresponding API route
     try {
       let response;
-      const url = `http://localhost:5000/api/v1/mark-${UserData.role}-chats-as-read/${UserData._id}`;
+      const url = `https://api.helpubuild.co.in/api/v1/mark-${UserData.role}-chats-as-read/${UserData._id}`;
 
       // Use axios to make the request
       response = await axios.put(url);

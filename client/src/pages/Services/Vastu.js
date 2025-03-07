@@ -31,7 +31,7 @@ const Vastu = () => {
   const handleFetchUser = async () => {
     try {
       const UserId = UserData?._id;
-      const { data } = await axios.get(`http://localhost:5000/api/v1/get-single-user/${UserId}`);
+      const { data } = await axios.get(`https://api.helpubuild.co.in/api/v1/get-single-user/${UserId}`);
 
       const formattedAmount = data.data.walletAmount.toFixed(2);
 
@@ -49,7 +49,7 @@ const Vastu = () => {
 
   const handleFetchProvider = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5000/api/v1/get-all-provider');
+      const { data } = await axios.get('https://api.helpubuild.co.in/api/v1/get-all-provider');
       const allData = data.data.filter((item) => item.type === 'Vastu');
       const shownProvider = allData.filter((item) => item.accountVerified === 'Verified')
       setAllProviders(shownProvider);
@@ -70,7 +70,7 @@ const Vastu = () => {
     const handleFetchProviderAllService = async () => {
       try {
         setLoading(true)
-        const all = await axios.get('http://localhost:5000/api/v1/get-all-provider-service');
+        const all = await axios.get('https://api.helpubuild.co.in/api/v1/get-all-provider-service');
         const allData = all.data.data
         const filterData = allData.filter((item) => item.category === 'Residential')
         setAllProviderService(filterData)
@@ -89,7 +89,7 @@ const Vastu = () => {
     try {
       // Fetch services for the selected category
       const { data } = await axios.get(
-        `http://localhost:5000/api/v1/get-service-by-provider/${providerId}/Residential`
+        `https://api.helpubuild.co.in/api/v1/get-service-by-provider/${providerId}/Residential`
       );
 
       // Find the service data for the selected category
@@ -211,7 +211,7 @@ const Vastu = () => {
         providerId: providerId._id, // Include providerId
       };
       try {
-        const res = await axios.post('http://localhost:5000/api/v1/create-chat', newForm);
+        const res = await axios.post('https://api.helpubuild.co.in/api/v1/create-chat', newForm);
         window.location.href = '/chat';
       } catch (error) {
         console.error("Internal server error", error);
@@ -241,7 +241,7 @@ const Vastu = () => {
 
       const UserId = UserData?._id;
 
-      const res = await axios.post(`http://localhost:5000/api/v1/create-payment/${UserId}`, {
+      const res = await axios.post(`https://api.helpubuild.co.in/api/v1/create-payment/${UserId}`, {
         price: amount
       })
       console.log("Order", res.data.data)
@@ -256,7 +256,7 @@ const Vastu = () => {
           name: 'Help U Build',
           description: 'Doing Recharge',
           order_id: order?.id || '',
-          callback_url: "http://localhost:5000/api/v1/verify-payment",
+          callback_url: "https://api.helpubuild.co.in/api/v1/verify-payment",
           prefill: {
             name: UserData?.name,
             email: UserData?.email,
@@ -440,13 +440,16 @@ const Vastu = () => {
         <div className='section architecture-section-2 mb-5'>
           <div className="container-fluid architecture-section-p">
             <div className='profile-card-box'>
-              {currentProviders && currentProviders.map((item, index) => (
-                <Link to={`/architect-profile/${item._id}`} class="profile-card" key={index}>
+            {currentProviders && currentProviders.map((item, index) => (
+                <Link to={`/architect-profile/${item._id}`} className="profile-card" key={index}>
                   {/* <!-- Left Section (Profile) --> */}
-                  <div class="left-section">
-                    <img src={item?.photo?.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || 'User')}&background=random`} alt="Profile" onError={(e) => e.target.src = 'https://via.placeholder.com/60'} class="profile-img" />
-                    {/* <div class="stars">★★★★★</div> */}
+                  <div className='left-to-left'>
+                    <img src={item?.photo?.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || 'User')}&background=random`} alt="Profile" onError={(e) => e.target.src = 'https://via.placeholder.com/60'} className="profile-img" />
                     <StarRating rating={item.averageRating || 0} />
+                    
+                  </div>
+                  <div className="left-section">
+                    {/* <div className="stars">★★★★★</div> */}
                     <h5 className="formarginzero">
                       {item.name ? (
                         <Link to={`/architect-profile/${item._id}`}>{item.name}</Link>
@@ -476,24 +479,25 @@ const Vastu = () => {
                     ) : (
                       "Not Updated"
                     )}</p>
-                    <p class="pricing formarginzero">
-                      {/* {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds ${handleFilterProviderService(item._id) || 'Sq. Yrds'} * 900`} */}
-                      {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds`}
+                    <p className="pricing formarginzero">
+                      {/* {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds ${handleFilterProviderService(item._id) || 'Sq. Yrds'} * 900`} */}
+                      {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds`}
                     </p>
+                    <p className="experience">{item.yearOfExperience ? (
+                      <span className='archi-language-tag'>{`${item.yearOfExperience}`}</span>
+                    ) : (
+                      ""
+                    )} Years Experience</p>
                   </div>
 
                   {/* <!-- Right Section (Buttons & Experience) --> */}
-                  <div class="right-section">
-                    <div style={{ padding: '0px' }} class="buttons chat-call-btn">
-                    <button disabled={!item.chatStatus} className={`${item.chatStatus === true ? 'profile-chat-btn greenBorder' : 'profile-call-btn redBorder'}`}>Chat <i className="fa-regular fa-comments"></i></button>
-                    <button disabled={!item.callStatus} className={`${item.callStatus === true ? 'profile-chat-btn greenBorder' : 'profile-call-btn redBorder'}`}>Call <i className="fa-solid fa-phone-volume"></i></button>
+                  <div className="right-section">
+                    <div style={{ padding: '0px' }} className="buttons chat-call-btn">
+                      <button disabled={!item.chatStatus} className={`${item.chatStatus === true ? 'profile-chat-btn greenBorder' : 'profile-call-btn redBorder'}`}>Chat <i className="fa-regular fa-comments"></i></button>
+                      <button disabled={!item.callStatus} className={`${item.callStatus === true ? 'profile-chat-btn greenBorder' : 'profile-call-btn redBorder'}`}>Call <i className="fa-solid fa-phone-volume"></i></button>
                     </div>
-                    <p class="price">{`₹ ${item.pricePerMin}/min`}</p>
-                    <p class="experience">{item.yearOfExperience ? (
-                      <span className='archi-language-tag'>{`${item.yearOfExperience}`}</span>
-                    ) : (
-                      "Not Available"
-                    )} Years Experience</p>
+                    <p className="price">{`₹ ${item.pricePerMin}/min`}</p>
+                    
                   </div>
                 </Link>
               ))}

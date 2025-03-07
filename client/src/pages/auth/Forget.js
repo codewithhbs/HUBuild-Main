@@ -15,7 +15,7 @@ function Forget() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/v1/forgot-password', {
+      const response = await axios.post('https://api.helpubuild.co.in/api/v1/forgot-password', {
         mobileNumber,
       });
 
@@ -56,7 +56,7 @@ function Forget() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/v1/Changepassword', {
+      const response = await axios.post('https://api.helpubuild.co.in/api/v1/Changepassword', {
         mobileNumber,
         otp,
         password,

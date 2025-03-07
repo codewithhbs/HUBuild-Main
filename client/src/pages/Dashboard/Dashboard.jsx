@@ -29,7 +29,7 @@ function Dashboard() {
     }
     setLoading(true);
     try {
-      const { data } = await axios.get(`http://localhost:5000/api/v1/get-single-user/${userId}`);
+      const { data } = await axios.get(`https://api.helpubuild.co.in/api/v1/get-single-user/${userId}`);
       // console.log("data: ", data.data)
       setMyProfile(data.data);
       // console.log("object", data)
@@ -110,7 +110,7 @@ function Dashboard() {
 
       const UserId = UserData?._id;
 
-      const res = await axios.post(`http://localhost:5000/api/v1/create-payment/${UserId}`, {
+      const res = await axios.post(`https://api.helpubuild.co.in/api/v1/create-payment/${UserId}`, {
         price: amount
       })
       // console.log("Order", res.data.data)
@@ -125,7 +125,7 @@ function Dashboard() {
           name: 'Help U Build',
           description: 'Doing Recharge',
           order_id: order?.id || '',
-          callback_url: "http://localhost:5000/api/v1/verify-payment",
+          callback_url: "https://api.helpubuild.co.in/api/v1/verify-payment",
           prefill: {
             name: UserData?.name,
             email: UserData?.email,
