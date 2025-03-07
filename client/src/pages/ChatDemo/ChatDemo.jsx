@@ -25,6 +25,7 @@ const ChatDemo = () => {
     const [isProviderConnected, setIsProviderConnected] = useState(false);
     const [timeLeft, setTimeLeft] = useState(0)
     const [isActive, setIsActive] = useState(false);
+    const [status, setStatus] = useState('offline');
 
     // console.log("message",UserData._id)
     const id = UserData?._id || ''
@@ -87,6 +88,11 @@ const ChatDemo = () => {
         socket.on('return_message', (data) => {
             // console.log('Received message:', data);
             setMessages((prev) => [...prev, data]);
+        });
+
+        socket.on('user_status', ({ userId, astrologerId, status }) => {
+            console.log(`User ${userId} or Provider ${astrologerId} is now ${status}`);
+            setStatus(status);
         });
 
         socket.on('error_message', (data) => {
@@ -312,7 +318,7 @@ const ChatDemo = () => {
         // return window.location.href = '/login'
         return <AccessDenied />
     }
-    // console.log(socket)
+    console.log("status",status);
     return (
         <section className=' hitesh_styling' style={{ backgroundColor: '#CDC4F9' }}>
             <div className="container py-5">

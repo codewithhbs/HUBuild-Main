@@ -73,11 +73,11 @@ app.use((req, res, next) => {
 // Middleware to capture response status and log it
 app.use((req, res, next) => {
     res.on('finish', () => {
-        console.log(`[REQUEST STATUS] ${req.method} ${req.originalUrl} - ${res.statusCode} from ${req.headers.origin || 'Unknown'}`);
+        // console.log(`[REQUEST STATUS] ${req.method} ${req.originalUrl} - ${res.statusCode} from ${req.headers.origin || 'Unknown'}`);
     });
     next();
 });
-
+const onlineUsers = {}; // Track online users and providers
 io.on('connection', (socket) => {
     console.log('A new client connected:', socket.id);
 
@@ -101,13 +101,28 @@ io.on('connection', (socket) => {
             socket.join(room);
             roomMembers[socket.id] = { userId, astrologerId, role, room };  // Store role here
 
+            // Mark user or provider as online
+            if (!onlineUsers[userId]) onlineUsers[userId] = { online: false };
+            if (!onlineUsers[astrologerId]) onlineUsers[astrologerId] = { online: false };
+
+            // Track online users and providers
+            if (role === 'user') {
+                onlineUsers[userId] = { online: true, socketId: socket.id };
+            } else if (role === 'provider') {
+                onlineUsers[astrologerId] = { online: true, socketId: socket.id };
+            }
+
             console.log(`${socket.id} joined room: ${room}`);
             console.log(`Current members in ${room}:`, [...socket.adapter.rooms.get(room)]);
+
+            // Notify the other participant in the room
+            socket.to(room).emit('user_status', { userId, astrologerId, status: 'online' });
+            console.log(`${socket.id} joined room: ${room}`);
 
             // Notify the client about successful room joining
             socket.emit('room_joined', { message: 'Welcome back. Start chat', room });
             // Respond with success to the callback
-            callback({ success: true, message: 'Welcome back. Start chat', status: true });
+            callback({ success: true, message: 'Welcome back. Start chat' });
         } catch (error) {
             console.error('Error in join_room event:', error);
             socket.emit('error_message', { message: 'An error occurred while joining the room' });
@@ -256,12 +271,13 @@ io.on('connection', (socket) => {
             // if(providerSocket){
             // }
 
-            console.log("role", role)
+            // console.log("role", role)
 
             if (role === 'provider') {
                 providerconnect = true;
                 console.log("providerconnect", providerconnect)
                 console.log('Provider disconnected. Waiting for user to disconnect to end the chat.', astrologerId);
+                onlineUsers[astrologerId].online = false;
                 await update_profile_status(astrologerId)
                 if (userSocket) {
                     io.to(userSocket).emit('provider_disconnected', { message: 'The provider has left the chat.' });
@@ -269,6 +285,7 @@ io.on('connection', (socket) => {
 
             } else if (role === 'user') {
                 console.log('User disconnected. Checking provider status...');
+                onlineUsers[userId].online = false;
                 if (providerconnect) {
 
                     roomData.providerConnected = true;
@@ -291,6 +308,18 @@ io.on('connection', (socket) => {
                     console.log("User disconnected before provider connected. No wallet deduction performed.");
                 }
             }
+
+            // Mark user or provider as offline
+            if (role === 'user') {
+                onlineUsers[userId].online = false;
+            } else if (role === 'provider') {
+                onlineUsers[astrologerId].online = false;
+            }
+
+            // Notify the remaining participant in the room
+            socket.to(room).emit('user_status', { userId, astrologerId, status: 'offline' });
+
+            console.log(`User ${userId} or Provider ${astrologerId} went offline`);
 
             // Update `bothConnected` flag if both parties are still in the room
             if (userSocket && providerSocket) {

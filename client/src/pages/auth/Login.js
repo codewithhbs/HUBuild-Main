@@ -10,7 +10,8 @@ import Swal from 'sweetalert2';
 function Login() {
     const [logindata, setLoginData] = useState({
         any: '',
-        password: ''
+        password: '',
+        loginFrom:'user'
     });
     const location = new URLSearchParams(window.location.search)
     const redirectPath = location.get('redirect') || {}

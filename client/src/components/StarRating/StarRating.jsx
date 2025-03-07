@@ -8,7 +8,8 @@ const StarRating = ({ rating }) => {
     const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
 
     return (
-        <div className="star-rating me-4">
+        // <div className="star-rating me-4">
+        <div className="star-rating">
             {/* Render full stars */}
             {[...Array(fullStars)].map((_, index) => (
                 <FaStar key={index} style={{fontSize:'15px'}} color="gold" />
