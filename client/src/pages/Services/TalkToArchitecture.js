@@ -479,15 +479,15 @@ function TalkToArchitect() {
                     ) : (
                       "Not Updated"
                     )}</p>
-                    <p className="pricing formarginzero">
-                      {/* {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds ${handleFilterProviderService(item._id) || 'Sq. Yrds'} * 900`} */}
-                      {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds`}
-                    </p>
                     <p className="experience">{item.yearOfExperience ? (
                       <span className='archi-language-tag'>{`${item.yearOfExperience}`}</span>
                     ) : (
                       ""
                     )} Years Experience</p>
+                    <p className="pricing formarginzero">
+                      {/* {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds ${handleFilterProviderService(item._id) || 'Sq. Yrds'} * 900`} */}
+                      {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds`}
+                    </p>
                   </div>
 
                   {/* <!-- Right Section (Buttons & Experience) --> */}
