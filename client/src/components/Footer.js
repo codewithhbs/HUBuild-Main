@@ -63,7 +63,7 @@ const Footer = () => {
               </li>
               <li className="footer-contact-item">
                 <Phone className="footer-contact-icon" />
-                <a href="tel:+918826465693">+91 8826465693</a>
+                <a href="tel:+919220441214">+91 9220441214</a>
               </li>
               <li className="footer-contact-item">
                 <Mail className="footer-contact-icon" />
