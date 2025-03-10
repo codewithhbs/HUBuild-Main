@@ -441,66 +441,66 @@ function TalkToInterior() {
           <div className="container-fluid architecture-section-p">
             <div className='profile-card-box'>
               {currentProviders && currentProviders.map((item, index) => (
-                              <Link to={`/architect-profile/${item._id}`} className="profile-card" key={index}>
-                                {/* <!-- Left Section (Profile) --> */}
-                                <div className='left-to-left'>
-                                  <img src={item?.photo?.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || 'User')}&background=random`} alt="Profile" onError={(e) => e.target.src = 'https://via.placeholder.com/60'} className="profile-img" />
-                                  <StarRating rating={item.averageRating || 0} />
-                                  
-                                </div>
-                                <div className="left-section">
-                                  {/* <div className="stars">★★★★★</div> */}
-                                  <h5 className="formarginzero">
-                                    {item.name ? (
-                                      <Link to={`/architect-profile/${item._id}`}>{item.name}</Link>
-                                    ) : (
-                                      "Not Available"
-                                    )}
-                                  </h5>
-                                  {/* <p className="formarginzero">{item.type ? item.type : "Profile Update"}</p> */}
-                                  {/* <p className="formarginzero">Languages:  {item.language && item.language.length > 0 ? ( */}
-                                  <p className="formarginzero">{item.language && item.language.length > 0 ? (
-                                    item.language.map((lang, index) => (
-                                      <span key={index} className="archi-language-tag">
-                                        {lang}
-                                        {index < item.language.length - 1 ? ", " : ""}
-                                      </span>
-                                    ))
-                                  ) : (
-                                    "Not Available"
-                                  )}</p>
-                                  <p className="formarginzero">{item.expertiseSpecialization && item.expertiseSpecialization.length > 0 ? (
-                                    item.expertiseSpecialization.map((specialization, index) => (
-                                      <span key={index} className="archi-language-tag">
-                                        {specialization}
-                                        {index < item.expertiseSpecialization.length - 1 ? ", " : ""}
-                                      </span>
-                                    ))
-                                  ) : (
-                                    "Not Updated"
-                                  )}</p>
-                                  <p className="pricing formarginzero">
-                                    {/* {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds ${handleFilterProviderService(item._id) || 'Sq. Yrds'} * 900`} */}
-                                    {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds`}
-                                  </p>
-                                  <p className="experience">{item.yearOfExperience ? (
-                                    <span className='archi-language-tag'>{`${item.yearOfExperience}`}</span>
-                                  ) : (
-                                    ""
-                                  )} Years Experience</p>
-                                </div>
-              
-                                {/* <!-- Right Section (Buttons & Experience) --> */}
-                                <div className="right-section">
-                                  <div style={{ padding: '0px' }} className="buttons chat-call-btn">
-                                    <button disabled={!item.chatStatus} className={`${item.chatStatus === true ? 'profile-chat-btn greenBorder' : 'profile-call-btn redBorder'}`}>Chat <i className="fa-regular fa-comments"></i></button>
-                                    <button disabled={!item.callStatus} className={`${item.callStatus === true ? 'profile-chat-btn greenBorder' : 'profile-call-btn redBorder'}`}>Call <i className="fa-solid fa-phone-volume"></i></button>
-                                  </div>
-                                  <p className="price">{`₹ ${item.pricePerMin}/min`}</p>
-                                  
-                                </div>
-                              </Link>
-                            ))}
+                <Link to={`/architect-profile/${item._id}`} className="profile-card" key={index}>
+                  {/* <!-- Left Section (Profile) --> */}
+                  <div className='left-to-left'>
+                    <img src={item?.photo?.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || 'User')}&background=random`} alt="Profile" onError={(e) => e.target.src = 'https://via.placeholder.com/60'} className="profile-img" />
+                    <StarRating rating={item.averageRating || 0} />
+
+                  </div>
+                  <div className="left-section">
+                    {/* <div className="stars">★★★★★</div> */}
+                    <h5 className="formarginzero">
+                      {item.name ? (
+                        <Link to={`/architect-profile/${item._id}`}>{item.name}</Link>
+                      ) : (
+                        "Not Available"
+                      )}
+                    </h5>
+                    {/* <p className="formarginzero">{item.type ? item.type : "Profile Update"}</p> */}
+                    {/* <p className="formarginzero">Languages:  {item.language && item.language.length > 0 ? ( */}
+                    <p className="formarginzero">{item.language && item.language.length > 0 ? (
+                      item.language.map((lang, index) => (
+                        <span key={index} className="archi-language-tag">
+                          {lang}
+                          {index < item.language.length - 1 ? ", " : ""}
+                        </span>
+                      ))
+                    ) : (
+                      "Not Available"
+                    )}</p>
+                    <p className="formarginzero">{item.expertiseSpecialization && item.expertiseSpecialization.length > 0 ? (
+                      item.expertiseSpecialization.map((specialization, index) => (
+                        <span key={index} className="archi-language-tag">
+                          {specialization}
+                          {index < item.expertiseSpecialization.length - 1 ? ", " : ""}
+                        </span>
+                      ))
+                    ) : (
+                      "Not Updated"
+                    )}</p>
+                    <p className="pricing formarginzero">
+                      {/* {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds ${handleFilterProviderService(item._id) || 'Sq. Yrds'} * 900`} */}
+                      {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds (Approx)`}
+                    </p>
+                    <p className="experience">{item.yearOfExperience ? (
+                      <span className='archi-language-tag'>{`${item.yearOfExperience}`}</span>
+                    ) : (
+                      ""
+                    )} Years Experience</p>
+                  </div>
+
+                  {/* <!-- Right Section (Buttons & Experience) --> */}
+                  <div className="right-section">
+                    <div style={{ padding: '0px' }} className="buttons chat-call-btn">
+                      <button disabled={!item.chatStatus} className={`${item.chatStatus === true ? 'profile-chat-btn greenBorder' : 'profile-call-btn redBorder'}`}>Chat <i className="fa-regular fa-comments"></i></button>
+                      <button disabled={!item.callStatus} className={`${item.callStatus === true ? 'profile-chat-btn greenBorder' : 'profile-call-btn redBorder'}`}>Call <i className="fa-solid fa-phone-volume"></i></button>
+                    </div>
+                    <p className="price">{`₹ ${item.pricePerMin}/min`}</p>
+
+                  </div>
+                </Link>
+              ))}
             </div>
             {/* Pagination */}
             <nav>

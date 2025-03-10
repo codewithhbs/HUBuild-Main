@@ -73,7 +73,7 @@
 
 @media (max-width:425px) {
     .forHeight {
-        height: 110px;
+        height: 130px;
     }
     .fs-6 {
         font-size: 12px !important;
@@ -88,5 +88,11 @@
     } */
     .as_menu_wrapper {
         padding: 0px 10px;
+    }
+}
+
+@media (max-width:373px) {
+    .forHeight {
+        height: 140px;
     }
 }
