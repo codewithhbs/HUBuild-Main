@@ -4,6 +4,8 @@ import { MapPin, Phone, Mail, Send } from 'lucide-react';
 import logo from './Help_You_Build__1_-removebg-preview (1).png';
 import './footer.css';
 import { GetData } from '../utils/sessionStoreage';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const quickLinks = [
   { to: '/member-registration', text: 'Become A Partner', key: 'partner' },
@@ -12,8 +14,6 @@ const quickLinks = [
   { to: '/contact', text: 'Contact Us' },
   // { to: '/mobile_card', text: 'Mobile Card' },
 ];
-
-
 
 const serviceLinks = [
   { to: '/talk-to-architect', text: 'Talk to Architect' },
@@ -42,11 +42,15 @@ const Footer = () => {
 
   }, [])
 
-  const handleNewsletterSubmit = (e) => {
+  const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
-    // Add newsletter subscription logic here
-    console.log('Newsletter subscription:', email);
-    setEmail('');
+    try {
+      const res = await axios.post('https://api.helpubuild.co.in/api/v1/create_newletter', { email });
+      toast.success(res.data.message);
+      setEmail('');
+    } catch (error) {
+      console.log("Internal sever error",error)
+    }
   };
 
   return (

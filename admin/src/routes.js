@@ -21,6 +21,7 @@ import EditGlobelDisPer from './views/GlobelDisPer/EditGlobelDisPer'
 import AllAdminCoupon from './views/AdminCoupon/AllAdminCoupon'
 import AddAdminCoupon from './views/AdminCoupon/AddAdminCoupon'
 import EditAdminCoupon from './views/AdminCoupon/EditAdminCoupon'
+import AllNewsLetter from './views/NewsLetter/AllNewsLetter'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
@@ -206,6 +207,9 @@ const routes = [
   { path: '/admin-coupon/add_admin_coupon', name: 'Add Admin Coupon', element: AddAdminCoupon },
   { path: '/admin-coupon/edit_admin_coupon/:id', name: 'Edit Admin Coupon', element: EditAdminCoupon },
 
+  // newsletter routes here 
+  { path: '/newsletter', name: 'Newsletter', element: Cards, exact: true },
+  { path: '/newsletter/all_newsletter', name: 'All Newsletter', element: AllNewsLetter},
 ]
 
 export default routes

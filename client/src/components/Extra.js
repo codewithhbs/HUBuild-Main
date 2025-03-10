@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import howwework from './how-we-work.webp';
-import toast from 'react-hot-toast';
 import axios from 'axios';
 import Slider from "react-slick";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
@@ -32,7 +30,6 @@ const Extra = () => {
                 cursor: "pointer",
                 backgroundColor: "#0E294C",
                 borderRadius: "50%",
-                // padding: "10px",
                 width: '40px',
                 height: '40px',
                 display: 'flex',
@@ -85,7 +82,7 @@ const Extra = () => {
         fetchWorkImage();
     }, [])
     return (
-        <div className="mx-5 extra-mobile">
+        <div className="extra-mobile">
             <div className='my-4'>
                 <div className='row align-items-center'>
                     <div className='col-lg-7 col-md-6'>
@@ -122,7 +119,7 @@ const Extra = () => {
                                                         <span className='text-white'>Step-{item.step}</span> {/* Dynamic step number */}
                                                     </div>
                                                 </div>
-                                                <p className=" ms-3" style={{ fontSize: '23px', textAlign: 'center' }}>
+                                                <p className=" ms-3" style={{ fontSize: '20px', textAlign: 'center', fontWeight: '500' }}>
                                                     {item.text}
                                                 </p>
                                             </div>

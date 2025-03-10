@@ -2,7 +2,6 @@ import React from "react";
 import Arch from "./Svg/Arch";
 import Int from "./Svg/Int";
 import Vastus from "./Svg/Vastus";
-import ShopSvg from "./Svg/ShopSvg";
 import image from './image.png'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import './Services.css'

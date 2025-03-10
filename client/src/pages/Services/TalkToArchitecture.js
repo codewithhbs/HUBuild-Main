@@ -486,7 +486,7 @@ function TalkToArchitect() {
                     )} Years Experience</p>
                     <p className="pricing formarginzero">
                       {/* {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds ${handleFilterProviderService(item._id) || 'Sq. Yrds'} * 900`} */}
-                      {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds`}
+                      {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds (Approx)`}
                     </p>
                   </div>
 

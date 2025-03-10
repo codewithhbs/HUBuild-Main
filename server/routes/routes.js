@@ -20,6 +20,7 @@ const { createCall, call_status } = require('../controllers/call.controller');
 const { createMemberShip, getAllMemberShip, getSingleMemberShip, updateMemberShip, deleteMemberShip, checkCouponCode, buyMemberShip, membershipPaymentVerify } = require('../controllers/memberShip.controller');
 const { createGlobelUserRefDis, getAllGlobelUserRefDis, updateGlobelUserRef, deleteGlobelUserRef, getSingleGlobelUserRef } = require('../controllers/globelUserRefDis.controller');
 const { createAdminCoupon, getAllAdminCoupon, getSingleAdminCoupon, updateAdminCoupon, deleteAdminCoupon } = require('../controllers/adminCoupon.controller');
+const { createNewsLetter, getAllNewsLetter, deleteNewsLetter, getSingleNewsLetter, sendNewsLetterMessage } = require('../controllers/newsLetter.controller');
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 const router = express.Router();
@@ -245,5 +246,13 @@ router.post('/membership_payment_verify',membershipPaymentVerify)
 // verify before update things routes 
 router.post('/otp_send_before_update',sendOtpForUpdateDetail)
 router.post('/verify_otp_before_update',verifyOtpForUpdateDetail)
+
+// newsletter routes here 
+
+router.post('/create_newletter',createNewsLetter)
+router.get('/all_newsletter',getAllNewsLetter)
+router.get('/single_newsletter/:id',getSingleNewsLetter)
+router.delete('/delete_newsletter/:id',deleteNewsLetter)
+router.post('/send_message_newsletter',sendNewsLetterMessage)
 
 module.exports = router;

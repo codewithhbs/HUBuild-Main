@@ -1,13 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
-import toast from 'react-hot-toast'
 import { setData } from '../../utils/sessionStoreage';
 import Swal from 'sweetalert2';
 
 const VerifyEmail = () => {
-    const location = new URLSearchParams(window.location.search)
-    const redirectPath = location.get('redirect') || {}
     const [query] = useSearchParams();
     const email = query.get("email");
     const ExpiresTime = query.get("expires");

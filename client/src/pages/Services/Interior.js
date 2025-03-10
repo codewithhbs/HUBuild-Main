@@ -1,4 +1,4 @@
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import BreadCrumbs from "../../components/BreadCrumbs";
 import { useEffect, useState } from "react";
 import { GiTalk } from "react-icons/gi";
@@ -53,8 +53,8 @@ const Interior = () => {
                 <div class="as_blog_detail">
                   <ul>
                     <li>
-                      <a href="javascript:;">
-                        <img src="assets/images/svg/user2.svg" alt="" />
+                      <a href="">
+                        <img src="assets/images/svg/user2.svg" alt="image" />
                         By - Admin
                       </a>
                     </li>

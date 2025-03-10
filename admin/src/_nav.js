@@ -85,6 +85,12 @@ const _nav = [
     icon: <CIcon icon={cilWallet} customClassName="nav-icon" />,
   },
   {
+    component: CNavItem,
+    name: 'Newsletter',
+    to: '/newsletter/all_newsletter',
+    icon: <CIcon icon={cilWallet} customClassName="nav-icon" />,
+  },
+  {
     component: CNavGroup,
     name: 'Refferal',
     to: '#',

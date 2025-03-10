@@ -305,7 +305,7 @@ const UserDashboard = () => {
     </div>
 
   }
-  
+
   return (
     <div className='userdashboard-body-bg'>
       <div className="w-100 mx-auto py-5 h-100 px-2">
@@ -314,9 +314,9 @@ const UserDashboard = () => {
             <div className="card  profile-card-header" style={{ borderRadius: 15 }}>
               <div className="card-body p-4">
                 <div className="d-flex justify-content-between">
-                  <div>
+                  <div className="d-flex flex-row align-items-start">
                     <div style={{ alignItems: 'center' }} className='mb-2 providerProfileHeading'>
-                      <a href="#!">
+                      <a>
                         <div className='' style={{ position: 'relative' }}>
                           <img
                             src={myProfile?.photo?.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(myProfile.name || 'User')}&background=random`}
@@ -330,7 +330,7 @@ const UserDashboard = () => {
                           />
                           {myProfile?.isVerified && (
                             <span
-                              className="badge "
+                              className="badge"
                               style={{
                                 position: 'absolute',
                                 top: '0',
@@ -346,30 +346,32 @@ const UserDashboard = () => {
                           )}
                         </div>
                       </a>
-                      <h3 className="mb-3">{myProfile.name}</h3>
                     </div>
-                    <p className="small mb-2">
-                      {/* <i className="fas fa-star fa-lg text-warning" />{" "} */}
-                      <span>{myProfile?.type}</span>
-                      <span className="mx-2">|</span>
-                      {`₹ ${myProfile.pricePerMin}/min`} <span className="mx-2">|</span>
+                    <div style={{}} className=''>
+                      <h3 className="mb-3">{myProfile.name}</h3>
+                      <p className="small mb-2">
+                        {/* <i className="fas fa-star fa-lg text-warning" />{" "} */}
+                        <span>{myProfile?.type}</span>
+                        <span className="mx-2">|</span>
+                        {`₹ ${myProfile.pricePerMin}/min`} <span className="mx-2">|</span>
 
-                      <span>{myProfile.language && myProfile.language.map((lang, index) => {
-                        return (
-                          <span key={index} className="archi-language-tag">
-                            {lang}{index < myProfile.language.length - 1 ? ', ' : ''}
-                          </span>
-                        );
-                      }) || ''}</span>
-                      <span className="mx-2">|</span>
-                      <span>{myProfile.expertiseSpecialization && myProfile.expertiseSpecialization.map((lang, index) => {
-                        return (
-                          <span key={index} className="archi-language-tag">
-                            {lang}{index < myProfile.expertiseSpecialization.length - 1 ? ', ' : ''}
-                          </span>
-                        );
-                      }) || ''}</span>
-                    </p>
+                        <span>{myProfile.language && myProfile.language.map((lang, index) => {
+                          return (
+                            <span key={index} className="archi-language-tag">
+                              {lang}{index < myProfile.language.length - 1 ? ', ' : ''}
+                            </span>
+                          );
+                        }) || ''}</span>
+                        <span className="mx-2">|</span>
+                        <span>{myProfile.expertiseSpecialization && myProfile.expertiseSpecialization.map((lang, index) => {
+                          return (
+                            <span key={index} className="archi-language-tag">
+                              {lang}{index < myProfile.expertiseSpecialization.length - 1 ? ', ' : ''}
+                            </span>
+                          );
+                        }) || ''}</span>
+                      </p>
+                    </div>
                   </div>
                   <div style={{ display: 'flex' }} className=" flex-column gap-2 align-items-center justify-content-center">
                     <a
@@ -423,7 +425,7 @@ const UserDashboard = () => {
                     </span>
                   </p>
 
-                  <p onClick={() => setActiveTab('Gallery')} style={{ fontWeight: '700' }} className="mb-0 ms-4 me-2 cursor-pointer text-uppercase">
+                  <p onClick={() => setActiveTab('Gallery')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase">
 
                     <span style={{ cursor: 'pointer' }} className={`cursor-pointer ${activeTab === 'Gallery' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
                       Gallery
@@ -434,7 +436,7 @@ const UserDashboard = () => {
 
                   <button
                     type="button"
-                    className="btn logout_btn mx-4 btn-sm btn-floating"
+                    className="btn logout_btn mt-2 mx-4 btn-sm btn-floating"
                     title="Logout"
                     onClick={() => handleLogout()}
                   >

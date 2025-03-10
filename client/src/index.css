@@ -150,6 +150,14 @@ a {
   /* margin: 3px 0; */
 }
 
+@media (max-width:750px) {
+  .profile-card p{
+    font-size: 11px;
+    line-height: 18px;
+    text-align: start;
+  }
+}
+
 .pricing {
   font-weight: bold;
   margin: 5px 0;
@@ -159,6 +167,7 @@ a {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 0px 4px;
 }
 
 .buttons {

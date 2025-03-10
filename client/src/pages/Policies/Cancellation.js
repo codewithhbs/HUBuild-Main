@@ -53,7 +53,7 @@ const Cancellation = () => {
       <p>
         <strong>Help U Build</strong><br />
         Email: info@helpubuild.co.in<br />
-        Phone:8826465693
+        Phone:+91 9220441214
       </p>
     </div>
   );

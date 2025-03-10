@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { useLocation, useParams, Link } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import BreadCrumbs from "../../components/BreadCrumbs";
-import image from '../../components/what-we-do.webp';
 import './about.css'
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -37,10 +36,6 @@ const About = () => {
             <section class="as_about_wrapper for-main-padding">
                 <div style={{ width: "90%", margin: "0 auto" }}>
                     <div class="row align-items-center">
-                        {/* <div class="col-lg-12 col-md-12 text-center">
-                            <h1 class="as_heading">Discover <span className="about_color">Help U Build</span></h1>
-                            <p class="as_font14 as_padderTop20 as_padderBottom50"></p>
-                        </div> */}
                         <div data-aos="fade-right" class="col-lg-6 col-md-6">
                             <div class="as_aboutimg text-right ">
                                 {
@@ -63,9 +58,6 @@ const About = () => {
                                         We connect consumers with professional Architects, Interior Designers, and Vastu Experts for personalized construction-related services and consultations. Additionally, we facilitate connections between B2B and B2C retailers and distributors in the construction materials sector, including raw materials, hardware, and electrical components.
                                     </p>
                                 </div>
-
-
-
                                 <Link to="/about?read-more=true" class="as_btn mt-5">read more</Link>
                             </div>
                         </div>
