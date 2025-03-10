@@ -372,7 +372,7 @@ function ArchitectProfile() {
                         </div>
                     </div>
                     <div className='container-fluid architecture-section-p rounded'>
-                        <div className='row prfile-custom-card px-4 py-5 align-items-center'>
+                        <div className='row prfile-custom-card py-5 align-items-center'>
                             <div className='col-xl-4 col-lg-4 col-md-6 col-12'>
                                 <div className='a-profile-image text-center'>
                                     <img src={profile?.photo?.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name || 'User')}&background=random`} alt="Profile Picture" className="text-center" /><br />
@@ -460,22 +460,22 @@ function ArchitectProfile() {
                                                     </p>
                                                 </div>
 
-                                                <div className="d-flex justify-content-center align-items-center gap-3">
+                                                <div style={{display:'flex'}} className="justify-content-center align-items-center gap-3">
                                                     <button
                                                         onClick={() => handleCategoryChange('Residential')}
-                                                        className={`btn ${selectedCategory === 'Residential' ? 'btn-primary' : 'btn-outline-primary'} px-4`}
+                                                        className={`btn ${selectedCategory === 'Residential' ? 'btn-primary' : 'btn-outline-primary'}`}
                                                     >
                                                         Residential
                                                     </button>
                                                     <button
                                                         onClick={() => handleCategoryChange('Commercial')}
-                                                        className={`btn ${selectedCategory === 'Commercial' ? 'btn-primary' : 'btn-outline-primary'} px-4`}
+                                                        className={`btn ${selectedCategory === 'Commercial' ? 'btn-primary' : 'btn-outline-primary'}`}
                                                     >
                                                         Commercial
                                                     </button>
                                                     <button
                                                         onClick={() => handleCategoryChange('Landscape')}
-                                                        className={`btn ${selectedCategory === 'Landscape' ? 'btn-primary' : 'btn-outline-primary'} px-4`}
+                                                        className={`btn ${selectedCategory === 'Landscape' ? 'btn-primary' : 'btn-outline-primary'}`}
                                                     >
                                                         Landscape
                                                     </button>

@@ -1,12 +1,10 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { toast } from 'react-hot-toast';
 import Swal from 'sweetalert2';
 const UploadGallery = ({ isShow, token }) => {
     const [files, setFiles] = useState([]);
     const [uploading, setUploading] = useState(false);
-    const [galleryUpload, setGalleryUpload] = useState(isShow);
 
     const { getRootProps, getInputProps } = useDropzone({
         accept: 'image/*',
@@ -21,7 +19,7 @@ const UploadGallery = ({ isShow, token }) => {
         setUploading(true);
 
         try {
-            const response = await axios.post('https://api.helpubuild.co.in/api/v1/addPortfolio?type=Gallery', formData, {
+            await axios.post('https://api.helpubuild.co.in/api/v1/addPortfolio?type=Gallery', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${token}`,

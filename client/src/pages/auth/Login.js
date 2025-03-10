@@ -3,7 +3,6 @@ import loginimage from './login-img.webp'
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { setData } from '../../utils/sessionStoreage';
-import { Link, redirect } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 
@@ -13,9 +12,6 @@ function Login() {
         password: '',
         loginFrom:'user'
     });
-    const location = new URLSearchParams(window.location.search)
-    const redirectPath = location.get('redirect') || {}
-    const [error, setError] = useState(null);
 
 
     const handleChange = (e) => {

@@ -382,6 +382,8 @@ exports.login = async (req, res) => {
             return res.status(400).json({ success: false, message: "Please provide both your email/phone number and password." });
         }
 
+        console.log("loginFrom",loginFrom)
+
         // First, try finding the user in the User collection
         let user = await User.findOne({
             $or: [{ email: any }, { PhoneNumber: any }]

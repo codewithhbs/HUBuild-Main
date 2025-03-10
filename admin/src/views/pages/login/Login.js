@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
   CButton,
@@ -22,9 +21,9 @@ const Login = () => {
   const [formData, setFormData] = useState({
     any: '',
     password: '',
+    loginFrom:'admin'
   });
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;

@@ -48,8 +48,8 @@ const TermCondition = () => {
       </p>
       <p>
         <strong>Help U Build</strong><br />
-        Email: support@helpubuild.com<br />
-        Phone: [Insert Phone Number]
+        Email: info@helpubuild.co.in<br />
+        Phone: +91 9220441214
       </p>
     </div>
   );

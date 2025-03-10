@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { GetData } from '../../../utils/sessionStoreage';
-import toast from 'react-hot-toast';
 import Swal from 'sweetalert2';
 
 function BankDetail() {

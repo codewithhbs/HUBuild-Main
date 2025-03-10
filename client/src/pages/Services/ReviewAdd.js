@@ -32,7 +32,7 @@ const ReviewAdd = ({ user_id, provider_id }) => {
         
         setLoading(true);
         try {
-            const response = await axios.post('https://api.helpubuild.co.in/api/v1/create-rating', formData);
+            await axios.post('https://api.helpubuild.co.in/api/v1/create-rating', formData);
             toast.success("Review added successfully!");
             setFormData({ provider_id, rating: 0, review: '', user_id });
             window.location.reload();
