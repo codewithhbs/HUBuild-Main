@@ -375,8 +375,8 @@ const UserDashboard = () => {
                   </div>
                   <div style={{ display: 'flex' }} className=" flex-column gap-2 align-items-center justify-content-center">
                     <a
-                      className="architectur-bar btn btn-primary d-flex align-items-center justify-content-center"
-                      style={{ gap: '8px', padding: '8px 16px', borderRadius: '8px' }}
+                      className="architectur-bar btn btn-primary align-items-center justify-content-center"
+                      style={{ display: 'flex', gap: '8px', padding: '8px 16px', borderRadius: '8px' }}
                       href={`https://wa.me/?text=Join%20HelpUBuild%20and%20get%20amazing%20benefits!%20Register%20here:%20https://helpubuild.co.in/member-registration?ref=${myProfile?.couponCode}`}
                       target="_blank"
                       rel="noopener noreferrer"
