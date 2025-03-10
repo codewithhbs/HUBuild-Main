@@ -1375,7 +1375,7 @@ a:visited {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  padding: 7% 4% 7% 4%;
+  padding: 3% 4% 3% 4%;
   position: relative;
   z-index: 1;
 }
@@ -1424,7 +1424,7 @@ a:visited {
 
 @media (max-width:420px) {
   .as_whychoose_wrapper{
-    padding: 17% 4% 17% 4%;
+    padding: 13% 4% 6% 4%;
   }
 }
 
@@ -4905,7 +4905,7 @@ form.d_block {
   }
 
   .as_whychoose_wrapper {
-    padding: 20% 4% 20% 4%;
+    padding: 13% 4% 6% 4%;
   }
 
   .as_padderBottom50 {

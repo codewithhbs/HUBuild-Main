@@ -60,7 +60,7 @@ const Cards = () => {
 
   return (
     <div>
-      <section className="Own-card_blog_wrapper py-5">
+      <section className="Own-card_blog_wrapper py-3">
         <div style={{ width: "90%" }} className="container">
           <div className="row">
             <div className="col-lg-12 col-md-12 text-center">
