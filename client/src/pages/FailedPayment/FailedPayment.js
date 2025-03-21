@@ -36,14 +36,14 @@ function FailedPayment() {
               <div className="my-4">
                 <h5>Payment Details</h5>
                 <ul className="list-unstyled">
-                  <li><strong>Amount:</strong> ₹{paymentDetails.amount}</li>
+                  <li><strong>Amount:</strong> ₹{(paymentDetails.amount / (paymentDetails.amount >= 100 ? 100 : 1)).toFixed(2)}</li>
                   <li><strong>Transaction ID:</strong> {paymentDetails.transactionId}</li>
                   <li><strong>Date:</strong> {new Date(paymentDetails.date).toLocaleString()}</li>
                 </ul>
               </div>
 
               <div className="mt-4">
-                <a href="/" className="btn btn-danger btn-lg">Go to Home Page</a>
+                <a href="/" className="btn btn-danger btn-lg text-white">Go to Home Page</a>
               </div>
             </div>
           </div>
