@@ -236,12 +236,11 @@ a:visited {
   z-index: 1;
   overflow: hidden;
 }
+
 .as_btn_back{
-
   background-image: -webkit-linear-gradient(0deg, rgb(244, 170, 54) 0%, rgb(232 188 55) 100%);
   background-image: -webkit-linear-gradient(0deg, rgb(244, 170, 54) 0%, rgb(232 188 55) 100%);
   background-image: -webkit-linear-gradient(0deg, rgb(244, 170, 54) 0%, rgb(232 188 55) 100%);
-
 }
 
 .as_btn:after {

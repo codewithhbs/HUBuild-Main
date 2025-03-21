@@ -1,7 +1,5 @@
 .new_banner{
     padding-top: 20px;
-    /* background-image:-webkit-linear-gradient(266deg, rgb(23 35 53) 0%, rgb(3 47 102) 100%); */
-    /* background-image: -webkit-linear-gradient(266deg, rgb(0 21 49) 0%, rgb(3 37 80) 100%); */
     background:#fff;
     padding-bottom: 2px;
 }
@@ -19,7 +17,6 @@
     display: none;
 }
 
-
 @media screen and (max-width: 768px){
     .icon_chat{
         width: 60px;
@@ -29,17 +26,6 @@
         font-size: 12px;
         margin-right: 5px;
     }
-}
-
-/* .forHeight{
-    height: 197px;
-} */
-
-@media (max-width:1343px) {
-    /* .forHeight{
-        height: 220px;
-    } */
-    
 }
 
 @media (max-width:1103px) {
@@ -82,10 +68,6 @@
         width: 50px;
         height: 50px;
     }
-    /* .mobile-view{
-        display: block;
-        margin-top: -5%;
-    } */
     .as_menu_wrapper {
         padding: 0px 10px;
     }

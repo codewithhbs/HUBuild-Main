@@ -119,7 +119,7 @@ function Dashboard() {
       if (order) {
 
         const options = {
-          key: 'rzp_test_cz0vBQnDwFMthJ',
+          key: 'rzp_live_bmq7YMRTuGvvfu',
           amount: amount * 100,
           currency: 'INR',
           name: 'Help U Build',
