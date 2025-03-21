@@ -34,7 +34,7 @@ function SuccessFull() {
               <div className="my-4">
                 <h5>Recharge Details</h5>
                 <ul className="list-unstyled">
-                <li><strong>Amount Recharged:</strong> ₹{(rechargeDetails.amount / 100).toFixed(2)}</li>
+                <li><strong>Amount Recharged:</strong> ₹{(rechargeDetails.amount / (rechargeDetails.amount >= 100 ? 100 : 1)).toFixed(2)}</li>
                   <li><strong>Transaction ID:</strong> {rechargeDetails.transactionId}</li>
                   <li><strong>Date:</strong> {new Date(rechargeDetails.date).toLocaleString()}</li>
                 </ul>
