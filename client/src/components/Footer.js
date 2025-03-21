@@ -63,15 +63,15 @@ const Footer = () => {
             <ul className="footer-contact-list">
               <li className="footer-contact-item">
                 <MapPin className="footer-contact-icon" />
-                <p>E-520A, 3rd Floor, Sector 7, Dwarka, New Delhi- 110075</p>
+                <p style={{color:'white'}}>E-520A, 3rd Floor, Sector 7, Dwarka, New Delhi- 110075</p>
               </li>
               <li className="footer-contact-item">
                 <Phone className="footer-contact-icon" />
-                <a href="tel:+919220441214">+91 9220441214</a>
+                <a style={{color:'white'}} href="tel:+919220441214">+91 9220441214</a>
               </li>
               <li className="footer-contact-item">
                 <Mail className="footer-contact-icon" />
-                <a href="mailto:info@helpubuild.co.in">info@helpubuild.co.in</a>
+                <a style={{color:'white'}} href="mailto:info@helpubuild.co.in">info@helpubuild.co.in</a>
               </li>
             </ul>
           </div>

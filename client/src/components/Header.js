@@ -160,27 +160,27 @@ const Header = () => {
                   <div className="as_menu">
                     <ul>
                       <li>
-                        <Link onClick={handleLinkClick} to="/" className={active === "/" ? "active" : ""}>
+                        <Link style={{color:'black'}} onClick={handleLinkClick} to="/" className={active === "/" ? "active" : ""}>
                           home
                         </Link>
                       </li>
                       <li>
-                        <Link onClick={handleLinkClick} to="/talk-to-architect" className={active === "/talk-to-architect" ? "active" : ""}>
+                        <Link style={{color:'black'}} onClick={handleLinkClick} to="/talk-to-architect" className={active === "/talk-to-architect" ? "active" : ""}>
                           Talk to Architect
                         </Link>
                       </li>
                       <li>
-                        <Link onClick={handleLinkClick} to="/talk-to-interior" className={active === "/talk-to-interior" ? "active" : ""}>
+                        <Link style={{color:'black'}} onClick={handleLinkClick} to="/talk-to-interior" className={active === "/talk-to-interior" ? "active" : ""}>
                           Talk to Interior Designer
                         </Link>
                       </li>
                       <li>
-                        <Link onClick={handleLinkClick} to="/Vastu" className={active === "/Vastu" ? "active" : ""}>
+                        <Link style={{color:'black'}} onClick={handleLinkClick} to="/Vastu" className={active === "/Vastu" ? "active" : ""}>
                           Talk to Vastu Expert
                         </Link>
                       </li>
                       <li>
-                        <Link onClick={handleLinkClick} to="/blog" className={active === "/blog" ? "active" : ""}>
+                        <Link style={{color:'black'}} onClick={handleLinkClick} to="/blog" className={active === "/blog" ? "active" : ""}>
                           blog
                         </Link>
                       </li>
