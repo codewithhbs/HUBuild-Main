@@ -12,7 +12,10 @@ const EditMembership = () => {
 
     // Handle input changes
     const handleChange = (e) => {
-        setPlanPrice(e.target.value);
+        const value = e.target.value;
+        if (value >= 0 || value === '') {
+            setPlanPrice(value);
+        }
     };
 
     // Fetch membership details
@@ -70,6 +73,7 @@ const EditMembership = () => {
                                 placeholder="Enter plan price"
                                 value={planPrice}
                                 onChange={handleChange}
+                                min="0"
                             />
                         </CCol>
 

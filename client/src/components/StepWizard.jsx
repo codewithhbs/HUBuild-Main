@@ -7,10 +7,10 @@ import "./wizard.css";
 import { useSearchParams } from "react-router-dom";
 import Swal from 'sweetalert2'
 
-const   StepWizard = () => {
+const StepWizard = () => {
     const [searchParams] = useSearchParams();
     const referralCode = searchParams.get("ref");
-    console.log("referralCode", referralCode)
+    const [memberShip, setMemberShip] = useState(null);
     const [memberData, setMemberData] = useState({
         name: "",
         email: "",
@@ -30,6 +30,18 @@ const   StepWizard = () => {
     useEffect(() => {
         if (coords) fetchCurrentLocation();
     }, [coords]);
+
+    const handleFetchmembership = async () => {
+        try {
+            const { data } = await axios.get("https://api.helpubuild.co.in/api/v1/get_all_membership");
+            setMemberShip(data.data[0].planPrice);
+        } catch (error) {
+            console.log("Internal server error", error)
+        }
+    }
+    useEffect(() => {
+        handleFetchmembership();
+    }, [])
 
     const fetchCurrentLocation = async () => {
         try {
@@ -58,7 +70,6 @@ const   StepWizard = () => {
     const validatePhone = () => {
         const phoneRegex = /^[0-9]{10}$/;
         if (!phoneRegex.test(memberData.mobileNumber)) {
-            // toast.error("Mobile number must be exactly 10 digits.");
             Swal.fire({
                 title: 'Error!',
                 text: "Mobile number must be exactly 10 digits.",
@@ -72,7 +83,6 @@ const   StepWizard = () => {
 
     const validatePassword = () => {
         if (memberData.password.length < 7) {
-            // toast.error("Password must be at least 7 characters long.");
             Swal.fire({
                 title: 'Error!',
                 text: "Password must be at least 7 characters long.",
@@ -101,16 +111,12 @@ const   StepWizard = () => {
                 toast.error("Failed to load Razorpay SDK. Please check your connection.");
                 return;
             }
-
-            // Fetch order details from backend
             const res = await axios.post(`https://api.helpubuild.co.in/api/v1/buy_membership/${providerId}`, {
                 couponCode: memberData.couponCode,
             });
-
             const order = res.data.data.razorpayOrder;
             const amount = res.data.data.discountAmount;
             const providerData = res.data.data.provider;
-
             if (order) {
                 const options = {
                     key: "rzp_live_bmq7YMRTuGvvfu",
@@ -150,13 +156,9 @@ const   StepWizard = () => {
             setData("token", res.data.token);
             setData("islogin", !!res.data.token);
             setData("user", res.data.user);
-
-            // console.log("res.data.data.user._id",res.data.user._id)
-
             // Proceed to payment after registration
             await handlePayment(res.data.user._id);
         } catch (error) {
-            // toast.error(error?.response?.data?.message || "Please try again later in register");
             Swal.fire({
                 title: 'Error!',
                 text: error?.response?.data?.message || "Please try again later in register",
@@ -173,7 +175,6 @@ const   StepWizard = () => {
             toast.error("Please enter a coupon code.");
             return;
         }
-
         setLoading(true);
         try {
             const res = await axios.post("https://api.helpubuild.co.in/api/v1/check_coupon_code", {
@@ -184,7 +185,6 @@ const   StepWizard = () => {
                 setCouponDetail(res.data.data);
                 toast.success(res.data.message);
             } else {
-                // toast.error("Invalid coupon code.");
                 Swal.fire({
                     title: 'Error!',
                     text: "Invalid coupon code.",
@@ -194,7 +194,6 @@ const   StepWizard = () => {
             }
         } catch (error) {
             console.error("Error checking coupon:", error);
-            // toast.error(error?.response?.data?.message || "Please try again later");
             Swal.fire({
                 title: 'Error!',
                 text: error?.response?.data?.message || "Please try again later",
@@ -205,9 +204,6 @@ const   StepWizard = () => {
             setLoading(false);
         }
     };
-
-    console.log("couponDetail",couponDetail)
-
     return (
         <div className="container mt-5 mb-5">
             <form onSubmit={handleSubmit}>
@@ -247,8 +243,9 @@ const   StepWizard = () => {
                             <button type="button" className="btn btn-outline-primary" onClick={handleCheckCouponCode}>Apply</button>
                         </div>
                     </div>
-                      {/* Display Coupon Details Based on Message */}
-                      {couponDetail && (
+
+                    {/* Display Coupon Details Based on Message */}
+                    {couponDetail && (
                         <div className="col-lg-12">
                             <div className="alert alert-success mt-3">
                                 <h5>Coupon Details</h5>
@@ -276,6 +273,17 @@ const   StepWizard = () => {
                             </div>
                         </div>
                     )}
+                    <div className="card text-center mb-4 shadow-sm border-0">
+                        <div className="card-body">
+                            <h3 className="card-title text-primary fw-bold">Membership Plan</h3>
+                            <p className="card-text fs-4">
+                                <strong className="text-success">
+                                    {memberShip !== null ? `₹${memberShip}` : "Loading..."}
+                                </strong>
+                            </p>
+                            <p className="text-muted">Get exclusive access to premium features.</p>
+                        </div>
+                    </div>
                 </div>
                 <button type="submit" className="btn btn-success">{loading ? "Loading..." : "Register"}</button>
             </form>

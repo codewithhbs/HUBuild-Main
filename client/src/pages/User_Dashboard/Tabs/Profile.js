@@ -120,7 +120,7 @@ const Profile = () => {
       <form onSubmit={handleSubmit} className="card p-4">
         <div className="row mb-3">
           <div className="col-md-6">
-            <label htmlFor="name" className="form-label">
+            <label htmlFor="name" style={{fontWeight:'700'}} className="form-label">
               Name
             </label>
             <input
@@ -134,7 +134,7 @@ const Profile = () => {
             />
           </div>
           <div className="col-md-6">
-            <label htmlFor="email" className="form-label">
+            <label htmlFor="email" style={{fontWeight:'700'}} className="form-label">
               Email
             </label>
             <input
@@ -150,7 +150,7 @@ const Profile = () => {
         </div>
         <div className="row mb-3">
           <div className="col-md-6">
-            <label htmlFor="DOB" className="form-label">
+            <label htmlFor="DOB" style={{fontWeight:'700'}} className="form-label">
               Date of Birth
             </label>
             <input
@@ -163,7 +163,7 @@ const Profile = () => {
             />
           </div>
           <div className="col-md-6">
-            <label htmlFor="language" className="form-label">
+            <label htmlFor="language" style={{fontWeight:'700'}} className="form-label">
               Language
             </label>
             <input
@@ -176,7 +176,7 @@ const Profile = () => {
             />
           </div>
           <div className="col-md-6 mt-2">
-            <label htmlFor="mobileNumber" className="form-label">
+            <label htmlFor="mobileNumber" style={{fontWeight:'700'}} className="form-label">
               Mobile Number
             </label>
             <input
@@ -191,7 +191,7 @@ const Profile = () => {
           {
             role === 'Architect' && (
               <div className="col-md-6 mt-2">
-                <label htmlFor="coaNumber" className="form-label">
+                <label htmlFor="coaNumber" style={{fontWeight:'700'}} className="form-label">
                   COA Number
                 </label>
                 <input
@@ -206,7 +206,7 @@ const Profile = () => {
             )
           }
           <div className="col-md-6 mt-2">
-            <label htmlFor="pricePerMin" className="form-label">
+            <label htmlFor="pricePerMin" style={{fontWeight:'700'}} className="form-label">
               Price Per Minute
             </label>
             <input
@@ -219,7 +219,7 @@ const Profile = () => {
             />
           </div>
           <div className="col-md-6 mt-2">
-            <label htmlFor="location" className="form-label">
+            <label htmlFor="location" style={{fontWeight:'700'}} className="form-label">
               Address
             </label>
             <input
@@ -232,7 +232,7 @@ const Profile = () => {
             />
           </div>
           <div className="col-md-6 mt-2">
-            <label htmlFor="yearOfExperience" className="form-label">
+            <label htmlFor="yearOfExperience" style={{fontWeight:'700'}} className="form-label">
               Year Of Experience
             </label>
             <input
@@ -246,7 +246,7 @@ const Profile = () => {
           </div>
         </div>
         <div className="mb-3">
-          <label htmlFor="bio" className="form-label">
+          <label htmlFor="bio" style={{fontWeight:'700'}} className="form-label">
             Bio
           </label>
           <textarea
@@ -259,7 +259,7 @@ const Profile = () => {
           ></textarea>
         </div>
         <div className="mb-3">
-          <label htmlFor="expertiseSpecialization" className="form-label">
+          <label htmlFor="expertiseSpecialization" style={{fontWeight:'700'}} className="form-label">
             Expertise/Specialization
           </label>
           <textarea

@@ -397,6 +397,12 @@ exports.login = async (req, res) => {
                 $or: [{ email: any }, { mobileNumber: any }]
             });
             isProvider = true; // Flag to indicate a provider login
+            if(user?.accountVerified == 'Pending'){
+                return res.status(400).json({
+                    success: false,
+                    message: "Your account is not verified yet. Please wait for the admin to verify your account."
+                })
+            }
         }
 
         if (!user) {

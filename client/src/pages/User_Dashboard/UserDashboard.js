@@ -110,7 +110,7 @@ const UserDashboard = () => {
   };
 
   const handleLogout = () => {
-    sessionStorage.clear()
+    localStorage.clear()
     window.location.href = '/'
   }
 
@@ -398,39 +398,39 @@ const UserDashboard = () => {
 
                 <hr className="my-4" />
                 <div className="featured-list d-flex justify-content-start align-items-center">
-                  <p onClick={() => setActiveTab('settings')} style={{ fontWeight: '700' }} className="mb-0 text-uppercase">
+                  <p onClick={() => setActiveTab('settings')} style={{ fontWeight: '700' }} className="mb-0 text-uppercase forresponsicetab">
                     <i className="fas fa-cog me-2" />{" "}
                     <span style={{ cursor: 'pointer' }} className={`cursor-pointer ${activeTab === 'settings' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
                       settings
                     </span>
                   </p>
-                  <p onClick={() => setActiveTab('Portfolio')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase">
-                    <i className="fas fa-link ms-4 me-2" />{" "}
+                  <p onClick={() => setActiveTab('Portfolio')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab">
+                    <i className="fas fa-link marginnone" />{" "}
                     <span style={{ cursor: 'pointer' }} className={`cursor-pointer ${activeTab === 'Portfolio' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
                       Portfolio
                     </span>
                   </p>
 
-                  <p onClick={() => setActiveTab('Wallet')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase">
-                    <i className="fas fa-link ms-4 me-2" />{" "}
+                  <p onClick={() => setActiveTab('Wallet')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab">
+                    <i className="fas fa-link marginnone" />{" "}
                     <span style={{ cursor: 'pointer' }} className={`cursor-pointer ${activeTab === 'Wallet' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
                       Wallet
                     </span>
                   </p>
 
-                  <p onClick={() => setActiveTab('Withdraw')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase">
-                    <i className="fas fa-link ms-4 me-2" />{" "}
+                  <p onClick={() => setActiveTab('Withdraw')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab">
+                    <i className="fas fa-link marginnone" />{" "}
                     <span style={{ cursor: 'pointer' }} className={`cursor-pointer ${activeTab === 'Withdraw' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
                       Withdraw History
                     </span>
                   </p>
 
-                  <p onClick={() => setActiveTab('Gallery')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase">
+                  <p onClick={() => setActiveTab('Gallery')} style={{ fontWeight: '700', marginLeft: '15px' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab">
 
                     <span style={{ cursor: 'pointer' }} className={`cursor-pointer ${activeTab === 'Gallery' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
                       Gallery
                     </span>
-                    <span className="ms-3 me-4">|</span>
+                    {/* <span className="ms-3 me-4">|</span> */}
                   </p>
 
 

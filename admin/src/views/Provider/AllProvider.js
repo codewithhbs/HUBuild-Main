@@ -195,7 +195,7 @@ function AllProvider() {
                 </div>
             ) : (
                 <Table
-                    heading="All Providers"
+                    heading="All Consultant"
                     btnText=""
                     btnURL=""
                     tableHeading={heading}

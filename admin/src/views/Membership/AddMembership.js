@@ -9,7 +9,10 @@ const AddMembership = () => {
     const [planPrice, setPlanPrice] = useState('');
 
     const handleChange = (e) => {
-        setPlanPrice(e.target.value);
+        const value = e.target.value;
+        if (value >= 0 || value === '') {
+            setPlanPrice(value);
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -49,6 +52,7 @@ const AddMembership = () => {
                         placeholder="Enter plan price"
                         value={planPrice}
                         onChange={handleChange}
+                         min="0"
                     />
                     <CCol xs={12} className="mt-4">
                         <CButton color="primary" type="submit" disabled={loading}>
