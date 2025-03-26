@@ -155,7 +155,7 @@ function Dashboard() {
   };
 
   const handleLogout = () => {
-    sessionStorage.clear()
+    localStorage.clear()
     window.location.href = '/'
   }
 

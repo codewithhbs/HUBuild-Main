@@ -355,3 +355,17 @@ a {
 .greenBorder {
   border: 1px solid green !important;
 }
+.marginnone{
+  margin: 0rem 1.5rem;
+}
+
+@media (max-width:650px) {
+  .forresponsicetab{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .marginnone{
+    margin: 0px 5px 0px 0px !important;
+  }
+}

@@ -153,7 +153,7 @@ const VerifyEmail = () => {
             <div className="card p-5 text-center shadow-lg rounded-4" style={{ maxWidth: '420px', width: '100%' }}>
                 <h4 className="mb-3 text-dark fw-bold">Phone Number Verification</h4>
                 <p className="text-muted">
-                    Enter the one-time password (OTP) sent to <strong>{email}</strong> to verify your number.
+                    Enter the one-time password (OTP) sent to your whatsapp on <strong>{email}</strong> to verify your number.
                 </p>
 
                 <div id="otp" style={{ display: 'flex' }} className=" justify-content-center mb-4">
