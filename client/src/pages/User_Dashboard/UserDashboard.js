@@ -425,8 +425,8 @@ const UserDashboard = () => {
                     </span>
                   </p>
 
-                  <p onClick={() => setActiveTab('Gallery')} style={{ fontWeight: '700', marginLeft: '15px' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab">
-
+                  <p onClick={() => setActiveTab('Gallery')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab">
+                  <i className="fas fa-link marginnone" />{" "}
                     <span style={{ cursor: 'pointer' }} className={`cursor-pointer ${activeTab === 'Gallery' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
                       Gallery
                     </span>

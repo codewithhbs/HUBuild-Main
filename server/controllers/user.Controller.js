@@ -1000,6 +1000,10 @@ exports.chatStart = async (userId, astrologerId) => {
         user.lastChatTransitionId = newChatTransitionId;
         provider.lastChatTransitionId = newChatTransitionId;
 
+        const adminNumber = process.env.ADMIN_NUMBER;
+        const adminMessage = `New chat transition created with id ${newChatTransitionId} for user ${user?.name} and provider ${provider?.name}.`;
+        await SendWhatsapp(adminNumber, adminMessage)
+
         // console.log("newChatTransition", newChatTransition)
         const number = provider?.mobileNumber;
         // const message = `New chat transition created with id ${newChatTransitionId} for user ${user?.name} and provider ${provider?.name}.`;
