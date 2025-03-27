@@ -21,6 +21,7 @@ const { createMemberShip, getAllMemberShip, getSingleMemberShip, updateMemberShi
 const { createGlobelUserRefDis, getAllGlobelUserRefDis, updateGlobelUserRef, deleteGlobelUserRef, getSingleGlobelUserRef } = require('../controllers/globelUserRefDis.controller');
 const { createAdminCoupon, getAllAdminCoupon, getSingleAdminCoupon, updateAdminCoupon, deleteAdminCoupon } = require('../controllers/adminCoupon.controller');
 const { createNewsLetter, getAllNewsLetter, deleteNewsLetter, getSingleNewsLetter, sendNewsLetterMessage } = require('../controllers/newsLetter.controller');
+const { createExpertise, getAllExpertise, getSingleExpertise, updateExpertise, deleteExpertise } = require('../controllers/expertise.controller');
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 const router = express.Router();
@@ -254,5 +255,13 @@ router.get('/all_newsletter',getAllNewsLetter)
 router.get('/single_newsletter/:id',getSingleNewsLetter)
 router.delete('/delete_newsletter/:id',deleteNewsLetter)
 router.post('/send_message_newsletter',sendNewsLetterMessage)
+
+// expertise router here 
+
+router.post('/create_expertise',createExpertise)
+router.get('/all_expertise',getAllExpertise)
+router.get('/single_expertise/:id',getSingleExpertise)
+router.put('/update_expertise/:id',updateExpertise)
+router.delete('/delete_expertise/:id',deleteExpertise)
 
 module.exports = router;

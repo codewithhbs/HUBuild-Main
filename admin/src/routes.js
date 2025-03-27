@@ -22,6 +22,9 @@ import AllAdminCoupon from './views/AdminCoupon/AllAdminCoupon'
 import AddAdminCoupon from './views/AdminCoupon/AddAdminCoupon'
 import EditAdminCoupon from './views/AdminCoupon/EditAdminCoupon'
 import AllNewsLetter from './views/NewsLetter/AllNewsLetter'
+import AllExpertise from './views/Expertise/AllExpertise'
+import AddExpertise from './views/Expertise/AddExpertise'
+import EditExpertise from './views/Expertise/EditExpertise'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
@@ -169,21 +172,15 @@ const routes = [
 
   // blogs routes here 
   { path: '/user', name: 'Blogs', element: Cards, exact: true },
-  // { path: '/user/add_user', name: 'Add Blogs', element: AddBlogs },
   { path: '/user/all_user', name: 'All Users', element: AllUser },
-  // { path: '/user/edit_user/:id', name: 'Edit Blogs', element: EditBlogs },
 
   // chat routes here 
   { path: '/chats', name: 'Chats', element: Cards, exact: true },
-  // { path: '/blogs/add_blogs', name: 'Add Blogs', element: AddBlogs },
   { path: '/chats/all_chat', name: 'All Chats', element: AllChatRoom },
-  // { path: '/blogs/edit_blogs/:id', name: 'Edit Blogs', element: EditBlogs },
 
   // provider routes here 
   { path: '/provider', name: 'Provider', element: Cards, exact: true },
-  // { path: '/blogs/add_blogs', name: 'Add Blogs', element: AddBlogs },
   { path: '/provider/all_provider', name: 'All Provider', element: AllProvider },
-  // { path: '/blogs/edit_blogs/:id', name: 'Edit Blogs', element: EditBlogs },
 
   // withdraw routes here 
   { path: '/withdraw', name: 'Withdraw Request', element: Cards, exact: true },
@@ -206,10 +203,17 @@ const routes = [
   { path: '/admin-coupon/all_admin_coupon', name: 'All Admin Coupon', element: AllAdminCoupon },
   { path: '/admin-coupon/add_admin_coupon', name: 'Add Admin Coupon', element: AddAdminCoupon },
   { path: '/admin-coupon/edit_admin_coupon/:id', name: 'Edit Admin Coupon', element: EditAdminCoupon },
-
+  
   // newsletter routes here 
   { path: '/newsletter', name: 'Newsletter', element: Cards, exact: true },
   { path: '/newsletter/all_newsletter', name: 'All Newsletter', element: AllNewsLetter},
+
+  // expertise routes here 
+  
+  { path: '/expertise', name: 'Expertise', element: Cards, exact: true },
+  { path: '/expertise/all_expertise', name: 'All Expertise', element: AllExpertise },
+  { path: '/expertise/add_expertise', name: 'Add Expertise', element: AddExpertise },
+  { path: '/expertise/edit_expertise/:id', name: 'Edit Expertise', element: EditExpertise },
 ]
 
 export default routes

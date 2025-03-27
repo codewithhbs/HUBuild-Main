@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { GetData } from '../../../utils/sessionStoreage';
 import toast from 'react-hot-toast';
 import Swal from 'sweetalert2'
+import Select from 'react-select';
 
 const Profile = () => {
 
@@ -10,8 +11,7 @@ const Profile = () => {
   const UserData = JSON.parse(Data);
   const UserId = UserData?._id;
   const role = UserData?.type
-
-  console.log("role",role)
+  const [expertise, setExpertise] = useState([])
 
   const [formData, setFormData] = useState({
     name: '',
@@ -23,9 +23,23 @@ const Profile = () => {
     location: '',
     pricePerMin: '',
     bio: '',
-    expertiseSpecialization: '',
+    expertiseSpecialization: [],
     yearOfExperience: ''
   });
+  
+
+  useEffect(() => {
+    const fetchExpertise = async () => {
+      try {
+        const { data } = await axios.get('https://api.helpubuild.co.in/api/v1/all_expertise');
+        const formattedExpertise = data.data.map((exp) => ({ label: exp.expertise, value: exp.expertise }));
+        setExpertise(formattedExpertise);
+      } catch (error) {
+        console.log("Internal server error", error);
+      }
+    };
+    fetchExpertise();
+  }, []);
 
   const [loading, setLoading] = useState(false);
 
@@ -34,6 +48,13 @@ const Profile = () => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       [name]: value
+    }));
+  };
+
+  const handleSelectChange = (selectedOptions) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      expertiseSpecialization: selectedOptions
     }));
   };
 
@@ -54,7 +75,7 @@ const Profile = () => {
         location: allData.location || '',
         pricePerMin: allData.pricePerMin || '',
         bio: allData.bio || '',
-        expertiseSpecialization: allData.expertiseSpecialization || '',
+        expertiseSpecialization: allData.expertiseSpecialization.map(exp => ({ label: exp, value: exp })) || [],
         yearOfExperience: allData.yearOfExperience || ''
       });
     } catch (error) {
@@ -72,9 +93,7 @@ const Profile = () => {
     try {
       const payload = {
         ...formData,
-        expertiseSpecialization: Array.isArray(formData.expertiseSpecialization)
-          ? formData.expertiseSpecialization.join(', ')
-          : formData.expertiseSpecialization,
+        expertiseSpecialization: formData.expertiseSpecialization.map(exp => exp.value),
       };
 
       const response = await axios.put(
@@ -120,7 +139,7 @@ const Profile = () => {
       <form onSubmit={handleSubmit} className="card p-4">
         <div className="row mb-3">
           <div className="col-md-6">
-            <label htmlFor="name" style={{fontWeight:'700'}} className="form-label">
+            <label htmlFor="name" style={{ fontWeight: '700' }} className="form-label">
               Name
             </label>
             <input
@@ -134,7 +153,7 @@ const Profile = () => {
             />
           </div>
           <div className="col-md-6">
-            <label htmlFor="email" style={{fontWeight:'700'}} className="form-label">
+            <label htmlFor="email" style={{ fontWeight: '700' }} className="form-label">
               Email
             </label>
             <input
@@ -150,7 +169,7 @@ const Profile = () => {
         </div>
         <div className="row mb-3">
           <div className="col-md-6">
-            <label htmlFor="DOB" style={{fontWeight:'700'}} className="form-label">
+            <label htmlFor="DOB" style={{ fontWeight: '700' }} className="form-label">
               Date of Birth
             </label>
             <input
@@ -163,7 +182,7 @@ const Profile = () => {
             />
           </div>
           <div className="col-md-6">
-            <label htmlFor="language" style={{fontWeight:'700'}} className="form-label">
+            <label htmlFor="language" style={{ fontWeight: '700' }} className="form-label">
               Language
             </label>
             <input
@@ -176,7 +195,7 @@ const Profile = () => {
             />
           </div>
           <div className="col-md-6 mt-2">
-            <label htmlFor="mobileNumber" style={{fontWeight:'700'}} className="form-label">
+            <label htmlFor="mobileNumber" style={{ fontWeight: '700' }} className="form-label">
               Mobile Number
             </label>
             <input
@@ -191,7 +210,7 @@ const Profile = () => {
           {
             role === 'Architect' && (
               <div className="col-md-6 mt-2">
-                <label htmlFor="coaNumber" style={{fontWeight:'700'}} className="form-label">
+                <label htmlFor="coaNumber" style={{ fontWeight: '700' }} className="form-label">
                   COA Number
                 </label>
                 <input
@@ -206,7 +225,7 @@ const Profile = () => {
             )
           }
           <div className="col-md-6 mt-2">
-            <label htmlFor="pricePerMin" style={{fontWeight:'700'}} className="form-label">
+            <label htmlFor="pricePerMin" style={{ fontWeight: '700' }} className="form-label">
               Price Per Minute
             </label>
             <input
@@ -219,7 +238,7 @@ const Profile = () => {
             />
           </div>
           <div className="col-md-6 mt-2">
-            <label htmlFor="location" style={{fontWeight:'700'}} className="form-label">
+            <label htmlFor="location" style={{ fontWeight: '700' }} className="form-label">
               Address
             </label>
             <input
@@ -232,7 +251,7 @@ const Profile = () => {
             />
           </div>
           <div className="col-md-6 mt-2">
-            <label htmlFor="yearOfExperience" style={{fontWeight:'700'}} className="form-label">
+            <label htmlFor="yearOfExperience" style={{ fontWeight: '700' }} className="form-label">
               Year Of Experience
             </label>
             <input
@@ -244,9 +263,20 @@ const Profile = () => {
               onChange={handleChange}
             />
           </div>
+          <div className="col-md-6 mt-2">
+          <label htmlFor="expertiseSpecialization" style={{ fontWeight: '700' }} className="form-label font-weight-bold">Expertise/Specialization</label>
+          <Select
+            id="expertiseSpecialization"
+            name="expertiseSpecialization"
+            options={expertise}
+            value={formData.expertiseSpecialization}
+            onChange={handleSelectChange}
+            isMulti
+          />
+        </div>
         </div>
         <div className="mb-3">
-          <label htmlFor="bio" style={{fontWeight:'700'}} className="form-label">
+          <label htmlFor="bio" style={{ fontWeight: '700' }} className="form-label">
             Bio
           </label>
           <textarea
@@ -254,19 +284,6 @@ const Profile = () => {
             id="bio"
             name="bio"
             value={formData.bio}
-            onChange={handleChange}
-            rows="3"
-          ></textarea>
-        </div>
-        <div className="mb-3">
-          <label htmlFor="expertiseSpecialization" style={{fontWeight:'700'}} className="form-label">
-            Expertise/Specialization
-          </label>
-          <textarea
-            className="form-control"
-            id="expertiseSpecialization"
-            name="expertiseSpecialization"
-            value={formData.expertiseSpecialization}
             onChange={handleChange}
             rows="3"
           ></textarea>
