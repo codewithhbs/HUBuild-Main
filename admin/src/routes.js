@@ -179,8 +179,8 @@ const routes = [
   { path: '/chats/all_chat', name: 'All Chats', element: AllChatRoom },
 
   // provider routes here 
-  { path: '/provider', name: 'Provider', element: Cards, exact: true },
-  { path: '/provider/all_provider', name: 'All Provider', element: AllProvider },
+  { path: '/provider', name: 'Consultant', element: Cards, exact: true },
+  { path: '/provider/all_provider', name: 'All Consultant', element: AllProvider },
 
   // withdraw routes here 
   { path: '/withdraw', name: 'Withdraw Request', element: Cards, exact: true },
