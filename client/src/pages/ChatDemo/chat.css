@@ -1,7 +1,7 @@
 /* Chat Container Styles */
 .hitesh_styling .chat-container {
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    min-height: 100vh;
+    min-height: 50vh;
 }
 
 /* Card Styles */
@@ -61,7 +61,7 @@
 .hitesh_styling .chat-box {
     display: flex;
     flex-direction: column;
-    height: 700px;
+    height: 500px;
     background: #fff;
     border-radius: 15px;
 }

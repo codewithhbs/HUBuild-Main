@@ -10,7 +10,7 @@ exports.createCall = async (req, res) => {
         if (!providerId || !userId) {
             return res.status(400).json({
                 success: false,
-                message: "Provider ID and User ID are required"
+                message: "Consultant ID and User ID are required"
             });
         }
 
@@ -28,7 +28,7 @@ exports.createCall = async (req, res) => {
         if (!provider || !user) {
             return res.status(404).json({
                 success: false,
-                message: "Provider or User not found"
+                message: "Consultant or User not found"
             });
         }
         if (user.walletAmount === 0) {
@@ -41,28 +41,28 @@ exports.createCall = async (req, res) => {
         if (provider.isBanned) {
             return res.status(400).json({
                 success: false,
-                message: "This provider is banned due to suspicious activity.",
+                message: "This Consultant is banned due to suspicious activity.",
             });
         }
 
         if (!provider.isProfileComplete) {
             return res.status(400).json({
                 success: false,
-                message: "This provider's profile is incomplete. Please choose another provider to make a call.",
+                message: "This Consultant's profile is incomplete. Please choose another Consultant to make a call.",
             });
         }
 
         if (provider.is_on_chat) {
             return res.status(400).json({
                 success: false,
-                message: "This provider is already on chat. Please choose another provider to make a call.",
+                message: "This Consultant is already on chat. Please choose another Consultant to make a call.",
             });
         }
 
         if (provider.is_on_call) {
             return res.status(400).json({
                 success: false,
-                message: "Another User  already on a call with this provider. Please choose another provider to make a call.",
+                message: "Another User  already on a call with this Consultant. Please choose another Consultant to make a call.",
             });
         }
 
@@ -74,7 +74,7 @@ exports.createCall = async (req, res) => {
         if (!userNumber || !providerNumber) {
             return res.status(400).json({
                 success: false,
-                message: "User or provider phone number is missing"
+                message: "User or Consultant phone number is missing"
             });
         }
 
@@ -136,7 +136,7 @@ exports.createCall = async (req, res) => {
 
 exports.call_status = async (req, res) => {
     try {
-
+        console.log("I am hit")
         const callStatusQuery = req.query;
 	console.log("query",req.query)
         if (!callStatusQuery.from_number || !callStatusQuery.to_number) {
@@ -178,6 +178,7 @@ exports.call_status = async (req, res) => {
             findHistory.providerId.is_on_call = false;
             await findHistory.providerId.save();
             await findHistory.save()
+            console.log("findHistory FAILED",findHistory)
             return res.status(200).json({
                 success: true,
                 message: "Call failed",
@@ -194,6 +195,7 @@ exports.call_status = async (req, res) => {
             await findHistory.providerId.save();
             findHistory.cancel_reason = 'Provider did not answer the call.';
             await findHistory.save();
+            console.log("findHistory cancel",findHistory)
             return res.status(200).json({
                 success: true,
                 message: "To Number Status Received successfully.",
