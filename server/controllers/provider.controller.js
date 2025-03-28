@@ -766,21 +766,21 @@ exports.getProviderStatus = async (req, res) => {
         if (provider.is_on_chat) {
             return res.status(403).json({
                 success: false,
-                message: 'Provider is currently on chat.',
+                message: 'Consultant is currently on chat.',
             });
         }
 
         if (provider.is_on_call) {
             return res.status(403).json({
                 success: false,
-                message: 'Provider is currently on a call.',
+                message: 'Consultant is currently on a call.',
             });
         }
 
         // If provider is available
         return res.status(200).json({
             success: true,
-            message: 'Provider is available.',
+            message: 'Consultant is available.',
         });
 
     } catch (error) {

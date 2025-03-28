@@ -152,6 +152,10 @@ function ArchitectProfile() {
             } catch (error) {
                 console.log("Internal server error", error)
                 // toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later")
+                const errorMessage = error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later";
+                if (errorMessage.includes('Chat is already started. Check Your chat room.')) {
+                    return window.location.href = '/chat'
+                }
                 Swal.fire({
                     title: 'Error!',
                     text: error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later",
@@ -323,6 +327,12 @@ function ArchitectProfile() {
         } catch (error) {
             console.log(error)
             setCallLoader(false)
+            Swal.fire({
+                title: 'Error!',
+                text: error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later",
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
         }
     }
 
@@ -460,7 +470,7 @@ function ArchitectProfile() {
                                                     </p>
                                                 </div>
 
-                                                <div style={{display:'flex'}} className="justify-content-center align-items-center gap-3">
+                                                <div style={{ display: 'flex' }} className="justify-content-center align-items-center gap-3">
                                                     <button
                                                         onClick={() => handleCategoryChange('Residential')}
                                                         className={`btn ${selectedCategory === 'Residential' ? 'btn-primary' : 'btn-outline-primary'}`}
