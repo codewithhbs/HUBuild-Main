@@ -146,10 +146,13 @@ exports.call_status = async (req, res) => {
             });
         }
 
+        console.log("query",callStatusQuery)
+
         const findHistory = await CallHistory.findOne({
             from_number: callStatusQuery.from_number,
             to_number: callStatusQuery.to_number,
         }).populate('userId');
+        console.log("findHistory finding",findHistory)
 
         if (!findHistory) {
             return res.status(404).json({
@@ -158,9 +161,13 @@ exports.call_status = async (req, res) => {
             });
         }
 
+        console.log("findHistory?.providerId finding",findHistory?.providerId)
+
         const findProviderId = findHistory?.providerId;
+        console.log("findProviderId finding id",findProviderId)
 
         const findedProvider = await Provider.findById(findProviderId);
+        console.log("findedProvider finding",findedProvider)
 
         if (!findedProvider) {
             return res.status(404).json({
@@ -189,6 +196,7 @@ exports.call_status = async (req, res) => {
             findedProvider.is_on_call = false;
             await findedProvider.save();
             await findHistory.save()
+            console.log("findedProvider FAILED",findedProvider)
             console.log("findHistory FAILED",findHistory)
             return res.status(200).json({
                 success: true,
@@ -206,6 +214,7 @@ exports.call_status = async (req, res) => {
             await findedProvider.save();
             findHistory.cancel_reason = 'Provider did not answer the call.';
             await findHistory.save();
+            console.log("findedProvider CANCEL",findedProvider)
             console.log("findHistory cancel",findHistory)
             return res.status(200).json({
                 success: true,
@@ -229,6 +238,7 @@ exports.call_status = async (req, res) => {
             findedProvider.is_on_call = false;
 
             await findedProvider.save();
+            console.log("findedProvider call start and done",findedProvider)
             await findHistory.userId.save();
         }
 
@@ -241,6 +251,7 @@ exports.call_status = async (req, res) => {
         findHistory.money_deducetation_amount = HowManyCostOfTalkTime
         findHistory.recording_url = callStatusQuery.recording_url;
         await findHistory.save();
+        console.log("findHistory final",findHistory)
 
         return res.status(200).json({
             success: true,
