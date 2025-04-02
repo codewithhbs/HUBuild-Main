@@ -212,6 +212,7 @@ exports.call_status = async (req, res) => {
             } else {
                 HowManyCostOfTalkTime = talkTimeInMinutes * findHistory.providerId?.pricePerMin;
             }
+            console.log("findHistory.providerId",findHistory.providerId)
             findHistory.providerId.walletAmount += Number(HowManyCostOfTalkTime);
             findHistory.userId.walletAmount -= Number(HowManyCostOfTalkTime);
             findHistory.providerId.is_on_call = false;
