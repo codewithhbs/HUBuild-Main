@@ -149,12 +149,23 @@ exports.call_status = async (req, res) => {
         const findHistory = await CallHistory.findOne({
             from_number: callStatusQuery.from_number,
             to_number: callStatusQuery.to_number,
-        }).populate('userId').populate('providerId');
+        }).populate('userId');
 
         if (!findHistory) {
             return res.status(404).json({
                 success: false,
                 message: "No call history found for the provided numbers."
+            });
+        }
+
+        const findProviderId = findHistory?.providerId;
+
+        const findedProvider = await Provider.findById(findProviderId);
+
+        if (!findedProvider) {
+            return res.status(404).json({
+                success: false,
+                message: "Provider not found."
             });
         }
 
@@ -175,8 +186,8 @@ exports.call_status = async (req, res) => {
             findHistory.start_time = callStatusQuery.start_time;
             findHistory.end_time = callStatusQuery.end_time;
             findHistory.TalkTime = (talkTimeInSeconds / 60).toFixed(2);
-            findHistory.providerId.is_on_call = false;
-            await findHistory.providerId.save();
+            findedProvider.is_on_call = false;
+            await findedProvider.save();
             await findHistory.save()
             console.log("findHistory FAILED",findHistory)
             return res.status(200).json({
@@ -190,9 +201,9 @@ exports.call_status = async (req, res) => {
             findHistory.status = callStatusQuery.to_number_status;
             findHistory.start_time = callStatusQuery.start_time;
             findHistory.end_time = callStatusQuery.end_time;
-            findHistory.providerId.is_on_call = false;
+            findedProvider.is_on_call = false;
 
-            await findHistory.providerId.save();
+            await findedProvider.save();
             findHistory.cancel_reason = 'Provider did not answer the call.';
             await findHistory.save();
             console.log("findHistory cancel",findHistory)
@@ -213,11 +224,11 @@ exports.call_status = async (req, res) => {
                 HowManyCostOfTalkTime = talkTimeInMinutes * findHistory.providerId?.pricePerMin;
             }
             console.log("findHistory.providerId",findHistory.providerId)
-            findHistory.providerId.walletAmount += Number(HowManyCostOfTalkTime);
+            findedProvider.walletAmount += Number(HowManyCostOfTalkTime);
             findHistory.userId.walletAmount -= Number(HowManyCostOfTalkTime);
-            findHistory.providerId.is_on_call = false;
+            findedProvider.is_on_call = false;
 
-            await findHistory.providerId.save();
+            await findedProvider.save();
             await findHistory.userId.save();
         }
 
