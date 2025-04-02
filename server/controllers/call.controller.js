@@ -178,7 +178,7 @@ exports.call_status = async (req, res) => {
             findHistory.providerId.is_on_call = false;
             await findHistory.providerId.save();
             await findHistory.save()
-            // console.log("findHistory FAILED",findHistory)
+            console.log("findHistory FAILED",findHistory)
             return res.status(200).json({
                 success: true,
                 message: "Call failed",
@@ -195,7 +195,7 @@ exports.call_status = async (req, res) => {
             await findHistory.providerId.save();
             findHistory.cancel_reason = 'Provider did not answer the call.';
             await findHistory.save();
-            // console.log("findHistory cancel",findHistory)
+            console.log("findHistory cancel",findHistory)
             return res.status(200).json({
                 success: true,
                 message: "To Number Status Received successfully.",
@@ -243,6 +243,7 @@ exports.call_status = async (req, res) => {
         });
 
     } catch (error) {
+        console.log("call disconnect error",error)
         return res.status(500).json({
             success: false,
             message: "An error occurred while processing the call status.",
