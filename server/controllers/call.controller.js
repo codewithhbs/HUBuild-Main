@@ -151,7 +151,7 @@ exports.call_status = async (req, res) => {
         const findHistory = await CallHistory.findOne({
             from_number: callStatusQuery.from_number,
             to_number: callStatusQuery.to_number,
-        }).sort({createdAt: -1}).populate('userId');
+        }).sort({createdAt: -1}).populate('userId').populate('providerId');
         console.log("findHistory finding",findHistory)
 
         if (!findHistory) {
@@ -163,7 +163,7 @@ exports.call_status = async (req, res) => {
 
         console.log("findHistory?.providerId finding",findHistory?.providerId)
 
-        const findProviderId = findHistory?.providerId;
+        const findProviderId = findHistory?.providerId?._id;
         console.log("findProviderId finding id",findProviderId)
 
         const findedProvider = await Provider.findById(findProviderId);
