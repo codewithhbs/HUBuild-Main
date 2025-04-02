@@ -151,7 +151,7 @@ exports.call_status = async (req, res) => {
         const findHistory = await CallHistory.findOne({
             from_number: callStatusQuery.from_number,
             to_number: callStatusQuery.to_number,
-        }).populate('userId');
+        }).sort({createdAt: -1}).populate('userId');
         console.log("findHistory finding",findHistory)
 
         if (!findHistory) {
