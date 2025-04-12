@@ -16,11 +16,11 @@ import axios from "axios";
 
 
 const Slider = () => {
-  const [desktopBanner,setDesktopBanner] = useState([])
-  const [mobileBanner,setMobileBanner] = useState([])
+  const [desktopBanner, setDesktopBanner] = useState([])
+  const [mobileBanner, setMobileBanner] = useState([])
   const handleFetchBanner = async () => {
     try {
-      const {data} = await axios.get('https://api.helpubuild.co.in/api/v1/get-all-banner')
+      const { data } = await axios.get('https://api.helpubuild.co.in/api/v1/get-all-banner')
       const allBanner = data.data
       const filterData = allBanner.filter(item => item.active === true)
       const desktopBanner = filterData.filter(item => item.view === 'Desktop')
@@ -28,26 +28,33 @@ const Slider = () => {
       setDesktopBanner(desktopBanner)
       setMobileBanner(mobileBanner)
     } catch (error) {
-      console.log("Internal server error in getting banners",error)
+      console.log("Internal server error in getting banners", error)
       // toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later")
     }
   }
-  useEffect(()=>{
+  useEffect(() => {
     handleFetchBanner()
-  },[])
+  }, [])
   return (
     <div className="container-fluid new_banner text-center">
-      <div className="col-md-12 d-none d-sm-block">
-        {
-          desktopBanner && desktopBanner.slice(0,1).map((item,index)=>(
-            <img key={index} className="img-fluid" style={{ width: "90%", border: "0px solid #fff", borderRadius: "5px" }} src={item?.bannerImage?.url} alt="Banner" />
-          ))
-        }
-      </div>
-      <div className="col-md-12 mobile-view">
-        {mobileBanner && mobileBanner.slice(0,1).map((item,index)=>(
-          <img className="img-fluid" style={{ width: "90%", border: "0px solid #fff", borderRadius: "5px" }} src={item?.bannerImage?.url} alt="Mobile Banner" />
-        ))}
+      <div id="carouselExampleFade" class="carousel slide carousel-fade" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          {
+            desktopBanner.map((item, index) => (
+              <div key={index}class="carousel-item active">
+                <img src={item?.bannerImage?.url} class="d-block w-100" alt="hero-banner" />
+              </div>
+            ))
+          }
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
       </div>
       <div style={{ width: "90%" }} className="mx-auto my-4">
         <div className="row">

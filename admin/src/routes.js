@@ -25,6 +25,8 @@ import AllNewsLetter from './views/NewsLetter/AllNewsLetter'
 import AllExpertise from './views/Expertise/AllExpertise'
 import AddExpertise from './views/Expertise/AddExpertise'
 import EditExpertise from './views/Expertise/EditExpertise'
+import EditCommission from './views/Commission/EditCommission'
+import EditTerm from './views/Term/EditTerm'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
@@ -214,6 +216,12 @@ const routes = [
   { path: '/expertise/all_expertise', name: 'All Expertise', element: AllExpertise },
   { path: '/expertise/add_expertise', name: 'Add Expertise', element: AddExpertise },
   { path: '/expertise/edit_expertise/:id', name: 'Edit Expertise', element: EditExpertise },
+
+  // commission routes here
+  { path: '/commission/edit_commission', name: 'Edit Commission', element: EditCommission },
+
+  // term and condition routes here
+  { path: '/term/edit_term', name: 'Edit Term', element: EditTerm },
 ]
 
 export default routes

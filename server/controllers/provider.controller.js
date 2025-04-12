@@ -27,11 +27,25 @@ exports.CreateProvider = async (req, res) => {
 
 
         if (existingEmail) {
+            if (existingEmail.PaymentStatus === 'pending') {
+                return res.status(400).json({
+                    success: true,
+                    message: "Email already exists, but payment is pending",
+                    data: existingEmail?._id
+                })
+            }
             return res.status(403).json({
                 message: 'Email is already exists with another account'
             })
         }
         if (existingMobile) {
+            if (existingMobile.PaymentStatus === 'pending') {
+                return res.status(400).json({
+                    success: true,
+                    message: "Mobile Number already exists, but payment is pending",
+                    data: existingMobile?._id
+                })
+            }
             return res.status(403).json({
                 success: false,
                 message: 'Mobile Number already exists with another account'
@@ -650,8 +664,8 @@ exports.deleteprovider = async (req, res) => {
         if (!findProvider) {
             return res.status(500).json({
                 success: false,
-                message: "Provider nout founded",
-                error: "Provider nout founded"
+                message: "Provider not founded",
+                error: "Provider not founded"
             })
         }
         res.status(200).json({

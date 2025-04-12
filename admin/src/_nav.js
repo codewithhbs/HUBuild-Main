@@ -97,6 +97,18 @@ const _nav = [
     icon: <CIcon icon={cilWallet} customClassName="nav-icon" />,
   },
   {
+    component: CNavItem,
+    name: 'Commission',
+    to: '/commission/edit_commission',
+    icon: <CIcon icon={cilWallet} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Term & Condition',
+    to: '/term/edit_term',
+    icon: <CIcon icon={cilWallet} customClassName="nav-icon" />,
+  },
+  {
     component: CNavGroup,
     name: 'Refferal',
     to: '#',
