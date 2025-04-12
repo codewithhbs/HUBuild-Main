@@ -114,6 +114,18 @@ const UserDashboard = () => {
     window.location.href = '/'
   }
 
+  const handleDeleteAccount = async (id) => {
+    try {
+      const res = await axios.delete(`https://api.helpubuild.co.in/api/v1/delete-provider/${id}`)
+      if (res.data.success) {
+        localStorage.clear()
+        window.location.href = '/'
+      }
+    } catch (error) {
+      console.log("Internal server error", error)
+    }
+  }
+
   const [amount, setAmount] = useState("");
   const [commission, setCommission] = useState(0);
   const [finalAmount, setFinalAmount] = useState(0);
@@ -425,8 +437,8 @@ const UserDashboard = () => {
                     </span>
                   </p>
 
-                  <p onClick={() => setActiveTab('Gallery')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab">
-                  <i className="fas fa-link marginnone" />{" "}
+                  <p onClick={() => setActiveTab('Gallery')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab marginrightmore">
+                    <i className="fas fa-link marginnone" />{" "}
                     <span style={{ cursor: 'pointer' }} className={`cursor-pointer ${activeTab === 'Gallery' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
                       Gallery
                     </span>
@@ -436,7 +448,16 @@ const UserDashboard = () => {
 
                   <button
                     type="button"
-                    className="btn logout_btn mt-2 mx-4 btn-sm btn-floating"
+                    className="btn forbtnwidth logout_btn mt-2 mx-2 btn-sm btn-floating"
+                    title="Delete Account"
+                    onClick={() => handleDeleteAccount(providerId)}
+                  >
+                    Delete Account <i className="fas fa-trash text-body"></i>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn forbtnwidth logout_btn mt-2 mx-2 btn-sm btn-floating"
                     title="Logout"
                     onClick={() => handleLogout()}
                   >

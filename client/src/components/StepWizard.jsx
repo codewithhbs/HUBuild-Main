@@ -19,6 +19,7 @@ const StepWizard = () => {
         location: "",
         password: "",
         couponCode: "",
+        agree: false,
     });
     const [couponDetail, setCouponDetail] = useState(null);
     const [couponMessage, setCouponMessage] = useState("");
@@ -150,8 +151,20 @@ const StepWizard = () => {
         if (!validatePhone() || !validatePassword()) return;
         setLoading(true);
 
+        if (memberData.agree === false) {
+            setLoading(false)
+            Swal.fire({
+                title: 'Error!',
+                text: "Please accept terms and conditions",
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
+        }
+
         try {
             const res = await axios.post("https://api.helpubuild.co.in/api/v1/register-provider", memberData);
+            const message = res.data.message;
+            // console.log("message",message)
             toast.success(res.data.message);
             setData("token", res.data.token);
             setData("islogin", !!res.data.token);
@@ -159,6 +172,13 @@ const StepWizard = () => {
             // Proceed to payment after registration
             await handlePayment(res.data.user._id);
         } catch (error) {
+            console.log("Internal server error", error)
+            const message = error?.response?.data?.message;
+            if (message == 'Email already exists, but payment is pending' || message == 'Mobile Number already exists, but payment is pending') {
+                console.log("i am in")
+                await handlePayment(error?.response?.data?.data);
+                return;
+            }
             Swal.fire({
                 title: 'Error!',
                 text: error?.response?.data?.message || "Please try again later in register",
@@ -282,6 +302,26 @@ const StepWizard = () => {
                                 </strong>
                             </p>
                             <p className="text-muted">Get exclusive access to premium features.</p>
+                        </div>
+                    </div>
+                    <div className="col-lg-12">
+                        <div className="form-check d-flex justify-content-start mb-4">
+                            <input
+                                className="form-check-input me-2"
+                                type="checkbox"
+                                id="termsCheck"
+                                checked={memberData.agree}
+                                onChange={(e) =>
+                                    setMemberData({ ...memberData, agree: e.target.checked })
+                                }
+                                required
+                            />
+                            <label className="form-check-label text-black" htmlFor="termsCheck">
+                                I agree to the
+                                <a href="/terms-and-conditions" target="_blank" rel="noopener noreferrer" className="text-warning ms-1">
+                                    Terms and Conditions
+                                </a>
+                            </label>
                         </div>
                     </div>
                 </div>

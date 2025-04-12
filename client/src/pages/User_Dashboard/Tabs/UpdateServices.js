@@ -68,6 +68,14 @@ function UpdateServices() {
     }, [])
 
     const handleInputChange = (category, field, value) => {
+        if (Number(value) < 0) {
+            Swal.fire({
+                icon: "warning",
+                title: "Invalid Input",
+                text: "Value cannot be less than 0",
+            });
+            return;
+        }
         setServicesData((prev) => ({
             ...prev,
             [category]: {
@@ -147,11 +155,18 @@ function UpdateServices() {
 
                                         <input
                                             type="number"
-                                            className="form-control"
+                                            className={`form-control ${selectedCategory !== category ? 'bg-light text-muted' : ''}`}
                                             placeholder={label}
                                             value={servicesData[category][key]}
                                             onChange={(e) => handleInputChange(category, key, e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === '-' || e.key === 'e') e.preventDefault(); // prevent negative or exponential input
+                                            }}
+                                            readOnly={selectedCategory !== category}
+                                            min="0"
                                         />
+
+
                                     </div>
                                 ))}
                             </div>

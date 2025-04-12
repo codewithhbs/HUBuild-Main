@@ -94,11 +94,13 @@ hr:not([size]) {
     }
 
     .logout_btn {
-        width: 80%;
+        width: 95%;
         background: #db3c4b;
         color: #fff;
     }
-    .logout_btn i{color:#fff!important;}
+    .logout_btn i{
+        color:#fff!important;
+    }
 
     .user-thumb{
         border-radius: 50% !important;

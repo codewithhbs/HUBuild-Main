@@ -4,12 +4,12 @@ import toast from 'react-hot-toast'
 import Swal from 'sweetalert2'
 function Register() {
     const [formData, setFormData] = useState({
-        // Gender: '',
         name: '',
         email: '',
         PhoneNumber: '',
         Password: '',
-        cPassword: ''
+        cPassword: '',
+        agree: false,
     })
     const [isPasswordShow, setIsPasswordShow] = useState(false)
     const location = new URLSearchParams(window.location.search)
@@ -30,6 +30,15 @@ function Register() {
     const handlSubmit = async (e) => {
         e.preventDefault()
         setloading(true)
+        if (formData.agree === false) {
+            setloading(false)
+            Swal.fire({
+                title: 'Error!',
+                text: "Please accept terms and conditions",
+                icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
+        }
         if (formData.Password !== formData.cPassword) {
             setloading(false)
             // return toast.error("Password does not match")
@@ -45,7 +54,7 @@ function Register() {
             const res = await axios.post('https://api.helpubuild.co.in/api/v1/register', formData)
 
             toast.success(res.data.message)
-            console.log("res.data",res.data.data)
+            console.log("res.data", res.data.data)
 
             window.location.href = `/otp-verification/user?email=${formData.PhoneNumber}&expires=${res.data?.data}&redirect=${redirectPath}`
             setloading(false)
@@ -141,28 +150,6 @@ function Register() {
                                                         </div>
 
                                                     </div>
-                                                    {/* <div className='col-lg-6'>
-                                                        <div className="d-flex flex-row mb-4">
-                                                            <i className="fas fa-user fa-lg me-3 fa-fw lable-icon" />
-                                                            <div
-                                                                data-mdb-input-init=""
-                                                                className="form-outline flex-fill mb-0"
-                                                            >   <label className="form-label text-white" htmlFor="form3Example3c">
-                                                                    Your Gender
-                                                                </label>
-                                                                <select name="Gender" onChange={handleChange} className="form-control form-select  input-shape px-5" value={formData.Gender} >
-                                                                    <option>Select Your Gender</option>
-
-                                                                    <option value={"Mr"}>Male</option>
-                                                                    <option value={"Mrs"}>Female</option>
-
-                                                                </select>
-
-
-                                                            </div>
-                                                        </div>
-
-                                                    </div> */}
 
                                                     <div className='col-lg-6'>
                                                         <div className="d-flex flex-row mb-4">
@@ -209,6 +196,27 @@ function Register() {
                                                     </div>
 
                                                 </div>
+                                                <div className="col-lg-12">
+                                                    <div className="form-check d-flex justify-content-start">
+                                                        <input
+                                                            className="form-check-input me-2"
+                                                            type="checkbox"
+                                                            id="termsCheck"
+                                                            checked={formData.agree}
+                                                            onChange={(e) =>
+                                                                setFormData({ ...formData, agree: e.target.checked })
+                                                            }
+                                                            required
+                                                        />
+                                                        <label className="form-check-label text-white" htmlFor="termsCheck">
+                                                            I agree to the
+                                                            <a href="/terms-and-conditions" target="_blank" rel="noopener noreferrer" className="text-warning ms-1">
+                                                                Terms and Conditions
+                                                            </a>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
 
                                                 <div className="d-flex justify-content-center mx-5 mb-3 mb-lg-4">
                                                     <button
@@ -246,7 +254,6 @@ function Register() {
                     </div >
                 </div >
             </section >
-
         </>
     )
 }
