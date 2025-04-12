@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './Wallet.css'; // Create a new CSS file for custom styling
 
 function Wallet({ data }) {
-    const [filteredData, setFilteredData] = useState(data?.chatTransition || []);
+    const [filteredData, setFilteredData] = useState(data?.chatTransition.reverse() || []);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOrder, setSortOrder] = useState('asc');
     const [currentPage, setCurrentPage] = useState(1);

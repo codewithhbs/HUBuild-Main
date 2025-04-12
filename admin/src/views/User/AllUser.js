@@ -251,7 +251,7 @@ function AllUser() {
                             </tbody>
                         </table>
                     ) : (
-                        <p>No chat transition data available.</p>
+                        <p>No Recharge History available.</p>
                     )}
                 </CModalBody>
                 <CModalFooter>

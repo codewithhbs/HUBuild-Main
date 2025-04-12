@@ -26,6 +26,7 @@ const ChatDemo = () => {
     const [timeLeft, setTimeLeft] = useState(0)
     const [isActive, setIsActive] = useState(false);
     const [status, setStatus] = useState('offline');
+    const [showReviewPopup, setShowReviewPopup] = useState(false);
 
     // console.log("message",UserData._id)
     const id = UserData?._id || ''
