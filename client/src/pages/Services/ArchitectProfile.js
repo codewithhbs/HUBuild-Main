@@ -44,6 +44,13 @@ function ArchitectProfile() {
     const [profileLoading, setProfileLoading] = useState(true);
     const [callLoader, setCallLoader] = useState(false);
 
+    useEffect(()=>{
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+        });
+    },[])
+
     const handleFetchProvider = async (providerId) => {
         setLoading(true);
         try {
@@ -105,7 +112,7 @@ function ArchitectProfile() {
             handleFetchProvider(id);
         }
         // handleFetchProvider();
-    }, [selectedCategory, id]);
+    }, [id]);
 
     const [formData, setFormData] = useState({
         userId: '',
