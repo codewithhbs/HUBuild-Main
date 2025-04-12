@@ -382,7 +382,7 @@ exports.login = async (req, res) => {
             return res.status(400).json({ success: false, message: "Please provide both your email/phone number and password." });
         }
 
-        console.log("loginFrom",loginFrom)
+        console.log("loginFrom", loginFrom)
 
         // First, try finding the user in the User collection
         let user = await User.findOne({
@@ -397,7 +397,7 @@ exports.login = async (req, res) => {
                 $or: [{ email: any }, { mobileNumber: any }]
             });
             isProvider = true; // Flag to indicate a provider login
-            if(user?.accountVerified == 'Pending'){
+            if (user?.accountVerified == 'Pending') {
                 return res.status(400).json({
                     success: false,
                     message: "Your account is not verified yet. Please wait for the admin to verify your account."
@@ -412,7 +412,7 @@ exports.login = async (req, res) => {
             });
         }
 
-        if(user.role !== loginFrom){
+        if (user.role !== loginFrom) {
             return res.status(404).json({
                 success: false,
                 message: `No account found with that email/phone number${isProvider ? " for user" : " for provider"}.`
@@ -1211,13 +1211,24 @@ exports.chatEnd = async (userId, astrologerId) => {
 
         // Calculate the chat end details
         const endTime = new Date();
-        const durationSeconds = Math.ceil((endTime - new Date(lastTransition.startChatTime)) / 1000); // Duration in seconds
+        const durationSeconds = Math.ceil((endTime - new Date(lastTransition.startChatTime)) / 1000); // total seconds
+        const providerPricePerMinInPaise = lastTransition.providerPricePerMin * 100;
 
-        // Convert the provider price from per minute to per second (in paise)
-        const pricePerSecondInPaise = lastTransition.providerPricePerMin * 100 / 60;
+        // Calculate whole minutes and remainder seconds
+        const minutes = Math.floor(durationSeconds / 60);
+        const seconds = durationSeconds % 60;
 
-        // Calculate the wallet deduction based on duration in seconds
-        const walletUsedInPaise = Math.min(durationSeconds * pricePerSecondInPaise, user.walletAmount * 100); // user.walletAmount is in rupees, so multiply by 100 to convert to paise
+        // Apply 10 seconds grace logic
+        let billableMinutes;
+        if (seconds <= 10) {
+            billableMinutes = minutes;
+        } else {
+            billableMinutes = minutes + 1;
+        }
+
+        // Final amount to deduct
+        const walletUsedInPaise = Math.min(billableMinutes * providerPricePerMinInPaise, user.walletAmount * 100);
+
 
         // Set the chat ending details
         lastTransition.endingChatTime = endTime.toISOString();

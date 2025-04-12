@@ -18,7 +18,7 @@ const Home = () => {
         <Ser/>
         {/* <Banner/> */}
         {/* <About/> */}
-        <Cards/>
+        {/* <Cards/> */}
         {/* <Extra/> */}
         <Reviews/>
         <WhyChooseUs/>

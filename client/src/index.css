@@ -318,9 +318,15 @@ a {
   }
 }
 
-@media (max-width: 510px) {
+@media (max-width: 822px) {
   .profile-card {
-    width: 46%;
+    width: 48%;
+  }
+}
+
+@media (max-width: 556px) {
+  .profile-card {
+    width: 100%;
   }
 }
 
@@ -359,6 +365,10 @@ a {
   margin: 0rem 1.5rem;
 }
 
+.marginrightmore{
+  margin-right: 0.5rem;
+}
+
 @media (max-width:650px) {
   .forresponsicetab{
     display: flex;
@@ -367,5 +377,8 @@ a {
   }
   .marginnone{
     margin: 0px 5px 0px 0px !important;
+  }
+  .marginrightmore{
+    margin: 0rem;
   }
 }

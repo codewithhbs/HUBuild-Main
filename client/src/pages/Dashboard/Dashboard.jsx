@@ -159,6 +159,32 @@ function Dashboard() {
     window.location.href = '/'
   }
 
+  const handleDeleteAccount = async (id) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This action will permanently delete your account!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await axios.delete(`https://api.helpubuild.co.in/api/v1/user-delete/${id}`);
+          if (res.data.success) {
+            Swal.fire('Deleted!', 'Your account has been deleted.', 'success');
+            localStorage.clear();
+            window.location.href = '/';
+          }
+        } catch (error) {
+          console.log("Internal server error", error);
+          Swal.fire('Error!', 'Something went wrong. Please try again.', 'error');
+        }
+      }
+    });
+  };
+
   if (loading || !myProfile) {
     return <div>Loading...</div>;
   }
@@ -234,7 +260,7 @@ function Dashboard() {
                     <p
                       onClick={() => setActiveTab('settings')}
                       style={{ fontWeight: '700' }}
-                      className="mb-0 text-uppercase"
+                      className="mb-0 text-uppercase marginrightmore"
                     >
                       <i className="fas fa-cog me-2" />{' '}
                       <span
@@ -248,9 +274,19 @@ function Dashboard() {
                       </span>
                       {/* <span className="ms-3 me-4">|</span> */}
                     </p>
+
                     <button
                       type="button"
-                      className="btn logout_btn mx-4 btn-sm btn-floating"
+                      className="btn logout_btn mx-2 btn-sm btn-floating"
+                      title="Delete Account"
+                      onClick={() => handleDeleteAccount(userId)}
+                    >
+                      Delete Account <i className="fas fa-trash text-body"></i>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btn logout_btn mx-2 btn-sm btn-floating"
                       title="Logout"
                       onClick={() => handleLogout()}
                     >
