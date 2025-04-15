@@ -5,6 +5,7 @@ import "./header.css";
 import { GetData } from "../utils/sessionStoreage";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { isTokenValid } from "./isTokenValid/isTokenValid";
 
 const Header = () => {
   const [allChat, setAllChat] = useState(0)
@@ -15,6 +16,18 @@ const Header = () => {
     isProfileComplete: false,
     dashboard: ''
   });
+
+  const findToken = GetData('token')
+
+  // useEffect(() => {
+  //   const isLoggedIn = isTokenValid();
+  //   if (!isLoggedIn) {
+  //     localStorage.clear();
+  // Redirect to login if needed
+  // navigate('/login');
+  // window.location.href = '/';
+  //   }
+  // }, [])
 
 
   const [scrollValue, setScrollValue] = useState(0);
@@ -97,6 +110,7 @@ const Header = () => {
   useEffect(() => {
 
     const isAuthenticatedValue = GetData('islogin')
+    // console.log('islogin', isAuthenticatedValue)
     const convertToBoolean = Boolean(isAuthenticatedValue);
 
     setSessionData(prevState => ({
@@ -127,7 +141,7 @@ const Header = () => {
     setActive(location.pathname);
   }, [location]);
 
-  // console.log("i am sss", sessionData.isAuthenticated);
+  // console.log("i am sss", findToken);
 
   return (
     <div>
@@ -160,32 +174,32 @@ const Header = () => {
                   <div className="as_menu">
                     <ul>
                       <li>
-                        <Link style={{color:'black'}} onClick={handleLinkClick} to="/" className={active === "/" ? "active" : ""}>
+                        <Link style={{ color: 'black' }} onClick={handleLinkClick} to="/" className={active === "/" ? "active" : ""}>
                           home
                         </Link>
                       </li>
                       <li>
-                        <Link style={{color:'black'}} onClick={handleLinkClick} to="/talk-to-architect" className={active === "/talk-to-architect" ? "active" : ""}>
+                        <Link style={{ color: 'black' }} onClick={handleLinkClick} to="/talk-to-architect" className={active === "/talk-to-architect" ? "active" : ""}>
                           Talk to Architect
                         </Link>
                       </li>
                       <li>
-                        <Link style={{color:'black'}} onClick={handleLinkClick} to="/talk-to-interior" className={active === "/talk-to-interior" ? "active" : ""}>
+                        <Link style={{ color: 'black' }} onClick={handleLinkClick} to="/talk-to-interior" className={active === "/talk-to-interior" ? "active" : ""}>
                           Talk to Interior Designer
                         </Link>
                       </li>
                       <li>
-                        <Link style={{color:'black'}} onClick={handleLinkClick} to="/Vastu" className={active === "/Vastu" ? "active" : ""}>
+                        <Link style={{ color: 'black' }} onClick={handleLinkClick} to="/Vastu" className={active === "/Vastu" ? "active" : ""}>
                           Talk to Vastu Expert
                         </Link>
                       </li>
                       <li>
-                        <Link style={{color:'black'}} onClick={handleLinkClick} to="/blog" className={active === "/blog" ? "active" : ""}>
+                        <Link style={{ color: 'black' }} onClick={handleLinkClick} to="/blog" className={active === "/blog" ? "active" : ""}>
                           blog
                         </Link>
                       </li>
                       {
-                        sessionData.isAuthenticated && (
+                        findToken && (
                           <>
                             {sessionData?.user?.role === 'provider' ? (
                               <li>
@@ -237,7 +251,7 @@ const Header = () => {
                       }
 
                       <li>
-                        {sessionData.isAuthenticated ? (
+                        {findToken ? (
 
                           <Link onClick={handleLinkClick}
                             className={`as_btn ${active === "/Profile" ? "active" : ""}`}
@@ -254,10 +268,10 @@ const Header = () => {
                           //   Login
                           // </Link>
                           <div class="dropdown">
-                            <button class="btn dropdown-toggle" style={{backgroundColor:'#EAB936', color:'white'}} type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button class="btn dropdown-toggle" style={{ backgroundColor: '#EAB936', color: 'white' }} type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                               Login
                             </button>
-                            <div class="dropdown-menu" style={{left:'-46%'}} aria-labelledby="dropdownMenuButton">
+                            <div class="dropdown-menu" style={{ left: '-46%' }} aria-labelledby="dropdownMenuButton">
                               <a class="dropdown-item" href="/login">Login as User</a>
                               <a class="dropdown-item" href="/partner-login">Login as Partner</a>
                             </div>

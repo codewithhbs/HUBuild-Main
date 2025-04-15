@@ -7,6 +7,7 @@ import Settings from './Settings';
 import crown from './crown.png'
 import { Modal, Button, Form } from 'react-bootstrap';
 import Swal from 'sweetalert2';
+import useLogout from '../../components/useLogout/useLogout';
 
 function Dashboard() {
   const [myProfile, setMyProfile] = useState(null);
@@ -154,10 +155,12 @@ function Dashboard() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.clear()
-    window.location.href = '/'
-  }
+  // const handleLogout = () => {
+  //   localStorage.clear()
+  //   window.location.href = '/'
+  // }
+
+  const handleLogout = useLogout(userId);
 
   const handleDeleteAccount = async (id) => {
     Swal.fire({
