@@ -305,7 +305,7 @@ const StepWizard = () => {
                         </div>
                     </div>
                     <div className="col-lg-12">
-                        <div className="form-check d-flex justify-content-start mb-4">
+                        <div style={{display:'flex'}} className="form-check justify-content-start mb-4">
                             <input
                                 className="form-check-input me-2"
                                 type="checkbox"
@@ -319,7 +319,7 @@ const StepWizard = () => {
                             <label className="form-check-label text-black" htmlFor="termsCheck">
                                 I agree to the
                                 <a href="/terms-and-conditions" target="_blank" rel="noopener noreferrer" className="text-warning ms-1">
-                                    Terms and Conditions
+                                    Terms & Conditions
                                 </a>
                             </label>
                         </div>

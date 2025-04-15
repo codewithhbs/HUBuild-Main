@@ -479,15 +479,17 @@ function TalkToInterior() {
                     ) : (
                       "Not Updated"
                     )}</p>
-                    <p className="pricing formarginzero">
-                      {/* {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds ${handleFilterProviderService(item._id) || 'Sq. Yrds'} * 900`} */}
-                      {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds (Approx)`}
-                    </p>
                     <p className="experience">{item.yearOfExperience ? (
                       <span className='archi-language-tag'>{`${item.yearOfExperience}`}</span>
                     ) : (
                       ""
                     )} Years Experience</p>
+                    <p className="pricing formarginzero">
+                      {item?.providerService ? (
+                        `Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds (Approx)`
+                      ) : ('')}
+                      {/* {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds ${handleFilterProviderService(item._id) || 'Sq. Yrds'} * 900`} */}
+                    </p>
                   </div>
 
                   {/* <!-- Right Section (Buttons & Experience) --> */}
@@ -503,19 +505,48 @@ function TalkToInterior() {
               ))}
             </div>
             {/* Pagination */}
-            <nav>
-              <ul className="pagination">
-                {Array.from({ length: Math.ceil(filteredProviders.length / itemsPerPage) }).map((_, index) => (
-                  <li
-                    key={index}
-                    className={`page-item ${currentPage === index + 1 ? "active" : ""}`}
-                    onClick={() => paginate(index + 1)}
-                  >
-                    <a className="page-link">{index + 1}</a>
+            {filteredProviders.length >= 1 && (
+              <nav className="d-flex justify-content-center mt-4">
+                <ul className="pagination">
+                  <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                    <button className="page-link" onClick={() => paginate(currentPage - 1)}>
+                      Previous
+                    </button>
                   </li>
-                ))}
-              </ul>
-            </nav>
+
+                  {currentPage > 1 && (
+                    <li className="page-item">
+                      <button className="page-link" onClick={() => paginate(currentPage - 1)}>
+                        {currentPage - 1}
+                      </button>
+                    </li>
+                  )}
+
+                  <li className="page-item active">
+                    <span className="page-link">{currentPage}</span>
+                  </li>
+
+                  {currentPage < Math.ceil(filteredProviders.length / itemsPerPage) && (
+                    <li className="page-item">
+                      <button className="page-link" onClick={() => paginate(currentPage + 1)}>
+                        {currentPage + 1}
+                      </button>
+                    </li>
+                  )}
+
+                  <li
+                    className={`page-item ${currentPage === Math.ceil(filteredProviders.length / itemsPerPage)
+                      ? "disabled"
+                      : ""
+                      }`}
+                  >
+                    <button className="page-link" onClick={() => paginate(currentPage + 1)}>
+                      Next
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            )}
           </div>
 
         </div>

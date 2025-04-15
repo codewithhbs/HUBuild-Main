@@ -35,7 +35,7 @@ function Login() {
                     'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token'
                 }
             });
-            console.log(data)
+            // console.log(data)
             const { token, user, message } = data
             setData('token', token)
             setData('islogin', token ? true : false)

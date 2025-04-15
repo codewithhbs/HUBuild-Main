@@ -150,7 +150,7 @@ function UpdateServices() {
                                 {serviceFields.map(({ key, label }) => (
                                     <div key={key} className="input-row">
                                         <label htmlFor="" className="form-label  ">
-                                            {label} ₹/cm
+                                            {label} ₹/sq.ft.
                                         </label>
 
                                         <input

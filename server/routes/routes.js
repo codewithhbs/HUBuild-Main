@@ -32,7 +32,7 @@ const router = express.Router();
 router.post('/register', registeruser);
 router.put('/user/update-profile/:id', upload.single('ProfileImage'), updateProfile);
 router.post('/login', login);
-router.post('/logout', logout);
+router.get('/universal_logout/:id', logout);
 router.post('/verify/:type', verifyEmail);
 router.post('/Changepassword', Changepassword);
 router.post('/resend-otp/:type', resendOtp);
@@ -80,8 +80,6 @@ router.post('/addPortfolio', protect, (req, res, next) => {
     upload.fields([
         { name: 'PortfolioLink', maxCount: 1 },
         { name: 'GalleryImages', maxCount: 10 },
-
-
     ])(req, res, (err) => {
         if (err) {
             return res.status(400).json({
@@ -228,48 +226,48 @@ router.delete('/delete_membership/:id', deleteMemberShip)
 
 // globel user discount router here
 router.post('/create_globel_discount', createGlobelUserRefDis)
-router.get('/all_globel_discounts',getAllGlobelUserRefDis)
-router.get('/globel_discount/:id',getSingleGlobelUserRef)
-router.put('/update_globel_discount/:id',updateGlobelUserRef)
-router.delete('/delete_globel_discount/:id',deleteGlobelUserRef)
+router.get('/all_globel_discounts', getAllGlobelUserRefDis)
+router.get('/globel_discount/:id', getSingleGlobelUserRef)
+router.put('/update_globel_discount/:id', updateGlobelUserRef)
+router.delete('/delete_globel_discount/:id', deleteGlobelUserRef)
 
 // admin coupon routes here 
-router.post('/create_admin_coupon',createAdminCoupon)
-router.get('/all_admin_coupon',getAllAdminCoupon)
-router.get('/admin_coupon/:id',getSingleAdminCoupon)
-router.put('/update_admin_coupon/:id',updateAdminCoupon)
-router.delete('/delete_admin_coupon/:id',deleteAdminCoupon)
+router.post('/create_admin_coupon', createAdminCoupon)
+router.get('/all_admin_coupon', getAllAdminCoupon)
+router.get('/admin_coupon/:id', getSingleAdminCoupon)
+router.put('/update_admin_coupon/:id', updateAdminCoupon)
+router.delete('/delete_admin_coupon/:id', deleteAdminCoupon)
 
 // coupon check and member ship router here
-router.post('/check_coupon_code',checkCouponCode)
-router.post('/buy_membership/:providerId',buyMemberShip)
-router.post('/membership_payment_verify',membershipPaymentVerify)
+router.post('/check_coupon_code', checkCouponCode)
+router.post('/buy_membership/:providerId', buyMemberShip)
+router.post('/membership_payment_verify', membershipPaymentVerify)
 
 // verify before update things routes 
-router.post('/otp_send_before_update',sendOtpForUpdateDetail)
-router.post('/verify_otp_before_update',verifyOtpForUpdateDetail)
+router.post('/otp_send_before_update', sendOtpForUpdateDetail)
+router.post('/verify_otp_before_update', verifyOtpForUpdateDetail)
 
 // newsletter routes here 
 
-router.post('/create_newletter',createNewsLetter)
-router.get('/all_newsletter',getAllNewsLetter)
-router.get('/single_newsletter/:id',getSingleNewsLetter)
-router.delete('/delete_newsletter/:id',deleteNewsLetter)
-router.post('/send_message_newsletter',sendNewsLetterMessage)
+router.post('/create_newletter', createNewsLetter)
+router.get('/all_newsletter', getAllNewsLetter)
+router.get('/single_newsletter/:id', getSingleNewsLetter)
+router.delete('/delete_newsletter/:id', deleteNewsLetter)
+router.post('/send_message_newsletter', sendNewsLetterMessage)
 
 // expertise router here 
 
-router.post('/create_expertise',createExpertise)
-router.get('/all_expertise',getAllExpertise)
-router.get('/single_expertise/:id',getSingleExpertise)
-router.put('/update_expertise/:id',updateExpertise)
-router.delete('/delete_expertise/:id',deleteExpertise)
+router.post('/create_expertise', createExpertise)
+router.get('/all_expertise', getAllExpertise)
+router.get('/single_expertise/:id', getSingleExpertise)
+router.put('/update_expertise/:id', updateExpertise)
+router.delete('/delete_expertise/:id', deleteExpertise)
 
 // term router here 
 
-router.post('/create_term',createTerm)
-router.get('/all_term',getTerm)
-router.get('/single_term/:id',singleTerm)
-router.put('/update_term/:id',updateTerm)
+router.post('/create_term', createTerm)
+router.get('/all_term', getTerm)
+router.get('/single_term/:id', singleTerm)
+router.put('/update_term/:id', updateTerm)
 
 module.exports = router;

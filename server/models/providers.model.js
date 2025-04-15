@@ -262,6 +262,10 @@ const ProviderProfileSchema = new mongoose.Schema({
     },
     updateOtpExpiresAt: {
         type: Date
+    },
+    providerService: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ProviderService'
     }
 });
 

@@ -274,7 +274,7 @@ exports.addPortfolio = async (req, res) => {
 
 exports.getAllProvider = async (req, res) => {
     try {
-        const providers = await providersModel.find().populate('portfolio').exec();
+        const providers = await providersModel.find().populate('providerService').populate('portfolio').exec();
         if (!providers) {
             return res.status(404).json({
                 success: false,
