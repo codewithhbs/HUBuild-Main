@@ -42,7 +42,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const allowedOrigins = ['http://localhost:3001', 'https://helpubuild.co.in', 'https://www.helpubuild.co.in', 'http://localhost:3000'];
+const allowedOrigins = ['http://localhost:3001', 'https://helpubuild.co.in', 'https://www.helpubuild.co.in', 'http://localhost:3000', 'https://www.admin.helpubuild.co.in', 'https://admin.helpubuild.co.in'];
 
 app.use(cors({
     origin: function (origin, callback) {
