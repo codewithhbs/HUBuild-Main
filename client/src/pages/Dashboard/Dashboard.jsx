@@ -307,7 +307,7 @@ function Dashboard() {
             activeTab === 'settings' && (
               <>
                 <div className="w-100 py-4 mt-5 mb-3">
-                  <h2>
+                  <h2 className='foraligncenter'>
                     <i className="fas fa-user-cog text-dark me-2" />
                     My Settings
 

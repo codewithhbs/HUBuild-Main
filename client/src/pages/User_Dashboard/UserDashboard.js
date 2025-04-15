@@ -362,8 +362,8 @@ const UserDashboard = () => {
                       </a>
                     </div>
                     <div style={{}} className=''>
-                      <h3 className="mb-3">{myProfile.name}</h3>
-                      <p className="small mb-2">
+                      <h3 className="mb-3 foraligncenter">{myProfile.name}</h3>
+                      <p className="small mb-2 foraligncenter">
                         {/* <i className="fas fa-star fa-lg text-warning" />{" "} */}
                         <span>{myProfile?.type}</span>
                         <span className="mx-2">|</span>
@@ -414,36 +414,36 @@ const UserDashboard = () => {
                 <div className="featured-list d-flex justify-content-start align-items-center">
                   <p onClick={() => setActiveTab('settings')} style={{ fontWeight: '700' }} className="mb-0 text-uppercase forresponsicetab">
                     <i className="fas fa-cog me-2" />{" "}
-                    <span style={{ cursor: 'pointer' }} className={`cursor-pointer ${activeTab === 'settings' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
+                    <a href='#settings' style={{ cursor: 'pointer', color:'black' }} className={`cursor-pointer ${activeTab === 'settings' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
                       settings
-                    </span>
+                    </a>
                   </p>
                   <p onClick={() => setActiveTab('Portfolio')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab">
                     <i className="fas fa-link marginnone" />{" "}
-                    <span style={{ cursor: 'pointer' }} className={`cursor-pointer ${activeTab === 'Portfolio' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
+                    <a href='#portfolio' style={{ cursor: 'pointer', color:'black' }} className={`cursor-pointer ${activeTab === 'Portfolio' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
                       Portfolio
-                    </span>
+                    </a>
                   </p>
 
                   <p onClick={() => setActiveTab('Wallet')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab">
                     <i className="fas fa-link marginnone" />{" "}
-                    <span style={{ cursor: 'pointer' }} className={`cursor-pointer ${activeTab === 'Wallet' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
+                    <a href='#wallet' style={{ cursor: 'pointer', color:'black' }} className={`cursor-pointer ${activeTab === 'Wallet' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
                       Wallet
-                    </span>
+                    </a>
                   </p>
 
                   <p onClick={() => setActiveTab('Withdraw')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab">
                     <i className="fas fa-link marginnone" />{" "}
-                    <span style={{ cursor: 'pointer' }} className={`cursor-pointer ${activeTab === 'Withdraw' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
+                    <a href='#withdraw' style={{ cursor: 'pointer', color:'black' }} className={`cursor-pointer ${activeTab === 'Withdraw' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
                       Withdraw History
-                    </span>
+                    </a>
                   </p>
 
                   <p onClick={() => setActiveTab('Gallery')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab marginrightmore">
                     <i className="fas fa-link marginnone" />{" "}
-                    <span style={{ cursor: 'pointer' }} className={`cursor-pointer ${activeTab === 'Gallery' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
+                    <a href='#gallery' style={{ cursor: 'pointer' }} className={`cursor-pointer ${activeTab === 'Gallery' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
                       Gallery
-                    </span>
+                    </a>
                     {/* <span className="ms-3 me-4">|</span> */}
                   </p>
 
@@ -474,7 +474,7 @@ const UserDashboard = () => {
 
         {activeTab === "Gallery" && (
 
-          <div className="w-100 py-4 mt-4 mb-3">
+          <div id='gallery' className="w-100 py-4 mt-4 mb-3">
             <div className='work-gallery-heading d-flex justify-content-between'>
 
               <div>
@@ -605,8 +605,8 @@ const UserDashboard = () => {
         )}
         <>
           {activeTab === 'Portfolio' && (
-            <div className="w-100 py-4 mt-5 mb-3">
-              <div style={{ display: 'flex' }} className='align-item-center justify-content-between'>
+            <div id='portfolio' className="w-100 py-4 mt-5 mb-3">
+              <div style={{ display: 'flex' }} className='align-item-center forbetweenandcenter'>
                 <div>
                   <h2>
                     <i className="fas fa-briefcase text-primary me-2" />
@@ -707,8 +707,8 @@ const UserDashboard = () => {
         </>
 
         {activeTab === "settings" && (
-          <div className="w-100 py-4 mt-5 mb-3">
-            <h2>
+          <div id='settings' className="w-100 py-4 mt-5 mb-3">
+            <h2 className='foraligncenter'>
               <i className="fas fa-user-cog text-dark me-2" />
               My Settings
 
@@ -721,8 +721,8 @@ const UserDashboard = () => {
         )}
 
         {activeTab === "Wallet" && (
-          <div className="w-100 py-4 mt-5 mb-3">
-            <h2>
+          <div id='wallet' className="w-100 py-4 mt-5 mb-3">
+            <h2 className='foraligncenter'>
               <i className="fas fa-user-cog text-dark me-2" />
               My Wallet
 
@@ -735,11 +735,11 @@ const UserDashboard = () => {
 
         {activeTab === "Withdraw" && (
           <div className="w-100 py-4 mt-5 mb-3">
-            <h2>
+            <a href="#withdraw" className='foraligncenter'>
               <i className="fas fa-user-cog text-dark me-2" />
               Withdraw History
 
-            </h2>
+            </a>
 
             <Withdraw data={myProfile} />
 
