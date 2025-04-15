@@ -19,17 +19,29 @@ const Header = () => {
 
   const [checkUserData, setCheckUserData] = useState(null)
 
-  const findToken = GetData('token')
+  // const findToken = GetData('token')
+  const [findToken, setFindToken] = useState(null)
 
-  // useEffect(() => {
-  //   const isLoggedIn = isTokenValid();
-  //   if (!isLoggedIn) {
-  //     localStorage.clear();
-  // Redirect to login if needed
-  // navigate('/login');
-  // window.location.href = '/';
-  //   }
-  // }, [])
+  useEffect(() => {
+    console.log("Validating user on mount...");
+  
+    const validateUser = async () => {
+      const valid = await isTokenValid();
+      if (!valid) {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = '/';
+      }
+    };
+
+    if(findToken){
+      validateUser()
+    }
+  
+    // validateUser();
+  }, []);
+  
+  
 
 
   const [scrollValue, setScrollValue] = useState(0);
@@ -113,6 +125,8 @@ const Header = () => {
     const isAuthenticatedValue = GetData('islogin')
     // console.log('islogin', isAuthenticatedValue)
     const convertToBoolean = Boolean(isAuthenticatedValue);
+
+    setFindToken(GetData('token'))
 
     setSessionData(prevState => ({
       ...prevState,
