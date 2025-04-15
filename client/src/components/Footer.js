@@ -45,7 +45,7 @@ const Footer = () => {
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/v1/create_newletter', { email });
+      const res = await axios.post('https://api.helpubuild.co.in/api/v1/create_newletter', { email });
       toast.success(res.data.message);
       setEmail('');
     } catch (error) {

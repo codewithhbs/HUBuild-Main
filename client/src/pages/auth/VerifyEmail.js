@@ -83,7 +83,7 @@ const VerifyEmail = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post(`http://localhost:5000/api/v1/verify/email`, {
+            const response = await axios.post(`https://api.helpubuild.co.in/api/v1/verify/email`, {
                 email,
                 otp: otpString,
             });
@@ -117,7 +117,7 @@ const VerifyEmail = () => {
             setTimer(0); // Reset timer on resend
 
             try {
-                const response = await axios.post(`http://localhost:5000/api/v1/resend-otp/email`, {
+                const response = await axios.post(`https://api.helpubuild.co.in/api/v1/resend-otp/email`, {
                     email,
                 });
                 // alert(response.data.message);

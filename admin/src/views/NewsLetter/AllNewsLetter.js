@@ -28,7 +28,7 @@ const AllNewsLetter = () => {
     const fetchNewsletters = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('http://localhost:5000/api/v1/all_newsletter');
+            const { data } = await axios.get('https://api.helpubuild.co.in/api/v1/all_newsletter');
             setNewsletters(data.data.reverse() || []);
         } catch (error) {
             console.error('Error fetching newsletters:', error);
@@ -47,7 +47,7 @@ const AllNewsLetter = () => {
     const handleSendNewsLetter = async () => {
         setLoading(true);
         try {
-            const response = await axios.post('http://localhost:5000/api/v1/send_message_newsletter', { message });
+            const response = await axios.post('https://api.helpubuild.co.in/api/v1/send_message_newsletter', { message });
             toast.success(response.data.message);
             setModalVisible(false);
             setMessage('');
@@ -64,7 +64,7 @@ const AllNewsLetter = () => {
     const handleDeleteNewsletter = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`http://localhost:5000/api/v1/delete_newsletter/${id}`);
+            await axios.delete(`https://api.helpubuild.co.in/api/v1/delete_newsletter/${id}`);
             fetchNewsletters();
             toast.success('Newsletter deleted successfully!');
         } catch (error) {

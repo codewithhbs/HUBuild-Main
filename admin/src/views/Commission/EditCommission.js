@@ -14,7 +14,7 @@ const EditCommission = () => {
     // Fetch commission details
     const fetchCommissionDetails = async () => {
         try {
-            const { data } = await axios.get(`http://localhost:5000/api/v1/get-single-commision/${id}`);
+            const { data } = await axios.get(`https://api.helpubuild.co.in/api/v1/get-single-commision/${id}`);
             setCommissionPercent(data.data.commissionPercent);
         } catch (error) {
             console.error('Error fetching commission details:', error);
@@ -37,7 +37,7 @@ const EditCommission = () => {
 
         setLoading(true);
         try {
-            const res = await axios.put(`http://localhost:5000/api/v1/update-commission/${id}`, {
+            const res = await axios.put(`https://api.helpubuild.co.in/api/v1/update-commission/${id}`, {
                 commissionPercent
             });
             toast.success(res.data.message || 'Commission updated successfully');

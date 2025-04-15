@@ -46,7 +46,7 @@ const UserDashboard = () => {
     if (!token) return;
     setLoading(true);
     try {
-      const { data } = await axios.get(`http://localhost:5000/api/v1/get-single-provider/${providerId}`);
+      const { data } = await axios.get(`https://api.helpubuild.co.in/api/v1/get-single-provider/${providerId}`);
       // console.log(data)
       setMyProfile(data.data);
       setMobileNumber(data.data.mobileNumber)
@@ -87,7 +87,7 @@ const UserDashboard = () => {
     setUploading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/v1/addPortfolio?type=Portfolio', formData, {
+      const response = await axios.post('https://api.helpubuild.co.in/api/v1/addPortfolio?type=Portfolio', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
@@ -118,7 +118,7 @@ const UserDashboard = () => {
 
   const handleDeleteAccount = async (id) => {
     try {
-      const res = await axios.delete(`http://localhost:5000/api/v1/delete-provider/${id}`)
+      const res = await axios.delete(`https://api.helpubuild.co.in/api/v1/delete-provider/${id}`)
       if (res.data.success) {
         localStorage.clear()
         window.location.href = '/'
@@ -137,7 +137,7 @@ const UserDashboard = () => {
 
   const handleFetchCommission = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5000/api/v1/get-all-commision')
+      const { data } = await axios.get('https://api.helpubuild.co.in/api/v1/get-all-commision')
       const commissiondata = data.data
       // console.log("commission",commissiondata[0]?.commissionPercent)
       setCommissionPercent(commissiondata[0]?.commissionPercent)
@@ -189,7 +189,7 @@ const UserDashboard = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/v1/create-withdraw-request", {
+      const response = await axios.post("https://api.helpubuild.co.in/api/v1/create-withdraw-request", {
         provider: myProfile._id,
         amount: parseFloat(amount),
         commission,
@@ -232,7 +232,7 @@ const UserDashboard = () => {
 
   const sendOtp = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/v1/otp_send_before_update', { mobileNumber });
+      const response = await axios.post('https://api.helpubuild.co.in/api/v1/otp_send_before_update', { mobileNumber });
       if (response.data.success) {
         setOtpSent(true);
         setTimeout(() => {
@@ -250,7 +250,7 @@ const UserDashboard = () => {
   // Function to verify OTP
   const verifyOtp = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/v1/verify_otp_before_update', { mobileNumber, otp });
+      const response = await axios.post('https://api.helpubuild.co.in/api/v1/verify_otp_before_update', { mobileNumber, otp });
       if (response.data.success) {
         setIsOtpVerified(true);
         setActiveTab(3); // Open BankDetail after OTP verification

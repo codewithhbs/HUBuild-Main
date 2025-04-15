@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 import AccessDenied from '../../components/AccessDenied/AccessDenied';
 // import Login from '../auth/Login'
 
-const ENDPOINT = 'http://localhost:5000/';
+const ENDPOINT = 'https://api.helpubuild.co.in/';
 
 const ChatDemo = () => {
     // const [messageReaded,setMessageReaded] = useState(false)
@@ -36,7 +36,7 @@ const ChatDemo = () => {
     const handleChatStart = async (chatId) => {
         // console.log("chatId", chatId);
         try {
-            const { data } = await axios.get(`http://localhost:5000/api/v1/get-chat-by-id/${chatId}`);
+            const { data } = await axios.get(`https://api.helpubuild.co.in/api/v1/get-chat-by-id/${chatId}`);
 
             setMessage([]);
             const allData = data.data;
@@ -295,8 +295,8 @@ const ChatDemo = () => {
 
         try {
             const url = UserData?.role === "provider"
-                ? `http://localhost:5000/api/v1/get-chat-by-providerId/${UserData._id}`
-                : `http://localhost:5000/api/v1/get-chat-by-userId/${UserData._id}`;
+                ? `https://api.helpubuild.co.in/api/v1/get-chat-by-providerId/${UserData._id}`
+                : `https://api.helpubuild.co.in/api/v1/get-chat-by-userId/${UserData._id}`;
 
             const { data } = await axios.get(url);
             const allData = data.data.reverse(); // Reverse the data to show latest chats first
