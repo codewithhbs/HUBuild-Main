@@ -1321,3 +1321,43 @@ exports.getTotalRechargeAmount = async (req, res) => {
         });
     }
 };
+
+exports.getDetailForVerification = async (req, res) => {
+    try {
+        const { id } = req.params;
+        let user = await User.findById(id)
+        if (!user) {
+            user = await Provider.findById(id)
+        }
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+                exists: false
+            })
+        }
+        console.log("user.role",user.role)
+        if(user.role === 'provider' ){
+            console.log("user.isMember",user.isMember)
+            if (user.isMember === false) {
+                return res.status(404).json({
+                    success: false,
+                    message: "provider is not purchased plan",
+                    exists: false
+                })
+            }
+        }
+        res.status(200).json({
+            success: true,
+            exists: true
+        })
+    } catch (error) {
+        console.log("Internal server error", error)
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message,
+            exists: true
+        })
+    }
+}

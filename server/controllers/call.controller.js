@@ -97,6 +97,7 @@ exports.createCall = async (req, res) => {
         );
 
         const callData = response.data;
+        console.log("callData",callData)
         const newCallData = new CallHistory({
             userId: userId,
             from_number: userNumber,
@@ -251,7 +252,7 @@ exports.call_status = async (req, res) => {
         findHistory.money_deducetation_amount = HowManyCostOfTalkTime
         findHistory.recording_url = callStatusQuery.recording_url;
         await findHistory.save();
-        console.log("findHistory final",findHistory)
+        // console.log("findHistory final",findHistory)
 
         return res.status(200).json({
             success: true,

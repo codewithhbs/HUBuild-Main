@@ -117,15 +117,27 @@ const UserDashboard = () => {
   const handleLogout = useLogout(providerId);
 
   const handleDeleteAccount = async (id) => {
-    try {
-      const res = await axios.delete(`https://api.helpubuild.co.in/api/v1/delete-provider/${id}`)
-      if (res.data.success) {
-        localStorage.clear()
-        window.location.href = '/'
-      }
-    } catch (error) {
-      console.log("Internal server error", error)
-    }
+    Swal.fire({
+          title: 'Are you sure?',
+          text: 'This action will permanently delete your account!',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, delete it!',
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            try {
+              const res = await axios.delete(`https://api.helpubuild.co.in/api/v1/delete-provider/${id}`)
+              if (res.data.success) {
+                localStorage.clear()
+                window.location.href = '/'
+              }
+            } catch (error) {
+              console.log("Internal server error", error)
+            }
+          }
+        });
   }
 
   const [amount, setAmount] = useState("");
