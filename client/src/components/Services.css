@@ -550,5 +550,9 @@ i.fa.fa-search {
   }
   .providerProfileHeading{
     display: flex;
+    justify-content: center !important;
+  }
+  .foraligncenter{
+    text-align: center;
   }
 }

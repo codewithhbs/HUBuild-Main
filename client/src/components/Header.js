@@ -17,6 +17,8 @@ const Header = () => {
     dashboard: ''
   });
 
+  const [checkUserData, setCheckUserData] = useState(null)
+
   const findToken = GetData('token')
 
   // useEffect(() => {
@@ -108,7 +110,6 @@ const Header = () => {
   };
 
   useEffect(() => {
-
     const isAuthenticatedValue = GetData('islogin')
     // console.log('islogin', isAuthenticatedValue)
     const convertToBoolean = Boolean(isAuthenticatedValue);
@@ -129,8 +130,23 @@ const Header = () => {
         role: UserData.role,
         isProfileComplete: UserData.isProfileComplete || false,
       }));
+      setCheckUserData(UserData)
     }
   }, []);
+
+  useEffect(() => {
+    console.log("checkUserData", checkUserData)
+    // if (checkUserData && checkUserData.isMember === false) {
+    //   setSessionData({
+    //     isAuthenticated: false,
+    //     user: null,
+    //     role: '',
+    //     isProfileComplete: false,
+    //     dashboard: ''
+    //   });
+    //   window.location.href = '/';
+    // }
+  }, [checkUserData])
   // console.log(sessionData)
   const location = useLocation();
   const [active, setActive] = useState(location.pathname);

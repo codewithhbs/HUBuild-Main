@@ -720,6 +720,9 @@ i.fa.fa-search {
 .review-item {
   animation: fadeIn 0.3s ease-out;
 }
+.forbetweenandcenter{
+  justify-content: space-between !important;
+}
 
 @media (max-width:550px) {
   .shortText{
@@ -727,5 +730,12 @@ i.fa.fa-search {
   }
   .providerProfileHeading{
     display: flex;
+    justify-content: center !important;
   }
+  .foraligncenter{
+    text-align: center;
+    }
+    .forbetweenandcenter{
+      justify-content: center !important;
+    }
 }
