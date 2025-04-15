@@ -22,7 +22,7 @@ function AllBlogs() {
     const handleFetchBanner = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('https://api.helpubuild.co.in/api/v1/get-all-blog');
+            const { data } = await axios.get('http://localhost:5000/api/v1/get-all-blog');
             setBanners(data.data || []); // Ensure default empty array
         } catch (error) {
             console.error('Error fetching blogs:', error);
@@ -38,7 +38,7 @@ function AllBlogs() {
         // console.log("i am hit",currentStatus)
         try {
             const updatedStatus = !currentStatus;
-            const res = await axios.put(`https://api.helpubuild.co.in/api/v1/update-testimonial-status/${id}`, {
+            const res = await axios.put(`http://localhost:5000/api/v1/update-testimonial-status/${id}`, {
                 active: updatedStatus,
             });
 
@@ -68,7 +68,7 @@ function AllBlogs() {
     const handleDeleteBanner = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`https://api.helpubuild.co.in/api/v1/delete-blog/${id}`);
+            await axios.delete(`http://localhost:5000/api/v1/delete-blog/${id}`);
             setBanners((prevBanners) => prevBanners.filter((banner) => banner._id !== id));
             toast.success('Blog deleted successfully!');
         } catch (error) {

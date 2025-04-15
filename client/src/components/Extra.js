@@ -7,7 +7,7 @@ const Extra = () => {
     const [image, setImage] = useState([])
     const fetchWorkImage = async () => {
         try {
-            const { data } = await axios.get('https://api.helpubuild.co.in/api/v1/get-all-describe-work-image')
+            const { data } = await axios.get('http://localhost:5000/api/v1/get-all-describe-work-image')
             const allData = data.data;
             const filterData = allData.filter((item) => item.active === true)
             setImage(filterData)

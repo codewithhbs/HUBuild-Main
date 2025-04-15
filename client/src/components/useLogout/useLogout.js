@@ -7,7 +7,7 @@ const useLogout = (id) => {
     const logout = async () => {
         try {
             // Call backend to clear the cookie
-            await axios.get(`https://api.helpubuild.co.in/api/v1/universal_logout/${id}`, {
+            await axios.get(`http://localhost:5000/api/v1/universal_logout/${id}`, {
                 withCredentials: true // Important to send the cookie
             });
 

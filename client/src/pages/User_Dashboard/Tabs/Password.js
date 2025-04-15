@@ -30,7 +30,7 @@ const Password = () => {
     setLoading(true);
     try {
       const res = await axios.put(
-        `https://api.helpubuild.co.in/api/v1/update-provider-password/${UserId}`,
+        `http://localhost:5000/api/v1/update-provider-password/${UserId}`,
         passwordData
       );
       toast.success(res.data.message || 'Password updated successfully!');

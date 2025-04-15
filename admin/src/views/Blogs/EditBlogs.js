@@ -39,7 +39,7 @@ function EditBlogs() {
 
     const handleFetchBlog = async () => {
         try {
-            const { data } = await axios.get(`https://api.helpubuild.co.in/api/v1/get-single-blog/${id}`);
+            const { data } = await axios.get(`http://localhost:5000/api/v1/get-single-blog/${id}`);
             const allData = data.data;
             setFormData({
                 title: allData.title,
@@ -80,7 +80,7 @@ function EditBlogs() {
 
         setLoading(true);
         try {
-            const res = await axios.put(`https://api.helpubuild.co.in/api/v1/update-blog/${id}`, payload, {
+            const res = await axios.put(`http://localhost:5000/api/v1/update-blog/${id}`, payload, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             toast.success(res.data.message);

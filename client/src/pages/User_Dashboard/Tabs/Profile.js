@@ -31,7 +31,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchExpertise = async () => {
       try {
-        const { data } = await axios.get('https://api.helpubuild.co.in/api/v1/all_expertise');
+        const { data } = await axios.get('http://localhost:5000/api/v1/all_expertise');
         const formattedExpertise = data.data.map((exp) => ({ label: exp.expertise, value: exp.expertise }));
         setExpertise(formattedExpertise);
       } catch (error) {
@@ -62,7 +62,7 @@ const Profile = () => {
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `https://api.helpubuild.co.in/api/v1/get-single-provider/${UserId}`
+        `http://localhost:5000/api/v1/get-single-provider/${UserId}`
       );
       const allData = data.data;
       setFormData({
@@ -97,7 +97,7 @@ const Profile = () => {
       };
 
       const response = await axios.put(
-        `https://api.helpubuild.co.in/api/v1/update-provider-profile/${UserId}`,
+        `http://localhost:5000/api/v1/update-provider-profile/${UserId}`,
         payload,
         {
           headers: {

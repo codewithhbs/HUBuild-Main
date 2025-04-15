@@ -436,6 +436,8 @@ exports.login = async (req, res) => {
 
         if (user.role === "provider") {
             user.loginStatus = true;
+            user.chatStatus = true;
+            user.callStatus = true;
             await user.save();
         }
 

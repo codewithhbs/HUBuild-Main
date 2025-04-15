@@ -26,7 +26,7 @@ const AddAdminCoupon = () => {
 
         setLoading(true);
         try {
-            const res = await axios.post('https://api.helpubuild.co.in/api/v1/create_admin_coupon', couponData);
+            const res = await axios.post('http://localhost:5000/api/v1/create_admin_coupon', couponData);
             toast.success(res.data.message);
             setCouponData({ couponCode: '', discount: '' });
         } catch (error) {

@@ -16,7 +16,7 @@ const About = () => {
     const [aboutImage,setAboutImage] = useState([])
     const fetchAboutImage = async () => {
         try {
-            const {data} = await axios.get('https://api.helpubuild.co.in/api/v1/get-all-about-image')
+            const {data} = await axios.get('http://localhost:5000/api/v1/get-all-about-image')
             const allData = data.data;
             const filterData = allData.filter(item => item.active === true)
             setAboutImage(filterData)

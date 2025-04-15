@@ -44,7 +44,7 @@ function UpdateServices() {
     const fetchServiceData = async (category) => {
         try {
             const { data } = await axios.get(
-                `https://api.helpubuild.co.in/api/v1/get-service-by-provider/${UserId}/${category}`,
+                `http://localhost:5000/api/v1/get-service-by-provider/${UserId}/${category}`,
             )
 
             const serviceData = data.data.find((service) => service.category === category)
@@ -89,7 +89,7 @@ function UpdateServices() {
         setLoading(true)
         try {
             await axios.put(
-                `https://api.helpubuild.co.in/api/v1/update-provider-service/${UserId}`,
+                `http://localhost:5000/api/v1/update-provider-service/${UserId}`,
                 {
                     ...servicesData[category],
                     provider: UserId,

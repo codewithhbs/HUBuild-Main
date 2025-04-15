@@ -42,7 +42,7 @@ function ProfileUpdate() {
     const handleFetchUser = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get(`https://api.helpubuild.co.in/api/v1/get-user-by-id/${UserId}`);
+            const { data } = await axios.get(`http://localhost:5000/api/v1/get-user-by-id/${UserId}`);
             // console.log(data.data);
             const allData = data.data;
             setFormData({
@@ -76,7 +76,7 @@ function ProfileUpdate() {
 
         try {
             const response = await axios.put(
-                `https://api.helpubuild.co.in/api/v1/user/update-profile/${UserId}`,
+                `http://localhost:5000/api/v1/user/update-profile/${UserId}`,
                 formDataToSend,
                 {
                     headers: {
