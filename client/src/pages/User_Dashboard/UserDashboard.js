@@ -10,6 +10,7 @@ import Wallet from './Wallet.js';
 import Withdraw from './Withdraw.js';
 import Reviews from '../../components/Reviews.js';
 import Swal from 'sweetalert2';
+import useLogout from '../../components/useLogout/useLogout.js';
 
 const UserDashboard = () => {
   const [files, setFiles] = useState([]);
@@ -109,10 +110,11 @@ const UserDashboard = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.clear()
-    window.location.href = '/'
-  }
+  // const handleLogout = () => {
+  //   window.location.href = '/'
+  // }
+
+  const handleLogout = useLogout(providerId);
 
   const handleDeleteAccount = async (id) => {
     try {

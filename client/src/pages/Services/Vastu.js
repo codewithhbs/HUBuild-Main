@@ -440,13 +440,13 @@ const Vastu = () => {
         <div className='section architecture-section-2 mb-5'>
           <div className="container-fluid architecture-section-p">
             <div className='profile-card-box'>
-            {currentProviders && currentProviders.map((item, index) => (
+              {currentProviders && currentProviders.map((item, index) => (
                 <Link to={`/architect-profile/${item._id}`} className="profile-card" key={index}>
                   {/* <!-- Left Section (Profile) --> */}
                   <div className='left-to-left'>
                     <img src={item?.photo?.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || 'User')}&background=random`} alt="Profile" onError={(e) => e.target.src = 'https://via.placeholder.com/60'} className="profile-img" />
                     <StarRating rating={item.averageRating || 0} />
-                    
+
                   </div>
                   <div className="left-section">
                     {/* <div className="stars">★★★★★</div> */}
@@ -479,15 +479,17 @@ const Vastu = () => {
                     ) : (
                       "Not Updated"
                     )}</p>
-                    <p className="pricing formarginzero">
-                      {/* {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds ${handleFilterProviderService(item._id) || 'Sq. Yrds'} * 900`} */}
-                      {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds (Approx)`}
-                    </p>
                     <p className="experience">{item.yearOfExperience ? (
                       <span className='archi-language-tag'>{`${item.yearOfExperience}`}</span>
                     ) : (
                       ""
                     )} Years Experience</p>
+                    <p className="pricing formarginzero">
+                      {item?.providerService ? (
+                        `Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds (Approx)`
+                      ) : ('')}
+                      {/* {`Rs ${handleFilterProviderService(item._id) * 900} for 100 Sq.Yrds ${handleFilterProviderService(item._id) || 'Sq. Yrds'} * 900`} */}
+                    </p>
                   </div>
 
                   {/* <!-- Right Section (Buttons & Experience) --> */}
@@ -497,25 +499,54 @@ const Vastu = () => {
                       <button disabled={!item.callStatus} className={`${item.callStatus === true ? 'profile-chat-btn greenBorder' : 'profile-call-btn redBorder'}`}>Call <i className="fa-solid fa-phone-volume"></i></button>
                     </div>
                     <p className="price">{`₹ ${item.pricePerMin}/min`}</p>
-                    
+
                   </div>
                 </Link>
               ))}
             </div>
             {/* Pagination */}
-            <nav>
-              <ul className="pagination">
-                {Array.from({ length: Math.ceil(filteredProviders.length / itemsPerPage) }).map((_, index) => (
-                  <li
-                    key={index}
-                    className={`page-item ${currentPage === index + 1 ? "active" : ""}`}
-                    onClick={() => paginate(index + 1)}
-                  >
-                    <a className="page-link">{index + 1}</a>
+            {filteredProviders.length >= 1 && (
+              <nav className="d-flex justify-content-center mt-4">
+                <ul className="pagination">
+                  <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                    <button className="page-link" onClick={() => paginate(currentPage - 1)}>
+                      Previous
+                    </button>
                   </li>
-                ))}
-              </ul>
-            </nav>
+
+                  {currentPage > 1 && (
+                    <li className="page-item">
+                      <button className="page-link" onClick={() => paginate(currentPage - 1)}>
+                        {currentPage - 1}
+                      </button>
+                    </li>
+                  )}
+
+                  <li className="page-item active">
+                    <span className="page-link">{currentPage}</span>
+                  </li>
+
+                  {currentPage < Math.ceil(filteredProviders.length / itemsPerPage) && (
+                    <li className="page-item">
+                      <button className="page-link" onClick={() => paginate(currentPage + 1)}>
+                        {currentPage + 1}
+                      </button>
+                    </li>
+                  )}
+
+                  <li
+                    className={`page-item ${currentPage === Math.ceil(filteredProviders.length / itemsPerPage)
+                      ? "disabled"
+                      : ""
+                      }`}
+                  >
+                    <button className="page-link" onClick={() => paginate(currentPage + 1)}>
+                      Next
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            )}
           </div>
 
         </div>

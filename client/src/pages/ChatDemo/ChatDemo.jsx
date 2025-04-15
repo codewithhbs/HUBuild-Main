@@ -333,11 +333,11 @@ const ChatDemo = () => {
                                         <div className="p-3">
                                             {UserData?.role === "provider" ? (
                                                 <div className="heading-chat-list w-100 mb-2">
-                                                    <h3 className="p-1 m-0">Customer</h3>
+                                                    <h3 className="p-1 m-0">Clients</h3>
                                                 </div>
                                             ) : (
                                                 <div className="heading-chat-list w-100 mb-2">
-                                                    <h3 className="p-1 m-0">Provider</h3>
+                                                    <h3 className="p-1 m-0">Consultant</h3>
                                                 </div>
                                             )}
                                             <div className="input-group rounded mb-3">

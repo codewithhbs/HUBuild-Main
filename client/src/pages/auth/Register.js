@@ -75,7 +75,7 @@ function Register() {
         <>
             <section className="py-5">
                 <div className="container">
-                    <div className="row d-flex justify-content-center align-items-center h-100">
+                    <div style={{display:'flex'}} className="row justify-content-center align-items-center h-100">
                         <div className="col-lg-12 col-xl-11">
                             <div className="card text-black" style={{ borderRadius: 25 }}>
                                 <div className="card-body register-bg p-md-5">
@@ -87,7 +87,7 @@ function Register() {
                                             <form onSubmit={handlSubmit} className="mx-1 mx-md-4">
                                                 <div className='row'>
                                                     <div className='col-lg-6'>
-                                                        <div className="d-flex flex-row mb-4">
+                                                        <div style={{display:'flex'}} className="flex-row mb-4">
                                                             <i className="fas fa-user fa-lg me-3 fa-fw lable-icon" />
                                                             <div
                                                                 data-mdb-input-init=""
@@ -108,7 +108,7 @@ function Register() {
                                                         </div>
                                                     </div>
                                                     <div className='col-lg-6'>
-                                                        <div className="d-flex flex-row mb-4">
+                                                        <div style={{display:'flex'}} className="flex-row mb-4">
                                                             <i className="fas fa-envelope fa-lg me-3 fa-fw lable-icon" />
                                                             <div
                                                                 data-mdb-input-init=""
@@ -129,7 +129,7 @@ function Register() {
                                                         </div>
                                                     </div>
                                                     <div className='col-lg-6'>
-                                                        <div className="d-flex flex-row mb-4">
+                                                        <div style={{display:'flex'}} className="flex-row mb-4">
                                                             <i className="fas fa-phone fa-lg me-3 fa-fw lable-icon" />
                                                             <div
                                                                 data-mdb-input-init=""
@@ -152,7 +152,7 @@ function Register() {
                                                     </div>
 
                                                     <div className='col-lg-6'>
-                                                        <div className="d-flex flex-row mb-4">
+                                                        <div style={{display:'flex'}} className="flex-row mb-4">
                                                             <i className="fas fa-lock fa-lg me-3 fa-fw lable-icon" />
                                                             <div
                                                                 data-mdb-input-init=""
@@ -176,7 +176,7 @@ function Register() {
                                                     </div>
 
                                                     <div className='col-lg-6'>
-                                                        <div className="d-flex flex-row mb-4">
+                                                        <div style={{display:'flex'}} className="flex-row mb-4">
                                                             <i className="fas fa-key fa-lg me-3 fa-fw lable-icon" />
                                                             <div data-mdb-input-init=""
                                                                 className="form-outline flex-fill mb-0" >
@@ -197,7 +197,7 @@ function Register() {
 
                                                 </div>
                                                 <div className="col-lg-12">
-                                                    <div className="form-check d-flex justify-content-start">
+                                                    <div style={{display:'flex'}} className="form-check justify-content-start">
                                                         <input
                                                             className="form-check-input me-2"
                                                             type="checkbox"
@@ -211,14 +211,14 @@ function Register() {
                                                         <label className="form-check-label text-white" htmlFor="termsCheck">
                                                             I agree to the
                                                             <a href="/terms-and-conditions" target="_blank" rel="noopener noreferrer" className="text-warning ms-1">
-                                                                Terms and Conditions
+                                                                Terms & Conditions
                                                             </a>
                                                         </label>
                                                     </div>
                                                 </div>
 
 
-                                                <div className="d-flex justify-content-center mx-5 mb-3 mb-lg-4">
+                                                <div style={{display:'flex'}} className="justify-content-center mx-5 mb-3 mb-lg-4">
                                                     <button
                                                         type="submit"
                                                         className="btn btn-primary btn-lg mt-4 as_btn"
@@ -237,7 +237,7 @@ function Register() {
                                                 </div>
 
                                                 <div className='col-lg-12'>
-                                                    <div class="form-check d-flex justify-content-center mb-5">
+                                                    <div style={{display:'flex'}} class="form-check justify-content-center mb-5">
 
                                                         <label class="form-check-label text-white" for="form2Example3">
                                                             Already have an Account? <a href="/login" class="text-warning">Login here</a>

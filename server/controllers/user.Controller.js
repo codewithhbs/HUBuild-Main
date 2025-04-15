@@ -13,6 +13,7 @@ const { default: mongoose } = require("mongoose");
 const SendWhatsapp = require("../utils/SendWhatsapp");
 const bcrypt = require('bcrypt');
 const GlobelUserRefDis = require("../models/globelUserRefDis.model");
+const providersModel = require("../models/providers.model");
 // const { SendWhatsapp } = require("../utils/SendWhatsapp");
 // const SendWhatsapp = require("../utils/SendWhatsapp");
 const razorpayInstance = new Razorpay({
@@ -382,7 +383,7 @@ exports.login = async (req, res) => {
             return res.status(400).json({ success: false, message: "Please provide both your email/phone number and password." });
         }
 
-        console.log("loginFrom", loginFrom)
+        console.log("loginFrom", any)
 
         // First, try finding the user in the User collection
         let user = await User.findOne({
@@ -433,6 +434,13 @@ exports.login = async (req, res) => {
             });
         }
 
+        if (user.role === "provider") {
+            user.loginStatus = true;
+            user.chatStatus = true;
+            user.callStatus = true;
+            await user.save();
+        }
+
         // Send token and login success message
         await sendToken(user, res, 200, `Login successful! Welcome back, ${isProvider ? "Provider" : "User"}!`);
     } catch (error) {
@@ -473,14 +481,32 @@ exports.updateUserPassword = async (req, res) => {
 }
 
 
-exports.logout = (req, res) => {
+exports.logout = async (req, res) => {
     try {
+        const { id } = req.params;
+        const provider = await providersModel.findById(id);
+        if (provider) {
+            provider.chatStatus = false
+            provider.callStatus = false
+            await provider.save();
+        }
+        res.cookie('token', null, {
+            expires: new Date(Date.now()),
+            httpOnly: true, // Optional: Ensures cookie is only accessible by the web server
+            secure: process.env.NODE_ENV === 'production', // Only send cookie over HTTPS in production
+            sameSite: 'Lax', // Adjust based on your cross-site requirements
+        });
 
-        res.cookie("token", "", { expires: new Date(0), httpOnly: true });
-        res.status(200).json({ success: true, message: "Logout successful. You have been logged out." });
+        return res.status(200).json({
+            success: true,
+            message: 'Logged out successfully'
+        });
     } catch (error) {
-        console.error("Error during logout:", error);
-        res.status(500).json({ success: false, message: "An error occurred during logout. Please try again later." });
+        return res.status(500).json({
+            success: false,
+            message: 'Something went wrong during logout',
+            error: error.message
+        });
     }
 };
 
