@@ -11,10 +11,8 @@ const axios = require('axios')
 const morgan = require('morgan');
 const { rateLimit } = require('express-rate-limit');
 const router = require('./routes/routes');
-const { singleUploadImage } = require('./middlewares/Multer');
 const Chat = require('./models/chatAndPayment.Model');
 const { chatStart, chatEnd, chatStartFromProvider } = require('./controllers/user.Controller');
-const mongoose = require('mongoose');
 const { update_profile_status } = require('./controllers/call.controller');
 
 ConnectDB()
@@ -42,18 +40,9 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const allowedOrigins = ['http://localhost:3001', 'https://helpubuild.co.in', 'https://www.helpubuild.co.in', 'http://localhost:3000', 'https://www.admin.helpubuild.co.in', 'https://admin.helpubuild.co.in', 'https://apiv1.cloudshope.com'];
+// const allowedOrigins = ['http://localhost:3001', 'https://helpubuild.co.in', 'https://www.helpubuild.co.in', 'http://localhost:3000', 'https://www.admin.helpubuild.co.in', 'https://admin.helpubuild.co.in', 'https://apiv1.cloudshope.com'];
 
-app.use(cors({
-    origin: function (origin, callback) {
-        if (allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true
-}));
+app.use(cors());
 
 
 const server = createServer(app);
