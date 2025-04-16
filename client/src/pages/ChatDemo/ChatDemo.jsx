@@ -12,12 +12,9 @@ import AccessDenied from '../../components/AccessDenied/AccessDenied';
 const ENDPOINT = 'https://api.helpubuild.co.in/';
 
 const ChatDemo = () => {
-    // const [messageReaded,setMessageReaded] = useState(false)
-    const [lastMessage, setLastMessage] = useState('')
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
     const [socketId, setSocketId] = useState('');
-    const [file, setFile] = useState(null);
     const Data = GetData('user')
     const UserData = JSON.parse(Data)
     const [astroId, setAstroId] = useState('')
@@ -26,23 +23,22 @@ const ChatDemo = () => {
     const [timeLeft, setTimeLeft] = useState(0)
     const [isActive, setIsActive] = useState(false);
     const [status, setStatus] = useState('offline');
-    const [showReviewPopup, setShowReviewPopup] = useState(false);
-
-    // console.log("message",UserData._id)
+    const [selectedUserId, setSelectedUserId] = useState(null);
+    const [selectedProviderId, setSelectedProviderId] = useState(null);
+    const [isChatStarted,setIsChatStarted] = useState(false)
     const id = UserData?._id || ''
-
     const socket = useMemo(() => io(ENDPOINT, { autoConnect: false }), []);
 
     const handleChatStart = async (chatId) => {
         // console.log("chatId", chatId);
         try {
             const { data } = await axios.get(`https://api.helpubuild.co.in/api/v1/get-chat-by-id/${chatId}`);
-
             setMessage([]);
             const allData = data.data;
             const userId = allData?.userId?._id;
             const providerId = allData?.providerId?._id;
             const allMessageData = allData.messages;
+
             setMessages(allMessageData);
 
             if (UserData?.role === 'provider') {
@@ -51,29 +47,57 @@ const ChatDemo = () => {
                 setAstroId(providerId);
             }
 
-            // Join the room
-            const room = `${userId}_${providerId}`;
-            // Join the room
-            // const room = `${userId}_${providerId}`;
-            if (UserData?.role === 'provider') {
-                socket.emit('provider_connected', { room: room });
-                console.log('Emitting provider_connected event to room:', room);
-            }
-            socket.emit('join_room', { userId, astrologerId: providerId, role: UserData.role }, (response) => {
-                // Check if socket connection was successful and join room was acknowledged
-                if (response.success) {
-                    setIsChatBoxActive(true);  // Only activate the chat box after successful response
-                    console.log('response:', response);
-                    setIsActive(response.status);
-                    toast.success(response.message);
-                } else {
-                    console.error(response.message);  // Log the error message
-                }
-            });
-            // console.log(`Joined room: ${room}`);
+            // Save IDs for later use in starting chat
+            setSelectedUserId(userId);
+            setSelectedProviderId(providerId);
+            setIsChatBoxActive(true);
+
         } catch (error) {
-            console.error('Error joining room:', error);
+            console.error('Error fetching chat:', error);
         }
+    };
+
+    const handleStartChat = () => {
+        if (!selectedUserId || !selectedProviderId) return;
+
+        const room = `${selectedUserId}_${selectedProviderId}`;
+
+        if (UserData?.role === 'provider') {
+            socket.emit('provider_connected', { room });
+            setIsChatStarted(true)
+            console.log('Emitting provider_connected event to room:', room);
+        }
+
+        socket.emit('join_room', {
+            userId: selectedUserId,
+            astrologerId: selectedProviderId,
+            role: UserData.role
+        }, (response) => {
+            if (response.success) {
+                setIsChatBoxActive(true);
+                setIsActive(response.status);
+                setIsChatStarted(true)
+                toast.success(response.message);
+                console.log('Socket joined:', response);
+            } else {
+                console.error(response.message);
+            }
+        });
+    }
+
+    const endChat = () => {
+        socket.off('connect');
+        socket.off('return_message');
+        socket.off('error_message');
+        socket.off('wrong_message');
+        socket.off('provider_connected');
+        socket.off('one_min_notice');
+        socket.off('time_out');
+        socket.disconnect();
+
+        setIsChatBoxActive(false);
+        setIsActive(false);
+        console.log('Chat ended and socket disconnected.');
     };
 
 
@@ -106,22 +130,13 @@ const ChatDemo = () => {
             toast.error(data.message)
         })
 
-        // socket.on('timeout_disconnect', (data) => {
-        //     toast.success(data.message)
-        // })
-
         // Listen for the 'provider_connected' event from the backend
         socket.on('provider_connected', ({ room }) => {
-            // // This will handle the provider's connection
-            // console.log(`Provider connected to room: ${room}`);
 
             // If the provider connects, mark them as connected
             setIsProviderConnected(true);
             // console.log("provider connected")
             toast.success('Provider has connected.');
-
-            // Optionally, you can trigger any other UI update here
-            // such as enabling the chat or showing provider-specific messages
         });
 
         socket.on('one_min_notice', (data) => {
@@ -137,7 +152,6 @@ const ChatDemo = () => {
             socket.off('return_message');
             socket.off('error_message');
             socket.off('wrong_message');
-            // socket.off('timeout_disconnect');
             socket.off('provider_connected');
             socket.off('one_min_notice');
             socket.off('time_out');
@@ -225,12 +239,9 @@ const ChatDemo = () => {
             ]);
         };
         reader.readAsDataURL(file);
-
         // Reset the file input to allow the same file to be selected again
         event.target.value = '';
     };
-
-
 
     const validateMessageContent = (message) => {
         // Regular expression for detecting phone numbers, emails, and 18+ content
@@ -247,7 +258,6 @@ const ChatDemo = () => {
                 return false;  // Message contains prohibited content
             }
         }
-
         return true;  // Message is clean
     };
 
@@ -319,7 +329,7 @@ const ChatDemo = () => {
         // return window.location.href = '/login'
         return <AccessDenied />
     }
-    console.log("status",status);
+    console.log("status", status);
     return (
         <section className=' hitesh_styling' style={{ backgroundColor: '#CDC4F9' }}>
             <div className="container py-5">
@@ -407,6 +417,11 @@ const ChatDemo = () => {
                                             <div className="col-md-8 chat-box">
                                                 <div className="chat-head">
                                                     <h2>Chats...</h2>
+                                                    {isChatStarted ? (
+                                                        <a onClick={endChat} className='chatStartEndBtn'>Chat End</a>
+                                                    ) : (
+                                                        <a onClick={handleStartChat} className='chatStartEndBtn'>Chat Start</a>
+                                                    )}
                                                 </div>
                                                 <ScrollToBottom initialScrollBehavior='smooth' className="chat-window">
 
