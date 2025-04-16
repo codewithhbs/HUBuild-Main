@@ -11,10 +11,8 @@ const axios = require('axios')
 const morgan = require('morgan');
 const { rateLimit } = require('express-rate-limit');
 const router = require('./routes/routes');
-const { singleUploadImage } = require('./middlewares/Multer');
 const Chat = require('./models/chatAndPayment.Model');
 const { chatStart, chatEnd, chatStartFromProvider } = require('./controllers/user.Controller');
-const mongoose = require('mongoose');
 const { update_profile_status } = require('./controllers/call.controller');
 
 ConnectDB()
