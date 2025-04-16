@@ -45,7 +45,7 @@ exports.createChatWithNew = async (req, res) => {
 
 Go ahead and wait for the user's message. ⏳`;
 
-        await SendWhatsapp(number,message)
+        // await SendWhatsapp(number,message)
         await newChat.save();
         return res.status(201).json({
             success: true,
