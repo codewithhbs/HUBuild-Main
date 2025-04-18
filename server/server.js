@@ -1,50 +1,53 @@
-const express = require('express')
-const app = express()
-const { createServer } = require('http')
+const express = require('express');
+const { createServer } = require('http');
 const { Server } = require("socket.io");
-require('dotenv').config()
-const PORT = process.env.PORT || 9123;
-const cors = require('cors')
-const ConnectDB = require('./Config/DataBase');
-const cookieParser = require('cookie-parser')
-const axios = require('axios')
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const { rateLimit } = require('express-rate-limit');
+const axios = require('axios');
+require('dotenv').config();
+
+// Import local modules
+const ConnectDB = require('./Config/DataBase');
 const router = require('./routes/routes');
 const Chat = require('./models/chatAndPayment.Model');
-const { chatStart, chatEnd, chatStartFromProvider } = require('./controllers/user.Controller');
+const { chatStart, chatEnd, chatStartFromProvider, changeAvailableStatus } = require('./controllers/user.Controller');
 const { update_profile_status } = require('./controllers/call.controller');
 
-ConnectDB()
+// Connect to database
+ConnectDB();
 
+// Initialize Express app
+const app = express();
+const PORT = process.env.PORT || 9123;
+
+// Configuration for rate limiting
 const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000, // 15 minutes
-    limit: 200,
+    windowMs: 1 * 60 * 1000, // 1 minute window
+    limit: 200, // 200 requests per window
     standardHeaders: 'draft-7',
     legacyHeaders: false,
-    message: "Too many Request",
+    message: "Too many requests",
     statusCode: 429,
-    handler: async (req, res, next) => {
+    handler: (req, res, next) => {
         try {
-            next()
+            next();
         } catch (error) {
-            res.status(options.statusCode).send(options.message)
+            res.status(429).send("Too many requests");
         }
     }
+});
 
-})
-
-app.set(express.static('public'))
-app.use('/public', express.static('public'))
+// Middleware setup
+app.set(express.static('public'));
+app.use('/public', express.static('public'));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// const allowedOrigins = ['http://localhost:3001', 'https://helpubuild.co.in', 'https://www.helpubuild.co.in', 'http://localhost:3000', 'https://www.admin.helpubuild.co.in', 'https://admin.helpubuild.co.in', 'https://apiv1.cloudshope.com'];
-
 app.use(cors());
 
-
+// Create HTTP server and Socket.IO instance
 const server = createServer(app);
 const io = new Server(server, {
     cors: {
@@ -52,18 +55,35 @@ const io = new Server(server, {
         methods: ["GET", "POST"],
         credentials: true,
     },
-})
+});
 
+// Make socket.io available to routes
 app.locals.socketIo = io;
-app.set('socketIo', io)
+app.set('socketIo', io);
 
-const activeTimers = {};
-const roomMembers = {};
-let providerconnect;
+// Socket.io configuration and constants
+const userConnections = new Map();
+const providerConnections = new Map();
+const roomMemberships = new Map();
+const activeTimers = new Map();
+let providerHasConnected = false;
+
+const TIMEOUT_DURATION = 60000; // 1 minute
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
+
+const PROHIBITED_PATTERNS = [
+    /\b\d{10}\b/,
+    /\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b/,
+    /@[\w.-]+\.[a-zA-Z]{2,6}/,
+    /\b18\+|adult\b/i,
+];
+
+// Set up logging
 morgan.token('origin', (req) => req.headers.origin || 'Unknown Origin');
-
 app.use(morgan(':method :url :status :response-time ms - Origin: :origin'));
 
+// Cache control headers
 app.use((req, res, next) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
@@ -71,274 +91,457 @@ app.use((req, res, next) => {
     next();
 });
 
-
-// Middleware to capture response status and log it
-app.use((req, res, next) => {
-    res.on('finish', () => {
-        // console.log(`[REQUEST STATUS] ${req.method} ${req.originalUrl} - ${res.statusCode} from ${req.headers.origin || 'Unknown'}`);
-    });
-    next();
-});
-const onlineUsers = {}; // Track online users and providers
+// Socket.IO event handlers
 io.on('connection', (socket) => {
-    console.log('A new client connected:', socket.id);
+    // Handle socket ID registration
+    socket.on('send_socket_id', ({ socketId, role, userId }) => {
+        try {
+            // console.log("socketId, role, userId", socketId, role, userId)
+            if (!socketId || !role || !userId) {
+                throw new Error('Missing required parameters');
+            }
 
+            if (role === 'user') {
+                userConnections.set(userId, socketId);
+            } else if (role === 'provider') {
+                providerConnections.set(userId, socketId);
+            } else {
+                throw new Error('Invalid role');
+            }
+        } catch (error) {
+            socket.emit('error_message', { message: `Registration failed: ${error.message}` });
+        }
+    });
+
+    // Handle room joining
     socket.on('join_room', async ({ userId, astrologerId, role }, callback) => {
         try {
+            if (!userId || !astrologerId || !role) {
+                throw new Error('Missing required parameters');
+            }
+
+            console.log(" Join room userId, astrologerId, role", userId, astrologerId, role)
+
             const room = `${userId}_${astrologerId}`;
+            socket.join(room);
+
+            roomMemberships.set(socket.id, {
+                userId,
+                astrologerId,
+                role,
+                room,
+                providerConnected: false
+            });
+            // console.log("Hey i am roomMemberships", roomMemberships)
 
             if (role === 'provider') {
                 const result = await chatStartFromProvider(userId, astrologerId);
 
-                socket.to(room).emit('provider_connected', { room });
-                console.log("iam hit result", result, astrologerId)
-                await update_profile_status(astrologerId)
                 if (!result.success) {
-                    socket.emit('error_message', { message: result.message });
-                    return callback({ success: false, message: result.message });
+                    throw new Error(result.message);
+                }
+
+                const findProvider = roomMemberships.get(socket.id);
+                findProvider.providerConnected = true;
+                roomMemberships.set(socket.id, findProvider);
+                console.log("Hey i am set provider connected", findProvider)
+                await update_profile_status(astrologerId);
+                socket.to(room).emit('provider_connected', { room });
+            }
+            console.log("Hey I Am User exit ")
+            if (role === 'user') {
+                console.log("Hey I Am User ",astrologerId)
+                console.log("Hey I Am providerConnections ",providerConnections)
+                const providerSocketId = providerConnections.get(astrologerId);
+                console.log("Hey I Am providerSocketId ",providerSocketId)
+
+                if (providerSocketId) {
+                    const findRoom = roomMemberships.get(socket.id);
+                    const roomId = findRoom.room;
+                    await changeAvailableStatus(roomId, true);
+                    io.to(providerSocketId).emit('user_connected_notification', {
+                        userId,
+                        message: 'A user has joined your chat!',
+                        status: true
+                    });
                 }
             }
 
-            // Join the room and store the role information
-            socket.join(room);
-            roomMembers[socket.id] = { userId, astrologerId, role, room };  // Store role here
+            socket.to(room).emit('user_status', {
+                userId,
+                astrologerId,
+                status: 'online'
+            });
 
-            // Mark user or provider as online
-            if (!onlineUsers[userId]) onlineUsers[userId] = { online: false };
-            if (!onlineUsers[astrologerId]) onlineUsers[astrologerId] = { online: false };
+            socket.emit('room_joined', {
+                message: 'Welcome back. Start chat',
+                room
+            });
 
-            // Track online users and providers
-            if (role === 'user') {
-                onlineUsers[userId] = { online: true, socketId: socket.id };
-            } else if (role === 'provider') {
-                onlineUsers[astrologerId] = { online: true, socketId: socket.id };
+            if (callback) {
+                callback({ success: true, message: 'Welcome back. Start chat' });
             }
-
-            console.log(`${socket.id} joined room: ${room}`);
-            console.log(`Current members in ${room}:`, [...socket.adapter.rooms.get(room)]);
-
-            // Notify the other participant in the room
-            socket.to(room).emit('user_status', { userId, astrologerId, status: 'online' });
-            console.log(`${socket.id} joined room: ${room}`);
-
-            // Notify the client about successful room joining
-            socket.emit('room_joined', { message: 'Welcome back. Start chat', room });
-            // Respond with success to the callback
-            callback({ success: true, message: 'Welcome back. Start chat' });
         } catch (error) {
-            console.error('Error in join_room event:', error);
-            socket.emit('error_message', { message: 'An error occurred while joining the room' });
+            socket.emit('error_message', { message: error.message });
+
+            if (callback) {
+                callback({ success: false, message: error.message });
+            }
         }
     });
 
+    // Handle chat messages
     socket.on('message', async ({ room, message, senderId, timestamp, role }) => {
         try {
-            const isFirstMessage = !activeTimers[room];
-            const roomData = roomMembers[socket.id];
+            if (!room || !message || !senderId || !role) {
+                throw new Error('Missing required parameters');
+            }
+            let roomData = roomMemberships.get(socket.id);
 
-            if (role === 'user' && isFirstMessage) {
-                // Call chatStart when the first message is sent
-                const result = await chatStart(roomData.userId, roomData.astrologerId);
+            console.log("Trying to get roomData by socket.id:", socket.id);
+            console.log("Result:", roomData);
 
-                if (!result.success) {
-                    socket.emit('error_message', { message: result.message });
-                    return;
+            if (!roomData) {
+                console.log("roomData not found by socket.id. Trying fallback search using astrologerId...");
+
+                for (let [key, data] of roomMemberships) {
+                    console.log(`Checking entry: key = ${key}, data =`, data);
+                    if (data.astrologerId === senderId && data.room === room) {
+                        roomData = data;
+                        console.log("Match found via astrologerId fallback:", roomData);
+                        break;
+                    }
                 }
 
-                socket.emit('one_min_notice', { message: 'Please wait a minute for the provider to come online.' });
-
-                socket.emit('time_out', { time: result.data.chatTimingRemaining })
-
-                // Start a 1-minute timer
-                activeTimers[room] = setTimeout(async () => {
-                    const connectedSockets = await io.in(room).fetchSockets();
-                    const providerStillConnected = connectedSockets.some((s) => {
-                        const member = roomMembers[s.id];
-                        return member?.role === 'provider';
-                    });
-
-                    if (!providerStillConnected) {
-                        console.log(`Provider not connected within 1 minute. Disconnecting user from room: ${room}`);
-                        const userSocket = connectedSockets.find((s) => roomMembers[s.id]?.role === 'user');
-                        if (userSocket) {
-                            io.to(userSocket.id).emit('timeout_disconnect', { message: 'Provider did not connect. Chat ended.' });
-                            userSocket.disconnect();
-                        }
-                    } else {
-                        console.log('Provider connected within 1 minute. Starting wallet deduction.');
-                        // Start wallet deduction logic here (e.g., call a function to start deductions)
-                    }
-                }, 60000); // 1 minute
+                if (!roomData) {
+                    console.error("No roomData found for senderId:", senderId, "and room:", room);
+                    throw new Error('User not properly registered in roomMemberships');
+                }
             }
 
-            // Check for prohibited content in the message
-            const prohibitedPatterns = [
-                /\b\d{10}\b/, // Phone numbers
-                /\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b/, // Phone numbers like 123-456-7890
-                /@[\w.-]+\.[a-zA-Z]{2,6}/, // Emails
-                /\b18\+|adult\b/i, // Inappropriate terms
-            ];
+            if (!roomData) {
+                throw new Error('User not properly registered');
+            }
 
-            const containsProhibitedContent = prohibitedPatterns.some((pattern) => pattern.test(message));
-            if (containsProhibitedContent) {
-                socket.emit('wrong_message', { message: 'Your message contains prohibited content.' });
+            if (PROHIBITED_PATTERNS.some(pattern => pattern.test(message))) {
+                socket.emit('wrong_message', {
+                    message: 'Your message contains prohibited content.'
+                });
                 return;
             }
 
-            // Save the message to the database
+            const isFirstMessage = !activeTimers.has(room);
+
+            if (role === 'user' && isFirstMessage) {
+                const { userId, astrologerId } = roomData;
+                const result = await chatStart(userId, astrologerId);
+
+                if (!result.success) {
+                    throw new Error(result.message);
+                }
+
+                // socket.emit('one_min_notice', {
+                //     message: 'Please wait a minute for the provider to come online.'
+                // });
+
+                socket.emit('time_out', {
+                    time: result.data.chatTimingRemaining
+                });
+
+                const timer = setTimeout(async () => {
+                    const connectedSockets = await io.in(room).fetchSockets();
+                    const providerConnected = connectedSockets.some(s => {
+                        const member = roomMemberships.get(s.id);
+                        return member?.role === 'provider';
+                    });
+
+                    if (!providerConnected) {
+                        const userSocket = connectedSockets.find(s => {
+                            const member = roomMemberships.get(s.id);
+                            return member?.role === 'user';
+                        });
+
+                        if (userSocket) {
+                            io.to(userSocket.id).emit('timeout_disconnect', {
+                                message: 'Provider did not connect. Chat ended.'
+                            });
+                        }
+                    }
+                }, TIMEOUT_DURATION);
+
+                activeTimers.set(room, timer);
+            }
+
             await Chat.findOneAndUpdate(
                 { room },
-                { $push: { messages: { sender: senderId, text: message, timestamp: timestamp || new Date().toISOString() } } },
+                {
+                    $push: {
+                        messages: {
+                            sender: senderId,
+                            text: message,
+                            timestamp: timestamp || new Date().toISOString()
+                        }
+                    }
+                },
                 { upsert: true, new: true }
             );
 
-            // Broadcast the message to other participants in the room
-            socket.to(room).emit('return_message', { text: message, sender: senderId, timestamp });
+            socket.to(room).emit('return_message', {
+                text: message,
+                sender: senderId,
+                timestamp: timestamp || new Date().toISOString()
+            });
         } catch (error) {
-            console.error('Error handling message event:', error);
+            socket.emit('error_message', { message: `Message failed: ${error.message}` });
         }
     });
 
-    socket.on('provider_connected', ({ room }) => {
-        console.log('Provider connected to room:', room);
-        console.log(room)
-        // Clear the 1-minute timer if it's active
-        if (activeTimers[room]) {
-            console.log(`Clearing timer for room: ${room}`);
-            clearTimeout(activeTimers[room]);
-            delete activeTimers[room];
-        }
-
-        // Mark the provider as connected in the roomMembers object for the user
-        const connectedSockets = [...socket.adapter.rooms.get(room) || []];
-        connectedSockets.forEach((socketId) => {
-            if (roomMembers[socketId]?.role === 'user') {
-                console.log("i am hit")
-                roomMembers[socketId].providerConnected = true;
-            }
-        });
-        console.log(`Provider connected to room: ${room}. Timer cleared.`);
-    });
-
-
+    // Handle file uploads
     socket.on('file_upload', async ({ room, fileData, senderId, timestamp }) => {
-        console.log(`File received in ${room}:`, fileData);
-
         try {
-            // Basic validation on file
-            if (!['image/jpeg', 'image/png', 'image/gif'].includes(fileData.type)) {
-                throw new Error('Invalid file type.');
+            if (!room || !fileData || !senderId) {
+                throw new Error('Missing required parameters');
             }
 
-            if (Buffer.byteLength(fileData.content, 'base64') > 5 * 1024 * 1024) { // 5MB size check
-                throw new Error('File size exceeds 5MB.');
+            if (!ALLOWED_FILE_TYPES.includes(fileData.type)) {
+                throw new Error('Invalid file type');
             }
 
-            // Save file to the database
+            if (Buffer.byteLength(fileData.content, 'base64') > MAX_FILE_SIZE) {
+                throw new Error('File size exceeds maximum allowed');
+            }
+
             await Chat.findOneAndUpdate(
                 { room },
-                { $push: { messages: { sender: senderId, file: fileData, timestamp: timestamp || new Date().toISOString() } } },
+                {
+                    $push: {
+                        messages: {
+                            sender: senderId,
+                            file: fileData,
+                            timestamp: timestamp || new Date().toISOString()
+                        }
+                    }
+                },
                 { upsert: true, new: true }
             );
 
-            // Emit the file to all participants in the room except the sender
-            socket.to(room).emit('return_message', { text: 'Attachment received', file: fileData, sender: senderId });
+            socket.to(room).emit('return_message', {
+                text: 'Attachment received',
+                file: fileData,
+                sender: senderId,
+                timestamp: timestamp || new Date().toISOString()
+            });
         } catch (error) {
-            console.error('Error saving file to database:', error);
             socket.emit('file_upload_error', { error: error.message });
         }
     });
 
-    socket.on('disconnect', async () => {
-        console.log('A client disconnected:', socket.id);
-
-        const roomData = roomMembers[socket.id];
-        if (roomData) {
-            const { userId, astrologerId, room, role } = roomData;
-
-            // Clear any active timer for the room
-            if (activeTimers[room]) {
-                clearTimeout(activeTimers[room]);
-                delete activeTimers[room];
+    // Handle provider connected event
+    socket.on('provider_connected', ({ room }) => {
+        try {
+            if (!room) {
+                throw new Error('Room identifier missing');
             }
 
-            delete roomMembers[socket.id];
-            console.log(`${socket.id} left room: ${room}`);
+            const timer = activeTimers.get(room);
+            if (timer) {
+                clearTimeout(timer);
+                activeTimers.delete(room);
+            }
 
-            // Check remaining connections in the room
-            const connectedSockets = [...socket.adapter.rooms.get(room) || []];
-            const userSocket = connectedSockets.find((s) => roomMembers[s]?.role === 'user');
-            const providerSocket = connectedSockets.find((s) => roomMembers[s]?.role === 'provider');
-
-            // if(providerSocket){
-            // }
-
-            // console.log("role", role)
-
-            if (role === 'provider') {
-                providerconnect = true;
-                console.log("providerconnect", providerconnect)
-                console.log('Provider disconnected. Waiting for user to disconnect to end the chat.', astrologerId);
-                onlineUsers[astrologerId].online = false;
-                await update_profile_status(astrologerId)
-                if (userSocket) {
-                    io.to(userSocket).emit('provider_disconnected', { message: 'The provider has left the chat.' });
-                }
-
-            } else if (role === 'user') {
-                console.log('User disconnected. Checking provider status...');
-                onlineUsers[userId].online = false;
-                if (providerconnect) {
-
-                    roomData.providerConnected = true;
-                }
-
-                if (roomData.providerConnected) {
-                    console.log('Both user and provider connected at some point. Running chatEnd...');
-                    try {
-                        const response = await chatEnd(userId, astrologerId);
-                        if (response.success) {
-                            providerconnect = false;
-                            console.log('Chat ended successfully:', response.message);
-                        } else {
-                            console.error('Chat end error:', response.message);
-                        }
-                    } catch (error) {
-                        console.error('Error calling chatEnd:', error);
-                    }
-                } else {
-                    console.log("User disconnected before provider connected. No wallet deduction performed.");
+            const roomSocketIds = Array.from(socket.adapter.rooms.get(room) || []);
+            for (const socketId of roomSocketIds) {
+                const memberData = roomMemberships.get(socketId);
+                if (memberData && memberData.role === 'user') {
+                    memberData.providerConnected = true;
                 }
             }
-
-            // Mark user or provider as offline
-            if (role === 'user') {
-                onlineUsers[userId].online = false;
-            } else if (role === 'provider') {
-                onlineUsers[astrologerId].online = false;
-            }
-
-            // Notify the remaining participant in the room
-            socket.to(room).emit('user_status', { userId, astrologerId, status: 'offline' });
-
-            console.log(`User ${userId} or Provider ${astrologerId} went offline`);
-
-            // Update `bothConnected` flag if both parties are still in the room
-            if (userSocket && providerSocket) {
-                roomMembers[userSocket].providerConnected = true;
-                roomMembers[providerSocket].providerConnected = true;
-            }
+        } catch (error) {
+            socket.emit('error_message', { message: error.message });
         }
     });
 
-
+    // On server side
+socket.on('end_chat', async (data) => {
+    const { userId, astrologerId, role, room } = data;
+    
+    try {
+        // Clean up as in the disconnect handler
+        const timer = activeTimers.get(room);
+        if (timer) {
+            clearTimeout(timer);
+            activeTimers.delete(room);
+        }
+        
+        // Notify others in the room
+        socket.to(room).emit('user_status', {
+            userId,
+            astrologerId,
+            status: 'offline'
+        });
+        
+        // Role-specific handling
+        if (role === 'provider') {
+            await update_profile_status(astrologerId);
+            await changeAvailableStatus(room, false);
+            
+            // Notify user that provider has left
+            socket.to(room).emit('provider_disconnected', {
+                message: 'The provider has ended the chat.'
+            });
+        } else if (role === 'user') {
+            await changeAvailableStatus(room, false);
+            // Notify provider that user has left
+            socket.to(room).emit('user_left_chat', {
+                userId,
+                message: 'User has ended the chat.',
+                status: false
+            });
+            
+            // End chat if provider was connected
+            if (providerHasConnected) {
+                try {
+                    const response = await chatEnd(userId, astrologerId);
+                    if (response.success) {
+                        providerHasConnected = false;
+                    }
+                } catch (error) {
+                    console.error('Error ending chat:', error);
+                }
+            }
+        }
+        
+        // Leave the room
+        socket.leave(room);
+        
+        // Remove from room memberships
+        roomMemberships.delete(socket.id);
+        
+        // Send acknowledgment
+        socket.emit('chat_ended', { success: true });
+    } catch (error) {
+        console.error('Error handling end_chat:', error);
+        socket.emit('chat_ended', { success: false, message: 'Error ending chat' });
+    }
 });
 
-app.use(limiter)
+    // Handle disconnections
+    socket.on('disconnect', async () => {
+        try {
+            // Clean up user connections
+            for (const [userId, socketId] of userConnections.entries()) {
+                if (socketId === socket.id) {
+                    userConnections.delete(userId);
+                }
+            }
+
+            // Clean up provider connections
+            for (const [providerId, socketId] of providerConnections.entries()) {
+                if (socketId === socket.id) {
+                    providerConnections.delete(providerId);
+                }
+            }
+
+            // Handle room-related cleanup
+            const roomData = roomMemberships.get(socket.id);
+            if (!roomData) return;
+
+            const { userId, astrologerId, room, role } = roomData;
+
+            // Clear any active timers
+            const timer = activeTimers.get(room);
+            if (timer) {
+                clearTimeout(timer);
+                activeTimers.delete(room);
+            }
+
+            // Remove from room memberships
+            roomMemberships.delete(socket.id);
+
+            console.log("socket.adapter.rooms.get(room)",socket.adapter.rooms.get(room))
+
+            // Check remaining connections
+            const roomSocketIds = Array.from(socket.adapter.rooms.get(room) || []);
+            console.log("roomSocketIds",roomSocketIds)
+            const hasUserSocket = roomSocketIds.some(id => {
+                const member = roomMemberships.get(id);
+                return member?.role === 'user';
+            });
+
+            const hasProviderSocket = roomSocketIds.some(id => {
+                const member = roomMemberships.get(id);
+                return member?.role === 'provider';
+            });
+
+            console.log("hasProviderSocket",hasProviderSocket)
+            console.log("hasUserSocket",hasUserSocket)
+
+            // Handle provider disconnection
+            if (role === 'provider') {
+                providerHasConnected = true;
+                await update_profile_status(astrologerId);
+
+                if (hasUserSocket) {
+                    const userSocketId = roomSocketIds.find(id => {
+                        const member = roomMemberships.get(id);
+                        return member?.role === 'user';
+                    });
+
+                    if (userSocketId) {
+                        io.to(userSocketId).emit('provider_disconnected', {
+                            message: 'The provider has left the chat.'
+                        });
+                    }
+                }
+            }
+            // Handle user disconnection
+            else if (role === 'user') {
+                if (hasProviderSocket) {
+                    const providerSocketId = roomSocketIds.find(id => {
+                        const member = roomMemberships.get(id);
+                        return member?.role === 'provider';
+                    });
+                    console.log("hasProviderSocket ",hasProviderSocket )
+                    console.log("providerSocketId",providerSocketId)
+
+                    if (providerSocketId) {
+                        io.to(providerSocketId).emit('user_left_chat', {
+                            userId,
+                            message: 'User has left the chat.',
+                            status: false
+                        });
+                    }
+                }
+
+                // End chat if provider connected during session
+                if (roomData.providerConnected || providerHasConnected) {
+                    try {
+                        const response = await chatEnd(userId, astrologerId);
+                        if (response.success) {
+                            providerHasConnected = false;
+                        }
+                    } catch (error) {
+                        // Graceful handling of disconnect errors
+                    }
+                }
+            }
+
+            // Notify others about status change
+            socket.to(room).emit('user_status', {
+                userId,
+                astrologerId,
+                status: 'offline'
+            });
+        } catch (error) {
+            // Can't send to disconnected client
+        }
+    });
+});
+
+// Location API endpoint
 app.post('/Fetch-Current-Location', async (req, res) => {
     const { lat, lng } = req.body;
 
-    // Check if latitude and longitude are provided
     if (!lat || !lng) {
         return res.status(400).json({
             success: false,
@@ -347,7 +550,6 @@ app.post('/Fetch-Current-Location', async (req, res) => {
     }
 
     try {
-        // Check if the Google Maps API key is present
         if (!process.env.GOOGLE_MAP_KEY) {
             return res.status(403).json({
                 success: false,
@@ -355,22 +557,18 @@ app.post('/Fetch-Current-Location', async (req, res) => {
             });
         }
 
-        // Fetch address details using the provided latitude and longitude
         const addressResponse = await axios.get(
             `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.GOOGLE_MAP_KEY}`
         );
 
-        // Check if any results are returned
         if (addressResponse.data.results.length > 0) {
             const addressComponents = addressResponse.data.results[0].address_components;
-            // console.log(addressComponents)
 
             let city = null;
             let area = null;
             let postalCode = null;
             let district = null;
 
-            // Extract necessary address components
             addressComponents.forEach(component => {
                 if (component.types.includes('locality')) {
                     city = component.long_name;
@@ -379,25 +577,21 @@ app.post('/Fetch-Current-Location', async (req, res) => {
                 } else if (component.types.includes('postal_code')) {
                     postalCode = component.long_name;
                 } else if (component.types.includes('administrative_area_level_3')) {
-                    district = component.long_name; // Get district
+                    district = component.long_name;
                 }
             });
 
-            // Prepare the address details object
             const addressDetails = {
                 completeAddress: addressResponse.data.results[0].formatted_address,
                 city: city,
                 area: area,
                 district: district,
                 postalCode: postalCode,
-                landmark: null, // Placeholder for landmark if needed
+                landmark: null,
                 lat: addressResponse.data.results[0].geometry.location.lat,
                 lng: addressResponse.data.results[0].geometry.location.lng,
             };
 
-            console.log("Address Details:", addressDetails);
-
-            // Respond with the location and address details
             return res.status(200).json({
                 success: true,
                 data: {
@@ -413,7 +607,6 @@ app.post('/Fetch-Current-Location', async (req, res) => {
             });
         }
     } catch (error) {
-        console.error('Error fetching address:', error);
         return res.status(500).json({
             success: false,
             message: "Failed to fetch address",
@@ -421,12 +614,14 @@ app.post('/Fetch-Current-Location', async (req, res) => {
     }
 });
 
-app.use('/api/v1', router)
+// Routes
+app.use('/api/v1', limiter, router);
 
 app.get('/', (req, res) => {
-    res.send('Welcome To Help U Build')
-})
+    res.send('Welcome To Help U Build');
+});
 
+// Start server
 server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`)
-})
+    console.log("server is running")
+});
