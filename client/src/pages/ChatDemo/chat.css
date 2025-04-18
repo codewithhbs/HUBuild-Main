@@ -77,7 +77,7 @@
     justify-content: space-between;
 }
 
-.hitesh_styling .chatStartEndBtn{
+.hitesh_styling .chatStartBtn{
     background-color: #4CAF50;
     padding: 6px 15px;
     color: white;
@@ -85,8 +85,20 @@
     cursor: pointer;
 }
 
-.hitesh_styling .chatStartEndBtn:hover{
+.hitesh_styling .chatStartBtn:hover{
     background-color: #3e8e41;
+}
+
+.hitesh_styling .chatEndBtn{
+    background-color: #d32929;
+    padding: 6px 15px;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.hitesh_styling .chatEndBtn:hover{
+    background-color: #dd1d1d;
 }
 
 .hitesh_styling .chat-head h2 {

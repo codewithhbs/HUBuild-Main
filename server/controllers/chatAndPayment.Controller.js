@@ -83,13 +83,13 @@ exports.getAllChatRecord = async (req, res) => {
 exports.getChatById = async (req, res) => {
     try {
         const { id } = req.params;
-        const chat = await ChatAndPayment.findById(id).populate('userId').populate('providerId')
+        console.log("ids", id)
+
+        let chat = await ChatAndPayment.findOne({ room: id }).populate('userId').populate('providerId')
         if (!chat) {
-            return res.status(404).json({
-                success: false,
-                message: 'Chat not found',
-            })
-        }
+            chat = await ChatAndPayment.findById(id).populate('userId').populate('providerId')
+        } 
+        console.log(chat)
         res.status(200).json({
             success: true,
             message: 'Chat fetched successfully',
