@@ -35,6 +35,10 @@ const ChatAndPaymentSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    isChatStarted: {
+        type: Boolean,
+        default: false
+    },
     messages: [
         {
             sender: { type: String, required: true },

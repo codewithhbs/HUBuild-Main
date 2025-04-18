@@ -14,6 +14,7 @@ const SendWhatsapp = require("../utils/SendWhatsapp");
 const bcrypt = require('bcrypt');
 const GlobelUserRefDis = require("../models/globelUserRefDis.model");
 const providersModel = require("../models/providers.model");
+const ChatAndPayment = require("../models/chatAndPayment.Model");
 // const { SendWhatsapp } = require("../utils/SendWhatsapp");
 // const SendWhatsapp = require("../utils/SendWhatsapp");
 const razorpayInstance = new Razorpay({
@@ -952,7 +953,7 @@ exports.PaymentVerify = async (req, res) => {
 // }
 
 exports.chatStart = async (userId, astrologerId) => {
-    console.log("i am hit")
+    console.log("i am chatStart", userId, astrologerId)
     try {
         const user = await User.findById(userId)
         const provider = await Provider.findById(astrologerId)
@@ -1116,14 +1117,7 @@ exports.chatStartFromProvider = async (userId, astrologerId) => {
         const currentTime = new Date().toISOString();
         // user.chatTransition = user.chatTransition || []; // Initialize if undefined
         provider.chatTransition = provider.chatTransition || []; // Initialize if undefined
-        // const newChatTransition = {
-        //     _id: newChatTransitionId,
-        //     startChatTime: currentTime,
-        //     startingChatAmount: walletAmount,
-        //     providerPricePerMin: providerPricePerMin,
-        //     chatTimingRemaining: chatTimingRemaining,
-        //     provider: provider._id,
-        // };
+       
         const newChatTransitionProvider = {
             _id: newChatTransitionId,
             startChatTime: currentTime,
@@ -1336,9 +1330,9 @@ exports.getDetailForVerification = async (req, res) => {
                 exists: false
             })
         }
-        console.log("user.role",user.role)
-        if(user.role === 'provider' ){
-            console.log("user.isMember",user.isMember)
+        console.log("user.role", user.role)
+        if (user.role === 'provider') {
+            console.log("user.isMember", user.isMember)
             if (user.isMember === false) {
                 return res.status(404).json({
                     success: false,
@@ -1359,5 +1353,33 @@ exports.getDetailForVerification = async (req, res) => {
             error: error.message,
             exists: true
         })
+    }
+}
+
+exports.changeAvailableStatus = async (id, status) => {
+    console.log("id",id)
+    try {
+        const chatroom = await ChatAndPayment.findOne({room:id})
+        if (!chatroom) {
+            return {
+                success: false,
+                message: 'Chatroom not found',
+                error: 'Chatroom not found',
+            };
+        }
+        chatroom.isChatStarted = status
+        await chatroom.save()
+        return {
+            success: true,
+            message: 'Chatroom updated successfully',
+            data: chatroom,
+        };
+    } catch (error) {
+        console.log("Internal server error", error)
+        return {
+            success: false,
+            message: 'Internal server error',
+            error: error.message,
+        };
     }
 }
