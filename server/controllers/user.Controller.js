@@ -628,6 +628,8 @@ exports.deleteAccount = async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
+        const userChat = await ChatAndPayment.deleteMany({ userId: userId });
+        
         res.status(200).json({ success: true, message: "User account deleted successfully" });
     } catch (error) {
         console.error("Error deleting account:", error);
