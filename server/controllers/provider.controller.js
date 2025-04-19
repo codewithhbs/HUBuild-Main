@@ -5,6 +5,7 @@ const sendToken = require("../utils/SendToken");
 const SendWhatsapp = require("../utils/SendWhatsapp");
 const GlobelUserRefDis = require("../models/globelUserRefDis.model");
 const generateOtp = require("../utils/GenreateOtp");
+const ChatAndPayment = require("../models/chatAndPayment.Model");
 const Cloudinary = require('cloudinary').v2;
 require('dotenv').config();
 
@@ -668,6 +669,8 @@ exports.deleteprovider = async (req, res) => {
                 error: "Provider not founded"
             })
         }
+
+        const providerChat = await ChatAndPayment.deleteMany({ providerId: id });
         res.status(200).json({
             success: true,
             message: "Provider deleted successfully",

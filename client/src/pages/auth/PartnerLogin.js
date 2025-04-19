@@ -40,7 +40,6 @@ const PartnerLogin = () => {
             setData('islogin', token ? true : false)
             setData('user', user)
 
-
             // if (user.role === 'provider') {
             //     if (user.isProfileComplete === false) {
             //         window.location.href = `/profile-page/${user._id}`;
@@ -64,7 +63,7 @@ const PartnerLogin = () => {
             //     }
             // } else {
             toast.success(message);
-            window.location.href = '/';
+            window.location.href = '/profile?role=provider'
             // }
 
 

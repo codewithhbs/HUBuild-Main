@@ -64,7 +64,6 @@
     .forHeight {
         height: 260px;
     }
-
 }
 
 @media (max-width:789px) {
@@ -91,8 +90,8 @@
     }
 
     .icon_chat {
-        width: 50px;
-        height: 50px;
+        width: 43px;
+        height: 43px;
     }
 
     .as_menu_wrapper {
