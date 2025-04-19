@@ -14,16 +14,16 @@ exports.createCall = async (req, res) => {
             });
         }
 
+        const provider = await Provider.findById(providerId);
+        const user = await User.findById(userId);
+
         if (max_duration_allowed === 0) {
+
             return res.status(400).json({
                 success: false,
                 message: `Insufficient balance! You need at least ${ProviderProfileMin} to make a 1-minute call.`,
             });
         }
-
-
-        const provider = await Provider.findById(providerId);
-        const user = await User.findById(userId);
 
         if (!provider || !user) {
             return res.status(404).json({

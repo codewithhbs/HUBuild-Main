@@ -750,24 +750,58 @@ const ChatDemo = () => {
                 <div
                     style={{
                         position: "fixed",
-                        top: "30%",
+                        top: "50%",
                         left: "50%",
                         transform: "translate(-50%, -50%)",
-                        padding: "20px",
-                        backgroundColor: "#fff",
-                        boxShadow: "0 0 10px rgba(0,0,0,0.2)",
-                        borderRadius: "10px",
+                        padding: "30px",
+                        backgroundColor: "#ffffff",
+                        boxShadow: "0 8px 30px rgba(0, 0, 0, 0.15)",
+                        borderRadius: "16px",
                         zIndex: 1000,
                         textAlign: "center",
+                        width: "300px",
                     }}
                 >
-                    <p>Are you sure you want to leave the chat?</p>
-                    <button onClick={confirmNavigation} style={{ marginRight: 10 }}>
-                        Yes
-                    </button>
-                    <button onClick={cancelNavigation}>No</button>
+                    <p style={{ fontSize: "18px", marginBottom: "20px", color: "#333" }}>
+                        Are you sure you want to leave the chat?
+                    </p>
+                    <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
+                        <button
+                            onClick={confirmNavigation}
+                            style={{
+                                padding: "10px 20px",
+                                backgroundColor: "#ff4d4f",
+                                color: "#fff",
+                                border: "none",
+                                borderRadius: "8px",
+                                cursor: "pointer",
+                                transition: "background 0.3s ease",
+                            }}
+                            onMouseOver={(e) => (e.target.style.backgroundColor = "#d9363e")}
+                            onMouseOut={(e) => (e.target.style.backgroundColor = "#ff4d4f")}
+                        >
+                            Yes
+                        </button>
+                        <button
+                            onClick={cancelNavigation}
+                            style={{
+                                padding: "10px 20px",
+                                backgroundColor: "#1890ff",
+                                color: "#fff",
+                                border: "none",
+                                borderRadius: "8px",
+                                cursor: "pointer",
+                                transition: "background 0.3s ease",
+                            }}
+                            onMouseOver={(e) => (e.target.style.backgroundColor = "#147dd8")}
+                            onMouseOut={(e) => (e.target.style.backgroundColor = "#1890ff")}
+                        >
+                            No
+                        </button>
+                    </div>
                 </div>
             )}
+
         </section>
     );
 };
