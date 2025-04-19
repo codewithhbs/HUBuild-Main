@@ -230,12 +230,13 @@ function ArchitectProfile() {
         try {
             const fixedAmount = Number(parseFloat(walletAmount).toFixed(2));
             const PricePerMin = Number(pricePerMinute);
-
+            // console.log("PricePerMin",PricePerMin)
+            let maxTimeForCall = (fixedAmount / PricePerMin) * 60;
             if (PricePerMin === 0) {
-                throw new Error("Price per minute cannot be zero.");
+                // throw new Error("Price per minute cannot be zero.");
+                maxTimeForCall = 600
             }
 
-            const maxTimeForCall = (fixedAmount / PricePerMin) * 60;
             return maxTimeForCall;
 
         } catch (error) {

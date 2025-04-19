@@ -16,7 +16,7 @@ function Dashboard() {
   const [amount, setAmount] = useState('');
   const Data = GetData('user')
   const UserData = JSON.parse(Data)
-  const userId = UserData._id
+  const userId = UserData?._id
   const token = GetData('token');
   const [walletAmount, setWalletAmount] = useState(0);
   const [showModal, setShowModal] = useState(false);
@@ -187,6 +187,26 @@ function Dashboard() {
       }
     });
   };
+
+  console.log("token",token)
+
+  if (token === null) {
+    return <div className="container my-5 text-center">
+      <div className="w-100">
+        <img
+          src="https://i.ibb.co/C56bwYQ/401-Error-Unauthorized-pana.png"
+          alt="401 Unauthorized"
+          className="img-fluid mx-auto d-block mb-4"
+          style={{ maxWidth: '80%', height: 'auto' }}
+        />
+      </div>
+      <p className="fs-4 text-muted">You are not authorized to view this page.</p>
+      <a href="/login" className="btn btn-outline-danger as_btn btn-lg mt-3">
+        <i className="fas fa-sign-in-alt me-2"></i>
+        Login
+      </a>
+    </div>
+  }
 
   if (loading || !myProfile) {
     return <div>Loading...</div>;
