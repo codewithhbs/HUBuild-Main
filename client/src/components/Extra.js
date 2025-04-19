@@ -113,13 +113,13 @@ const Extra = () => {
                                     <div className="col-lg-6 mt-4" key={index}>
                                         <div className="position-relative step-bg forSliderCenter" data-aos="fade-up" data-aos-easing="ease-in-back" data-aos-delay="300" data-aos-offset="0">
                                             <div className="position-absolute top-0 start-0 w-100 bg-light-dark bg-opacity-50"></div>
-                                            <div style={{padding:'0px 45px'}} className="d-inline-flex align-items-center fordisplaydirection">
+                                            <div className="d-inline-flex align-items-center fordisplaydirection">
                                                 <div className="d-inline-flex bg-white rounded-pill">
                                                     <div className=" align-items-center justify-content-center fs-5 fw-bold rounded-pill" style={{ backgroundColor: '#0E294C', padding: '10px 30px', display: 'flex' }}>
                                                         <span className='text-white'>Step-{item.step}</span> {/* Dynamic step number */}
                                                     </div>
                                                 </div>
-                                                <p className="" style={{ fontSize: '20px', textAlign: 'center', fontWeight: '500' }}>
+                                                <p className="extra-para">
                                                     {item.text}
                                                 </p>
                                             </div>
