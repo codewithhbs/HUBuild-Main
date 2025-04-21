@@ -118,26 +118,26 @@ const UserDashboard = () => {
 
   const handleDeleteAccount = async (id) => {
     Swal.fire({
-          title: 'Are you sure?',
-          text: 'This action will permanently delete your account!',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#d33',
-          cancelButtonColor: '#3085d6',
-          confirmButtonText: 'Yes, delete it!',
-        }).then(async (result) => {
-          if (result.isConfirmed) {
-            try {
-              const res = await axios.delete(`https://api.helpubuild.co.in/api/v1/delete-provider/${id}`)
-              if (res.data.success) {
-                localStorage.clear()
-                window.location.href = '/'
-              }
-            } catch (error) {
-              console.log("Internal server error", error)
-            }
+      title: 'Are you sure?',
+      text: 'This action will permanently delete your account!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await axios.delete(`https://api.helpubuild.co.in/api/v1/delete-provider/${id}`)
+          if (res.data.success) {
+            localStorage.clear()
+            window.location.href = '/'
           }
-        });
+        } catch (error) {
+          console.log("Internal server error", error)
+        }
+      }
+    });
   }
 
   const [amount, setAmount] = useState("");
@@ -426,27 +426,27 @@ const UserDashboard = () => {
                 <div className="featured-list d-flex justify-content-start align-items-center">
                   <p onClick={() => setActiveTab('settings')} style={{ fontWeight: '700' }} className="mb-0 text-uppercase forresponsicetab">
                     <i className="fas fa-cog me-2" />{" "}
-                    <a href='#settings' style={{ cursor: 'pointer', color:'black' }} className={`cursor-pointer ${activeTab === 'settings' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
+                    <a href='#settings' style={{ cursor: 'pointer', color: 'black' }} className={`cursor-pointer ${activeTab === 'settings' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
                       settings
                     </a>
                   </p>
                   <p onClick={() => setActiveTab('Portfolio')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab">
                     <i className="fas fa-link marginnone" />{" "}
-                    <a href='#portfolio' style={{ cursor: 'pointer', color:'black' }} className={`cursor-pointer ${activeTab === 'Portfolio' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
+                    <a href='#portfolio' style={{ cursor: 'pointer', color: 'black' }} className={`cursor-pointer ${activeTab === 'Portfolio' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
                       Portfolio
                     </a>
                   </p>
 
                   <p onClick={() => setActiveTab('Wallet')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab">
                     <i className="fas fa-link marginnone" />{" "}
-                    <a href='#wallet' style={{ cursor: 'pointer', color:'black' }} className={`cursor-pointer ${activeTab === 'Wallet' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
+                    <a href='#wallet' style={{ cursor: 'pointer', color: 'black' }} className={`cursor-pointer ${activeTab === 'Wallet' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
                       Wallet
                     </a>
                   </p>
 
                   <p onClick={() => setActiveTab('Withdraw')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab">
                     <i className="fas fa-link marginnone" />{" "}
-                    <a href='#withdraw' style={{ cursor: 'pointer', color:'black' }} className={`cursor-pointer ${activeTab === 'Withdraw' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
+                    <a href='#withdraw' style={{ cursor: 'pointer', color: 'black' }} className={`cursor-pointer ${activeTab === 'Withdraw' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
                       Withdraw History
                     </a>
                   </p>

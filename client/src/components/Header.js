@@ -253,9 +253,6 @@ const Header = () => {
                                       (
                                         <>
                                           Chat
-                                          {/* <span className="badge-chat">
-                                            0
-                                          </span> */}
                                         </>
                                       )
                                   }
@@ -298,10 +295,10 @@ const Header = () => {
                           //   Login
                           // </Link>
                           <div class="dropdown">
-                            <button class="btn dropdown-toggle" style={{ backgroundColor: '#EAB936', color: 'white' }} type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button class="btn dropdown-toggle" style={{ backgroundColor: '#EAB936', color: 'white', fontSize:'20px', padding: '5px 20px' }} type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                               Login
                             </button>
-                            <div class="dropdown-menu" style={{ left: '-46%' }} aria-labelledby="dropdownMenuButton">
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                               <a class="dropdown-item" href="/login">Login as User</a>
                               <a class="dropdown-item" href="/partner-login">Login as Partner</a>
                             </div>

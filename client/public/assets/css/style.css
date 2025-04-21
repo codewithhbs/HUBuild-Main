@@ -512,10 +512,10 @@ a:visited {
   width: 29px;
 }
 
-.as_menu ul li a:hover,
+/* .as_menu ul li a:hover,
 .as_menu ul li a.active {
   color: var(--secondary-color);
-}
+} */
 
 .as_info_detail {
   background-color: #042f66;

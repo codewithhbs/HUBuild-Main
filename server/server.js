@@ -150,10 +150,10 @@ io.on('connection', (socket) => {
             }
             console.log("Hey I Am User exit ")
             if (role === 'user') {
-                console.log("Hey I Am User ",astrologerId)
-                console.log("Hey I Am providerConnections ",providerConnections)
+                console.log("Hey I Am User ", astrologerId)
+                console.log("Hey I Am providerConnections ", providerConnections)
                 const providerSocketId = providerConnections.get(astrologerId);
-                console.log("Hey I Am providerSocketId ",providerSocketId)
+                console.log("Hey I Am providerSocketId ", providerSocketId)
 
                 if (providerSocketId) {
                     const findRoom = roomMemberships.get(socket.id);
@@ -354,6 +354,7 @@ io.on('connection', (socket) => {
                 const memberData = roomMemberships.get(socketId);
                 if (memberData && memberData.role === 'user') {
                     memberData.providerConnected = true;
+                    providerHasConnected = true;
                 }
             }
         } catch (error) {
@@ -362,68 +363,72 @@ io.on('connection', (socket) => {
     });
 
     // On server side
-socket.on('end_chat', async (data) => {
-    const { userId, astrologerId, role, room } = data;
-    
-    try {
-        // Clean up as in the disconnect handler
-        const timer = activeTimers.get(room);
-        if (timer) {
-            clearTimeout(timer);
-            activeTimers.delete(room);
-        }
-        
-        // Notify others in the room
-        socket.to(room).emit('user_status', {
-            userId,
-            astrologerId,
-            status: 'offline'
-        });
-        
-        // Role-specific handling
-        if (role === 'provider') {
-            await update_profile_status(astrologerId);
-            await changeAvailableStatus(room, false);
-            
-            // Notify user that provider has left
-            socket.to(room).emit('provider_disconnected', {
-                message: 'The provider has ended the chat.'
-            });
-        } else if (role === 'user') {
-            await changeAvailableStatus(room, false);
-            // Notify provider that user has left
-            socket.to(room).emit('user_left_chat', {
+    socket.on('end_chat', async (data) => {
+        const { userId, astrologerId, role, room } = data;
+
+        try {
+            // Clean up as in the disconnect handler
+            const timer = activeTimers.get(room);
+            if (timer) {
+                clearTimeout(timer);
+                activeTimers.delete(room);
+            }
+
+            // Notify others in the room
+            socket.to(room).emit('user_status', {
                 userId,
-                message: 'User has ended the chat.',
-                status: false
+                astrologerId,
+                status: 'offline'
             });
-            
-            // End chat if provider was connected
-            if (providerHasConnected) {
-                try {
-                    const response = await chatEnd(userId, astrologerId);
-                    if (response.success) {
-                        providerHasConnected = false;
+
+            console.log("role hitesh",role)
+            console.log("providerHasConnected hitesh",providerHasConnected)
+
+            // Role-specific handling
+            if (role === 'provider') {
+                await update_profile_status(astrologerId);
+                await changeAvailableStatus(room, false);
+
+                // Notify user that provider has left
+                socket.to(room).emit('provider_disconnected', {
+                    message: 'The provider has ended the chat.'
+                });
+            } else if (role === 'user') {
+                await changeAvailableStatus(room, false);
+                // Notify provider that user has left
+                socket.to(room).emit('user_left_chat', {
+                    userId,
+                    message: 'User has ended the chat.',
+                    status: false
+                });
+
+                // End chat if provider was connected
+                if (providerHasConnected) {
+                    console.log("providerHasConnected", providerHasConnected)
+                    try {
+                        const response = await chatEnd(userId, astrologerId);
+                        if (response.success) {
+                            providerHasConnected = false;
+                        }
+                    } catch (error) {
+                        console.error('Error ending chat:', error);
                     }
-                } catch (error) {
-                    console.error('Error ending chat:', error);
                 }
             }
+
+            // Leave the room
+            socket.leave(room);
+
+            // Remove from room memberships
+            roomMemberships.delete(socket.id);
+
+            // Send acknowledgment
+            socket.emit('chat_ended', { success: true });
+        } catch (error) {
+            console.error('Error handling end_chat:', error);
+            socket.emit('chat_ended', { success: false, message: 'Error ending chat' });
         }
-        
-        // Leave the room
-        socket.leave(room);
-        
-        // Remove from room memberships
-        roomMemberships.delete(socket.id);
-        
-        // Send acknowledgment
-        socket.emit('chat_ended', { success: true });
-    } catch (error) {
-        console.error('Error handling end_chat:', error);
-        socket.emit('chat_ended', { success: false, message: 'Error ending chat' });
-    }
-});
+    });
 
     // Handle disconnections
     socket.on('disconnect', async () => {
@@ -458,11 +463,11 @@ socket.on('end_chat', async (data) => {
             // Remove from room memberships
             roomMemberships.delete(socket.id);
 
-            console.log("socket.adapter.rooms.get(room)",socket.adapter.rooms.get(room))
+            console.log("socket.adapter.rooms.get(room)", socket.adapter.rooms.get(room))
 
             // Check remaining connections
             const roomSocketIds = Array.from(socket.adapter.rooms.get(room) || []);
-            console.log("roomSocketIds",roomSocketIds)
+            console.log("roomSocketIds", roomSocketIds)
             const hasUserSocket = roomSocketIds.some(id => {
                 const member = roomMemberships.get(id);
                 return member?.role === 'user';
@@ -473,8 +478,8 @@ socket.on('end_chat', async (data) => {
                 return member?.role === 'provider';
             });
 
-            console.log("hasProviderSocket",hasProviderSocket)
-            console.log("hasUserSocket",hasUserSocket)
+            console.log("hasProviderSocket", hasProviderSocket)
+            console.log("hasUserSocket", hasUserSocket)
 
             // Handle provider disconnection
             if (role === 'provider') {
@@ -501,8 +506,8 @@ socket.on('end_chat', async (data) => {
                         const member = roomMemberships.get(id);
                         return member?.role === 'provider';
                     });
-                    console.log("hasProviderSocket ",hasProviderSocket )
-                    console.log("providerSocketId",providerSocketId)
+                    console.log("hasProviderSocket ", hasProviderSocket)
+                    console.log("providerSocketId", providerSocketId)
 
                     if (providerSocketId) {
                         io.to(providerSocketId).emit('user_left_chat', {
