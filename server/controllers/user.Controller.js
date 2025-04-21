@@ -1161,6 +1161,7 @@ exports.chatStartFromProvider = async (userId, astrologerId) => {
 
 exports.chatEnd = async (userId, astrologerId) => {
     try {
+        console.log("i am hit for deduction in chat")
         // First, find the user by userId
         const findUser = await User.findById(userId);
         if (!findUser) {
