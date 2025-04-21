@@ -252,7 +252,8 @@ const ProviderProfileSchema = new mongoose.Schema({
     },
     PaymentStatus: {
         type: String,
-        default: 'pending'
+        default: 'pending',
+        enum: ['pending', 'success', 'failed']
     },
     paymentMethod: {
         type: String
