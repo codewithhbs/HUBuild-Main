@@ -126,7 +126,29 @@ const StepWizard = () => {
                     name: "Help U Build",
                     description: "Buying Membership",
                     order_id: order.id,
-                    callback_url: "https://api.helpubuild.co.in/api/v1/membership_payment_verify",
+                    // callback_url: "https://api.helpubuild.co.in/api/v1/membership_payment_verify",
+                    handler: async function (response) {
+                        // This runs on successful payment
+                        try {
+                            const { data } = await axios.post("https://api.helpubuild.co.in/api/v1/membership_payment_verify", {
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_signature: response.razorpay_signature,
+                                providerId: providerId
+                            });
+
+                            const { token, user, message } = data
+                            setData('token', token)
+                            setData('islogin', token ? true : false)
+                            setData('user', user)
+                            toast.success("Membership purchase successful!");
+                            // navigate("/"); // or wherever you want
+                            window.location.href = '/profile'
+                        } catch (err) {
+                            console.error("Verification failed:", err);
+                            toast.error("Payment verification failed.");
+                        }
+                    },
                     prefill: {
                         name: providerData.name,
                         email: providerData.email,
@@ -163,12 +185,12 @@ const StepWizard = () => {
 
         try {
             const res = await axios.post("https://api.helpubuild.co.in/api/v1/register-provider", memberData);
-            const message = res.data.message;
+            // const message = res.data.message;
             // console.log("message",message)
-            toast.success(res.data.message);
-            setData("token", res.data.token);
-            setData("islogin", !!res.data.token);
-            setData("user", res.data.user);
+            // toast.success(res.data.message);
+            // setData("token", res.data.token);
+            // setData("islogin", !!res.data.token);
+            // setData("user", res.data.user);
             // Proceed to payment after registration
             await handlePayment(res.data.user._id);
         } catch (error) {
@@ -305,7 +327,7 @@ const StepWizard = () => {
                         </div>
                     </div>
                     <div className="col-lg-12">
-                        <div style={{display:'flex'}} className="form-check justify-content-start mb-4">
+                        <div style={{ display: 'flex' }} className="form-check justify-content-start mb-4">
                             <input
                                 className="form-check-input me-2"
                                 type="checkbox"

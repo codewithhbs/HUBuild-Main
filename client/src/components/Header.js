@@ -24,7 +24,7 @@ const Header = () => {
 
   useEffect(() => {
     console.log("Validating user on mount...");
-  
+
     const validateUser = async () => {
       const valid = await isTokenValid();
       if (!valid) {
@@ -34,14 +34,14 @@ const Header = () => {
       }
     };
 
-    if(findToken){
+    if (findToken) {
       validateUser()
     }
-  
+
     // validateUser();
   }, []);
-  
-  
+
+
 
 
   const [scrollValue, setScrollValue] = useState(0);
@@ -148,18 +148,60 @@ const Header = () => {
     }
   }, []);
 
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   useEffect(() => {
-    console.log("checkUserData", checkUserData)
-    // if (checkUserData && checkUserData.isMember === false) {
-    //   setSessionData({
-    //     isAuthenticated: false,
-    //     user: null,
-    //     role: '',
-    //     isProfileComplete: false,
-    //     dashboard: ''
-    //   });
-    //   window.location.href = '/';
-    // }
+    if (checkUserData && checkUserData.isMember === false) {
+      const handlePayment = async (providerId) => {
+        try {
+          const scriptLoaded = await loadRazorpayScript();
+          if (!scriptLoaded) {
+            toast.error("Failed to load Razorpay SDK. Please check your connection.");
+            return;
+          }
+          const res = await axios.post(`https://api.helpubuild.co.in/api/v1/buy_membership/${providerId}`);
+          const order = res.data.data.razorpayOrder;
+          const amount = res.data.data.discountAmount;
+          const providerData = res.data.data.provider;
+          if (order) {
+            const options = {
+              key: "rzp_live_bmq7YMRTuGvvfu",
+              amount: amount * 100,
+              currency: "INR",
+              name: "Help U Build",
+              description: "Buying Membership",
+              order_id: order.id,
+              callback_url: "https://api.helpubuild.co.in/api/v1/membership_payment_verify",
+              prefill: {
+                name: providerData.name,
+                email: providerData.email,
+                contact: providerData.mobileNumber,
+              },
+              theme: {
+                color: "#F37254",
+              },
+            };
+
+            const rzp = new window.Razorpay(options);
+            rzp.open();
+          }
+        } catch (error) {
+          console.error("Payment error:", error);
+          toast.error("Payment failed. Please try again.");
+        }
+      };
+      handlePayment(checkUserData?._id);
+      // localStorage.clear();
+      // window.location.href = '/';
+    }
   }, [checkUserData])
   // console.log(sessionData)
   const location = useLocation();
@@ -295,7 +337,7 @@ const Header = () => {
                           //   Login
                           // </Link>
                           <div class="dropdown">
-                            <button class="btn dropdown-toggle" style={{ backgroundColor: '#EAB936', color: 'white', fontSize:'20px', padding: '5px 20px' }} type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button class="btn dropdown-toggle" style={{ backgroundColor: '#EAB936', color: 'white', fontSize: '20px', padding: '5px 20px' }} type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                               Login
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">

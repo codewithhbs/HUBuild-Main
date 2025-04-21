@@ -267,6 +267,12 @@ const ProviderProfileSchema = new mongoose.Schema({
     providerService: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'ProviderService'
+    },
+    changeNumberOtp: {
+        type: String
+    },
+    changeNumberOtpExpiresAt: {
+        type: Date
     }
 });
 

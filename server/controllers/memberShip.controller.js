@@ -6,6 +6,7 @@ const Razorpay = require('razorpay');
 require('dotenv').config();
 const axios = require('axios');
 const { validatePaymentVerification } = require("razorpay/dist/utils/razorpay-utils");
+const sendToken = require("../utils/SendToken");
 
 const razorpayInstance = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -289,7 +290,7 @@ exports.buyMemberShip = async (req, res) => {
 exports.membershipPaymentVerify = async (req, res) => {
     try {
         const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
-        console.log("object", req.body);
+        // console.log("object", req.body);
         // Validate request body
         if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
             return res.status(400).json({
@@ -338,9 +339,10 @@ exports.membershipPaymentVerify = async (req, res) => {
         findProvider.isMember = true;
         findProvider.PaymentStatus = 'success';
         await findProvider.save();
-        return res.redirect(
-            `https://helpubuild.co.in/successfull-recharge?amount=${amount}&transactionId=${razorpay_payment_id}&date=${currentTime}`
-        );
+        // return res.redirect(
+        //     `https://helpubuild.co.in/successfull-recharge?amount=${amount}&transactionId=${razorpay_payment_id}&date=${currentTime}`
+        // );
+        await sendToken(findProvider, res, 201, 'Payment done');
 
     } catch (error) {
         console.log("Internal server error", error)
