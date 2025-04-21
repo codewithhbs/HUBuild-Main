@@ -88,7 +88,7 @@ exports.getChatById = async (req, res) => {
         let chat = await ChatAndPayment.findOne({ room: id }).populate('userId').populate('providerId')
         if (!chat) {
             chat = await ChatAndPayment.findById(id).populate('userId').populate('providerId')
-        } 
+        }
         console.log(chat)
         res.status(200).json({
             success: true,
@@ -265,6 +265,31 @@ exports.getchatByRoom = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: 'An error occurred while fetching the chat.',
+            error: error.message,
+        });
+    }
+}
+
+exports.deleteChatByRoom = async (req, res) => {
+    try {
+        const { chatRoomId } = req.params;
+        const result = await ChatAndPayment.deleteOne({ room: chatRoomId });
+        if (!result) {
+            return res.status(404).json({
+                success: false,
+                message: 'Chat not found.',
+                error: 'Chat not found.',
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            message: 'Chat deleted successfully.',
+        });
+    } catch (error) {
+        console.log("Internal server error", error)
+        return res.status(500).json({
+            success: false,
+            message: 'An error occurred while deleting the chat.',
             error: error.message,
         });
     }
