@@ -22,6 +22,16 @@ const PartnerLogin = () => {
         }))
     }
 
+    const loadRazorpayScript = () => {
+        return new Promise((resolve) => {
+            const script = document.createElement("script");
+            script.src = "https://checkout.razorpay.com/v1/checkout.js";
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
+    };
+
     const handleloginSubmit = async (e) => {
 
         e.preventDefault()
@@ -36,9 +46,77 @@ const PartnerLogin = () => {
             });
             console.log(data)
             const { token, user, message } = data
-            setData('token', token)
-            setData('islogin', token ? true : false)
-            setData('user', user)
+            // console.log("user?.isMember", user?.isMember)
+            if (user?.isMember === false) {
+                const handlePayment = async (providerId) => {
+                    try {
+                        const scriptLoaded = await loadRazorpayScript();
+                        if (!scriptLoaded) {
+                            toast.error("Failed to load Razorpay SDK. Please check your connection.");
+                            return;
+                        }
+                        const res = await axios.post(`https://api.helpubuild.co.in/api/v1/buy_membership/${providerId}`);
+                        const order = res.data.data.razorpayOrder;
+                        const amount = res.data.data.discountAmount;
+                        const providerData = res.data.data.provider;
+                        if (order) {
+                            const options = {
+                                key: "rzp_live_bmq7YMRTuGvvfu",
+                                amount: amount * 100,
+                                currency: "INR",
+                                name: "Help U Build",
+                                description: "Buying Membership",
+                                order_id: order.id,
+                                // callback_url: "https://api.helpubuild.co.in/api/v1/membership_payment_verify",
+                                handler: async function (response) {
+                                    // This runs on successful payment
+                                    try {
+                                        const { data } = await axios.post("https://api.helpubuild.co.in/api/v1/membership_payment_verify", {
+                                            razorpay_payment_id: response.razorpay_payment_id,
+                                            razorpay_order_id: response.razorpay_order_id,
+                                            razorpay_signature: response.razorpay_signature,
+                                            providerId: providerId
+                                        });
+
+                                        const { token, user, message } = data
+                                        setData('token', token)
+                                        setData('islogin', token ? true : false)
+                                        setData('user', user)
+                                        toast.success("Membership purchase successful!");
+                                        // navigate("/"); // or wherever you want
+                                        window.location.href = '/'
+                                    } catch (err) {
+                                        console.error("Verification failed:", err);
+                                        toast.error("Payment verification failed.");
+                                    }
+                                },
+                                prefill: {
+                                    name: providerData.name,
+                                    email: providerData.email,
+                                    contact: providerData.mobileNumber,
+                                },
+                                theme: {
+                                    color: "#F37254",
+                                },
+                            };
+
+                            const rzp = new window.Razorpay(options);
+                            rzp.open();
+
+                        }
+                    } catch (error) {
+                        console.error("Payment error:", error);
+                        toast.error("Payment failed. Please try again.");
+                    }
+                };
+                handlePayment(user._id)
+            } else {
+                setData('token', token)
+                setData('islogin', token ? true : false)
+                setData('user', user)
+                toast.success(message);
+                window.location.href = '/profile?role=provider'
+            }
 
             // if (user.role === 'provider') {
             //     if (user.isProfileComplete === false) {
@@ -62,8 +140,6 @@ const PartnerLogin = () => {
             //         }
             //     }
             // } else {
-            toast.success(message);
-            window.location.href = '/profile?role=provider'
             // }
 
 

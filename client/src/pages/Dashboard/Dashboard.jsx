@@ -188,8 +188,6 @@ function Dashboard() {
     });
   };
 
-  console.log("token",token)
-
   if (token === null) {
     return <div className="container my-5 text-center">
       <div className="w-100">
