@@ -402,7 +402,7 @@ const ChatDemo = () => {
     })
 
     return () => {
-      socket.off("connect")
+      socket.off("connection")
       socket.off("return_message")
       socket.off("error_message")
       socket.off("wrong_message")
