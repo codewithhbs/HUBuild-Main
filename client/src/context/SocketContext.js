@@ -22,7 +22,7 @@ export const SocketProvider = ({ children }) => {
 
         socket.connect();
 
-        socket.on('connect', () => {
+        socket.on('connection', () => {
             console.log('✅ Socket connected:', socket.id);
 
             if (userData) {
