@@ -6,7 +6,7 @@ const SocketContext = createContext();
 
 export const useSocket = () => useContext(SocketContext);
 
-const ENDPOINT = 'http://localhost:5000';
+const ENDPOINT = 'http://192.168.1.32:5000';
 
 export const SocketProvider = ({ children }) => {
     const socket = useMemo(() => io(ENDPOINT, {
