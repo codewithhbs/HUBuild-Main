@@ -93,9 +93,11 @@ app.use((req, res, next) => {
 
 // Socket.IO event handlers
 io.on('connection', (socket) => {
+    console.log("socket is connected ", socket.id)
     // Handle socket ID registration
     socket.on('send_socket_id', ({ socketId, role, userId }) => {
         try {
+            console.log("i am in send socket id")
             // console.log("socketId, role, userId", socketId, role, userId)
             if (!socketId || !role || !userId) {
                 throw new Error('Missing required parameters');
@@ -120,7 +122,7 @@ io.on('connection', (socket) => {
                 throw new Error('Missing required parameters');
             }
 
-            console.log(" Join room userId, astrologerId, role", userId, astrologerId, role)
+            console.log("Join room userId, astrologerId, role", userId, astrologerId, role)
 
             const room = `${userId}_${astrologerId}`;
             socket.join(room);
