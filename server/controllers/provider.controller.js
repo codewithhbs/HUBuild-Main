@@ -878,3 +878,106 @@ exports.verifyOtpForUpdateDetail = async (req, res) => {
         })
     }
 }
+
+exports.changeProviderNumber = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { newMobileNumber } = req.body;
+        if (!newMobileNumber) {
+            return res.status(400).json({
+                success: false,
+                message: 'Mobile number is required.',
+            })
+        }
+        const findProvider = await providersModel.findById(id);
+        if (!findProvider) {
+            return res.status(404).json({
+                success: false,
+                message: 'Consultant not found.',
+            })
+        }
+
+        const checkNumber = await providersModel.findOne({ mobileNumber: newMobileNumber });
+        if (checkNumber) {
+            if (checkNumber._id == id) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Mobile number already registered.',
+                })
+            } else {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Mobile number already registered in another Consultant Profile.',
+                })
+            }
+        }
+
+        const { otp, expiresAt } = generateOtp(6, 120000)
+        findProvider.changeNumberOtp = otp;
+        findProvider.changeNumberOtpExpiresAt = expiresAt;
+        await findProvider.save();
+        const message = `Your otp for update Number is ${otp}.`
+        await SendWhatsapp(newMobileNumber, message);
+        return res.status(200).json({
+            success: true,
+            message: "Otp send successfully",
+        })
+
+    } catch (error) {
+        console.log("Internal server error", error)
+    }
+}
+
+exports.verifyOtpForChangeNumber = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { otp, newMobileNumber } = req.body;
+        if (!newMobileNumber) {
+            return res.status(400).json({
+                success: false,
+                message: 'Mobile number is required.',
+            })
+        }
+        if (!otp) {
+            return res.status(400).json({
+                success: false,
+                message: 'Otp is required.',
+            })
+        }
+        const findProvider = await providersModel.findById(id);
+        if (!findProvider) {
+            return res.status(404).json({
+                success: false,
+                message: 'Consultant not found.',
+            })
+        }
+        if (findProvider.changeNumberOtp !== otp) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid otp.',
+            })
+        }
+        if (Date.now() > findProvider.changeNumberOtpExpiresAt) {
+            return res.status(400).json({
+                success: false,
+                message: 'Otp expired.',
+            })
+        }
+        findProvider.changeNumberOtp = null;
+        findProvider.changeNumberOtpExpiresAt = null;
+        findProvider.mobileNumber = newMobileNumber;
+        await findProvider.save();
+        return res.status(200).json({
+            success: true,
+            message: "Otp verified successfully",
+        })
+
+    } catch (error) {
+        console.log("Internal server error", error)
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error.message
+        })
+    }
+}
