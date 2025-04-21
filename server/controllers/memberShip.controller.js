@@ -336,6 +336,7 @@ exports.membershipPaymentVerify = async (req, res) => {
             );
         }
         findProvider.isMember = true;
+        findProvider.PaymentStatus = 'success';
         await findProvider.save();
         return res.redirect(
             `https://helpubuild.co.in/successfull-recharge?amount=${amount}&transactionId=${razorpay_payment_id}&date=${currentTime}`
