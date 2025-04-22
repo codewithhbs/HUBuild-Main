@@ -28,7 +28,7 @@ function AllChatRoom() {
             // console.log("all data", data.data)
             setBanners(data.data.reverse() || []);
         } catch (error) {
-            console.error('Error fetching chat records:');
+            console.log('Error fetching chat records:');
             toast.error('Failed to load chat records. Please try again.');
         } finally {
             setLoading(false);
@@ -41,7 +41,7 @@ function AllChatRoom() {
             setSelectedChat(data.data[0]);
             setShowChatModal(true);
         } catch (error) {
-            console.error('Error fetching chat:', error);
+            console.log('Error fetching chat:', error);
             toast.error('Failed to load chat messages');
         }
     };
@@ -53,7 +53,7 @@ function AllChatRoom() {
             handleFetchBanner();
             toast.success('Chat room deleted successfully!');
         } catch (error) {
-            console.error('Error deleting chat room:', error);
+            console.log('Error deleting chat room:', error);
             toast.error('Failed to delete the chat room. Please try again.');
         } finally {
             setLoading(false);

@@ -3,7 +3,7 @@ const sendEmail = require("../utils/SendEmail");
 const sendToken = require("../utils/SendToken");
 const generateOtp = require("../utils/GenreateOtp")
 const Provider = require("../models/providers.model");
-const { uploadToCloudinary } = require("../utils/Cloudnary");
+const { uploadToCloudinary, deleteImageFromCloudinary } = require("../utils/Cloudnary");
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const axios = require('axios')
@@ -374,6 +374,44 @@ exports.updateProfile = async (req, res) => {
     }
 };
 
+exports.updateUserProfileImage = async(req, res) => {
+    try {
+        const {id} = req.params;
+        const existingUser = await User.findById(id);
+        if(!existingUser){
+            return res.status(404).json({
+                success: false,
+                message: 'Internal server error'
+            })
+        }
+        if(!req.file){
+            return res.status(400).json({
+                success: false,
+                message: 'No file uploaded.',
+                error: 'No file uploaded.'
+            })
+        }
+        if(existingUser?.ProfileImage?.public_id){
+            await deleteImageFromCloudinary(existingUser.ProfileImage.public_id)
+        }
+        const imgUrl = await uploadToCloudinary(req.file.buffer);
+        const { imageUrl, public_id } = imgUrl
+        existingUser.ProfileImage = { public_id, imageUrl: imageUrl }
+        await existingUser.save();
+        return res.status(200).json({
+            success: true,
+            message: 'Profile image updated successfully.',
+            data: existingUser
+        })
+    } catch (error) {
+        console.log("Internal server error",error)
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message
+        })
+    }
+}
 
 exports.login = async (req, res) => {
     try {
@@ -1360,7 +1398,7 @@ exports.getDetailForVerification = async (req, res) => {
 }
 
 exports.changeAvailableStatus = async (id, status) => {
-    console.log("id",id)
+    console.log("room id for set",id, status)
     try {
         const chatroom = await ChatAndPayment.findOne({room:id})
         if (!chatroom) {
@@ -1371,6 +1409,7 @@ exports.changeAvailableStatus = async (id, status) => {
             };
         }
         chatroom.isChatStarted = status
+        console.log("chatroom.isChatStarted",chatroom.isChatStarted)
         await chatroom.save()
         return {
             success: true,
