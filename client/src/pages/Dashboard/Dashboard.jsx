@@ -8,6 +8,7 @@ import crown from './crown.png'
 import { Modal, Button, Form } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import useLogout from '../../components/useLogout/useLogout';
+import CropperModal from '../../Helper/CropperModal.js';
 
 function Dashboard() {
   const [myProfile, setMyProfile] = useState(null);
@@ -20,6 +21,11 @@ function Dashboard() {
   const token = GetData('token');
   const [walletAmount, setWalletAmount] = useState(0);
   const [showModal, setShowModal] = useState(false);
+
+  const [showCropper, setShowCropper] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(false)
   // console.log("UserData", UserData)
   // console.log("userid", userId)
 
@@ -47,6 +53,34 @@ function Dashboard() {
   useEffect(() => {
     GetMyProfile();
   }, []);
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    const imageUrl = URL.createObjectURL(file);
+    setSelectedImage(imageUrl);
+    setShowCropper(true);
+  };
+
+  const handleCropComplete = async (blob) => {
+    setProfileLoading(true)
+    const formData = new FormData();
+    formData.append('ProfileImage', blob);
+    try {
+      const res = await axios.put(`https://api.helpubuild.co.in/api/v1/update_user_profile_image/${userId}`, formData)
+      if (res.data.success) {
+        setProfileLoading(false)
+        toast.success('Image updated successfully');
+        setShowCropper(false);
+        setSelectedImage(null);
+        window.location.reload()
+      }
+    } catch (error) {
+      console.log("Internal server error", error)
+    } finally {
+      setProfileLoading(false)
+    }
+
+  };
 
   const handleOpenModel = async () => {
     if (!token) {
@@ -221,22 +255,31 @@ function Dashboard() {
                   <div className="d-flex justify-content-between">
                     <div>
                       <div style={{ alignItems: 'center', display: 'flex' }} className=" mb-2">
-                        <a href="#!">
+                        <a>
                           <div style={{ position: 'relative' }}>
-                            <img
-                              src={
-                                myProfile?.ProfileImage?.imageUrl ||
-                                `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                  myProfile.name || 'User'
-                                )}&background=random`
-                              }
-                              alt="avatar"
-                              className="img-fluid object-cover rounded-circle me-3"
-                              style={{
-                                width: '80px',
-                                height: '80px',
-                                display: 'flex'
-                              }}
+                            <label htmlFor="profile-upload">
+                              <img
+                                src={
+                                  myProfile?.ProfileImage?.imageUrl ||
+                                  `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                    myProfile.name || 'User'
+                                  )}&background=random`
+                                }
+                                alt="avatar"
+                                className="img-fluid object-cover rounded-circle me-3"
+                                style={{
+                                  width: '80px',
+                                  height: '80px',
+                                  display: 'flex'
+                                }}
+                              />
+                            </label>
+                            <input
+                              type="file"
+                              id="profile-upload"
+                              style={{ display: 'none' }}
+                              accept="image/*"
+                              onChange={handleFileChange}
                             />
                             {myProfile?.isVerified && (
                               <span
@@ -256,6 +299,14 @@ function Dashboard() {
                                 <i style={{ color: '#ff6100' }} class="ri-vip-crown-fill"></i>
                                 {/* <img style={{ width: '80px' }} src={crown} alt="" /> */}
                               </span>
+                            )}
+                            {showCropper && selectedImage && (
+                              <CropperModal
+                                imageSrc={selectedImage}
+                                onClose={() => setShowCropper(false)}
+                                onCropComplete={handleCropComplete}
+                                profileLoading={profileLoading}
+                              />
                             )}
                           </div>
                         </a>

@@ -1,17 +1,23 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { GetData } from '../../../utils/sessionStoreage';
 import toast from 'react-hot-toast';
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
 import Select from 'react-select';
 
 const Profile = () => {
-
   const Data = GetData('user');
   const UserData = JSON.parse(Data);
   const UserId = UserData?._id;
-  const role = UserData?.type
-  const [expertise, setExpertise] = useState([])
+  const role = UserData?.type;
+  const [expertise, setExpertise] = useState([]);
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [newMobileNumber, setNewMobileNumber] = useState('');
+  const [originalMobileNumber, setOriginalMobileNumber] = useState('');
+  const [otp, setOtp] = useState('');
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [mobileVerified, setMobileVerified] = useState(true); // Assume verified initially
+  const otpInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -26,7 +32,6 @@ const Profile = () => {
     expertiseSpecialization: [],
     yearOfExperience: ''
   });
-  
 
   useEffect(() => {
     const fetchExpertise = async () => {
@@ -45,10 +50,23 @@ const Profile = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value
-    }));
+    
+    // Special handling for mobile number
+    if (name === 'mobileNumber') {
+      setNewMobileNumber(value);
+      // Set mobile as unverified if changed from original
+      if (value !== originalMobileNumber) {
+        setMobileVerified(false);
+      } else {
+        setMobileVerified(true);
+      }
+    } else {
+      // For all other fields, update formData normally
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: value
+      }));
+    }
   };
 
   const handleSelectChange = (selectedOptions) => {
@@ -78,6 +96,10 @@ const Profile = () => {
         expertiseSpecialization: allData.expertiseSpecialization.map(exp => ({ label: exp, value: exp })) || [],
         yearOfExperience: allData.yearOfExperience || ''
       });
+      
+      // Store both original and current mobile number
+      setOriginalMobileNumber(allData.mobileNumber || '');
+      setNewMobileNumber(allData.mobileNumber || '');
     } catch (error) {
       console.log('Error fetching provider data', error);
       toast.error('Failed to fetch profile data.');
@@ -86,13 +108,119 @@ const Profile = () => {
     }
   };
 
+  const handleSendOtp = async () => {
+    console.log("Sending OTP for new number:", newMobileNumber);
+    
+    // Don't send OTP if number hasn't changed
+    if (newMobileNumber === originalMobileNumber) {
+      console.log("Mobile number unchanged, no OTP needed");
+      setMobileVerified(true);
+      return;
+    }
+    
+    setOtpLoading(true);
+    try {
+      const response = await axios.post(
+        `https://api.helpubuild.co.in/api/v1/provider_number_change_request/${UserId}`,
+        { newMobileNumber },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      
+      if (response.data.success) {
+        setShowOtpModal(true);
+        setOtp(''); // Clear previous OTP if any
+        toast.success('OTP sent successfully');
+        
+        // Focus on OTP input when modal opens
+        setTimeout(() => {
+          if (otpInputRef.current) {
+            otpInputRef.current.focus();
+          }
+        }, 100);
+      }
+    } catch (error) {
+      console.log('Error sending OTP:', error.response?.data || error.message);
+      Swal.fire({
+        title: 'Error!',
+        text: error?.response?.data?.message || 'Failed to send OTP. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'Okay'
+      });
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    setOtpLoading(true);
+    try {
+      const response = await axios.post(
+        `https://api.helpubuild.co.in/api/v1/verify_provider_change_number/${UserId}`,
+        { 
+          otp,
+          newMobileNumber 
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      
+      if (response.data.success) {
+        setShowOtpModal(false);
+        setOtp('');
+        setMobileVerified(true);
+        
+        // Update the formData with verified number
+        setFormData(prevFormData => ({
+          ...prevFormData,
+          mobileNumber: newMobileNumber
+        }));
+        
+        // Update the original mobile number to the new one
+        setOriginalMobileNumber(newMobileNumber);
+        
+        Swal.fire({
+          title: 'Success!',
+          text: 'Mobile number verified successfully',
+          icon: 'success',
+          confirmButtonText: 'Okay'
+        });
+      }
+    } catch (error) {
+      console.log('Error verifying OTP:', error.response?.data || error.message);
+      Swal.fire({
+        title: 'Error!',
+        text: error?.response?.data?.message || 'Failed to verify OTP. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'Okay'
+      });
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // If mobile number is changed but not verified, send OTP first
+    if (!mobileVerified) {
+      handleSendOtp();
+      return;
+    }
+    
     setLoading(true);
 
     try {
+      // Make sure to use the newly verified mobile number
       const payload = {
         ...formData,
+        mobileNumber: newMobileNumber,
         expertiseSpecialization: formData.expertiseSpecialization.map(exp => exp.value),
       };
 
@@ -110,17 +238,16 @@ const Profile = () => {
       Swal.fire({
         title: 'Profile Updated!',
         text: response.data.message,
-        icon: 'success', // use lowercase
+        icon: 'success',
         confirmButtonText: 'Okay'
       });
 
     } catch (error) {
       console.log('Error updating profile:', error.response?.data || error.message);
-      // toast.error(error?.response?.data?.message || 'Failed to update profile. Please try again.');
       Swal.fire({
         title: 'Error!',
         text: error?.response?.data?.message || 'Failed to update profile. Please try again.',
-        icon: 'error', // use lowercase
+        icon: 'error',
         confirmButtonText: 'Okay'
       });
     } finally {
@@ -128,6 +255,10 @@ const Profile = () => {
     }
   };
 
+  // Handle OTP input change separately to prevent focus loss
+  const handleOtpChange = (e) => {
+    setOtp(e.target.value);
+  };
 
   useEffect(() => {
     handleFetchProvider();
@@ -136,6 +267,58 @@ const Profile = () => {
   return (
     <div className="mt-5">
       <h1 className="text-center mb-4">Profile</h1>
+      
+      {/* OTP Modal - Extracted outside main component to prevent re-renders */}
+      {showOtpModal && (
+        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Verify OTP</h5>
+                <button 
+                  type="button" 
+                  className="btn-close" 
+                  onClick={() => setShowOtpModal(false)}
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div className="modal-body">
+                <p>We've sent an OTP to your new mobile number: {newMobileNumber}</p>
+                <div className="mb-3">
+                  <label htmlFor="otp" className="form-label">Enter OTP</label>
+                  <input 
+                    type="text" 
+                    className="form-control" 
+                    id="otp" 
+                    value={otp}
+                    onChange={handleOtpChange}
+                    placeholder="Enter 6-digit OTP"
+                    ref={otpInputRef}
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  type="button" 
+                  className="btn btn-secondary" 
+                  onClick={() => setShowOtpModal(false)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="button" 
+                  className="btn btn-primary" 
+                  onClick={handleVerifyOtp}
+                  disabled={otpLoading}
+                >
+                  {otpLoading ? 'Verifying...' : 'Verify OTP'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <form onSubmit={handleSubmit} className="card p-4">
         <div className="row mb-3">
           <div className="col-md-6">
@@ -198,14 +381,29 @@ const Profile = () => {
             <label htmlFor="mobileNumber" style={{ fontWeight: '700' }} className="form-label">
               Mobile Number
             </label>
-            <input
-              type="text"
-              className="form-control"
-              id="mobileNumber"
-              name="mobileNumber"
-              value={formData.mobileNumber}
-              onChange={handleChange}
-            />
+            <div className="input-group">
+              <input
+                type="text"
+                className="form-control"
+                id="mobileNumber"
+                name="mobileNumber"
+                value={newMobileNumber}
+                onChange={handleChange}
+              />
+              {!mobileVerified && (
+                <button 
+                  type="button"
+                  className="btn btn-outline-primary"
+                  onClick={handleSendOtp}
+                  disabled={otpLoading}
+                >
+                  {otpLoading ? 'Sending...' : 'Verify'}
+                </button>
+              )}
+            </div>
+            {!mobileVerified && (
+              <small className="text-danger">You'll need to verify this new number.</small>
+            )}
           </div>
           {
             role === 'Architect' && (
@@ -264,16 +462,18 @@ const Profile = () => {
             />
           </div>
           <div className="col-md-6 mt-2">
-          <label htmlFor="expertiseSpecialization" style={{ fontWeight: '700' }} className="form-label font-weight-bold">Expertise/Specialization</label>
-          <Select
-            id="expertiseSpecialization"
-            name="expertiseSpecialization"
-            options={expertise}
-            value={formData.expertiseSpecialization}
-            onChange={handleSelectChange}
-            isMulti
-          />
-        </div>
+            <label htmlFor="expertiseSpecialization" style={{ fontWeight: '700' }} className="form-label font-weight-bold">
+              Expertise/Specialization
+            </label>
+            <Select
+              id="expertiseSpecialization"
+              name="expertiseSpecialization"
+              options={expertise}
+              value={formData.expertiseSpecialization}
+              onChange={handleSelectChange}
+              isMulti
+            />
+          </div>
         </div>
         <div className="mb-3">
           <label htmlFor="bio" style={{ fontWeight: '700' }} className="form-label">
@@ -291,10 +491,15 @@ const Profile = () => {
         <button
           type="submit"
           className="btn btn-primary"
-          disabled={loading}
+          disabled={loading || !mobileVerified}
         >
           {loading ? 'Saving...' : 'Update Profile'}
         </button>
+        {!mobileVerified && (
+          <div className="alert alert-warning mt-3">
+            Please verify your new mobile number before updating your profile.
+          </div>
+        )}
       </form>
     </div>
   );

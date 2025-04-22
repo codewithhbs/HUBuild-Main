@@ -83,7 +83,7 @@ exports.getAllChatRecord = async (req, res) => {
 exports.getChatById = async (req, res) => {
     try {
         const { id } = req.params;
-        console.log("ids", id)
+        // console.log("ids", id)
 
         let chat = await ChatAndPayment.findOne({ room: id }).populate('userId').populate('providerId')
         if (!chat) {
