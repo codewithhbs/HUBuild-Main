@@ -45,6 +45,7 @@
 
 .provider .message-bubble {
     background-color: #fff;
+    color: rgb(92, 92, 92);
     border-bottom-left-radius: 0.25rem;
 }
 

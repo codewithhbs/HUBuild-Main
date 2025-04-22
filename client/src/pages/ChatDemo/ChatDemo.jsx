@@ -98,17 +98,18 @@ const ChatDemo = () => {
     }
 
     useEffect(() => {
-        const res = async () => {
+        const fetchStatusOfChatStart = async () => {
             try {
                 const { data } = await axios.get(`${ENDPOINT}api/v1/get-chat-by-id/${isRoomId}`)
                 const chatData = data.data
+                // console.log("chatData.isChatStarted", chatData.isChatStarted)
                 setIsAbleToJoinChat(chatData.isChatStarted)
             } catch (error) {
                 console.log("Internal server error", error)
             }
         }
         if (isRoomId) {
-            res()
+            fetchStatusOfChatStart()
         }
     }, [isRoomId])
 
@@ -219,6 +220,7 @@ const ChatDemo = () => {
                     userId: selectedUserId,
                     astrologerId: selectedProviderId,
                     role: userData.role,
+                    room: room
                 },
                 (response) => {
                     if (response?.success) {
@@ -243,7 +245,7 @@ const ChatDemo = () => {
                 role: userData?.role,
                 room: `${selectedUserId}_${selectedProviderId}`,
             })
-
+            // res()
             setIsChatStarted(false)
             setIsChatBoxActive(false)
             setIsActive(false)
@@ -347,6 +349,7 @@ const ChatDemo = () => {
                 role: userData?.role,
                 userId: id,
             })
+            console.log("after emit", userData?.role, id, socket.id)
         })
 
         socket.on("return_message", (data) => {
@@ -404,6 +407,7 @@ const ChatDemo = () => {
                 setIsChatStarted(false)
                 setIsChatBoxActive(false)
                 setIsActive(false)
+                setIsAbleToJoinChat(false)
                 toast.success("Chat ended successfully")
             } else {
                 toast.error(data.message || "Error ending chat")
@@ -413,6 +417,7 @@ const ChatDemo = () => {
         socket.on("provider_disconnected", (data) => {
             toast.success(data.message)
             setIsProviderConnected(false)
+            setIsAbleToJoinChat(false)
             setIsChatStarted(false)
         })
 
@@ -768,7 +773,36 @@ const ChatDemo = () => {
                                                             <MdDelete className="me-2" /> Delete Chat
                                                         </button>
                                                     </li>
-
+                                                    {/* {role === "user" ? (
+                                                        isChatStarted ? (
+                                                            <li>
+                                                                <button className="dropdown-item text-danger" onClick={endChat}>
+                                                                    End Chat
+                                                                </button>
+                                                            </li>
+                                                        ) : (
+                                                            <li>
+                                                                <button className="dropdown-item text-success" onClick={handleStartChat}>
+                                                                    Start Chat
+                                                                </button>
+                                                            </li>
+                                                        )
+                                                    ) : (
+                                                        isAbleToJoinChat &&
+                                                        (isChatStarted ? (
+                                                            <li>
+                                                                <button className="dropdown-item text-danger" onClick={endChat}>
+                                                                    End Chat
+                                                                </button>
+                                                            </li>
+                                                        ) : (
+                                                            <li>
+                                                                <button className="dropdown-item text-success" onClick={handleStartChat}>
+                                                                    Start Chat
+                                                                </button>
+                                                            </li>
+                                                        ))
+                                                    )} */}
                                                 </ul>
                                             </div>
                                         </div>

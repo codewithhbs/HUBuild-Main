@@ -11,12 +11,19 @@ import Withdraw from './Withdraw.js';
 import Reviews from '../../components/Reviews.js';
 import Swal from 'sweetalert2';
 import useLogout from '../../components/useLogout/useLogout.js';
+import CropperModal from '../../Helper/CropperModal.js';
+import toast from 'react-hot-toast';
 
 const UserDashboard = () => {
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [reUploadTrue, setReUploadTrue] = useState(true);
   const [showGalleryUpload, setShowGalleryUpload] = useState(false);
+
+  const [showCropper, setShowCropper] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(false)
 
   const [token, setToken] = useState(null);
   const [providerId, setProviderId] = useState(null);
@@ -108,6 +115,34 @@ const UserDashboard = () => {
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    const imageUrl = URL.createObjectURL(file);
+    setSelectedImage(imageUrl);
+    setShowCropper(true);
+  };
+
+  const handleCropComplete = async (blob) => {
+    setProfileLoading(true)
+    const formData = new FormData();
+    formData.append('photo', blob);
+    try {
+      const res = await axios.put(`https://api.helpubuild.co.in/api/v1/update_provider_profile_image/${providerId}`, formData)
+      if (res.data.success) {
+        setProfileLoading(false)
+        toast.success('Image updated successfully');
+        setShowCropper(false);
+        setSelectedImage(null);
+        window.location.reload()
+      }
+    } catch (error) {
+      console.log("Internal server error", error)
+    } finally {
+      setProfileLoading(false)
+    }
+
   };
 
   // const handleLogout = () => {
@@ -344,31 +379,40 @@ const UserDashboard = () => {
                     <div style={{ alignItems: 'center' }} className='mb-2 providerProfileHeading'>
                       <a>
                         <div className='' style={{ position: 'relative' }}>
-                          <img
-                            src={myProfile?.photo?.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(myProfile.name || 'User')}&background=random`}
-                            alt="avatar"
-                            className="img-fluid object-cover rounded-circle me-3"
-                            style={{
-                              width: '80px',
-                              height: '80px',
-                              display: 'flex'
-                            }}
+                          <label htmlFor="profile-upload">
+                            <img
+                              src={myProfile?.photo?.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(myProfile.name || 'User')}&background=random`}
+                              alt="avatar"
+                              className="img-fluid object-cover rounded-circle me-3"
+                              style={{ width: '80px', height: '80px', cursor: 'pointer' }}
+                            />
+                          </label>
+                          <input
+                            type="file"
+                            id="profile-upload"
+                            style={{ display: 'none' }}
+                            accept="image/*"
+                            onChange={handleFileChange}
                           />
                           {myProfile?.isVerified && (
-                            <span
-                              className="badge"
-                              style={{
-                                position: 'absolute',
-                                top: '0',
-                                right: '0',
-                                // borderRadius: '50%',
-                                padding: '5px',
-                                backgroundColor: '#090986',
-                                color: 'white'
-                              }}
-                            >
+                            <span className="badge" style={{
+                              position: 'absolute',
+                              top: '0',
+                              right: '0',
+                              padding: '5px',
+                              backgroundColor: '#090986',
+                              color: 'white'
+                            }}>
                               Verified
                             </span>
+                          )}
+                          {showCropper && selectedImage && (
+                            <CropperModal
+                              imageSrc={selectedImage}
+                              onClose={() => setShowCropper(false)}
+                              onCropComplete={handleCropComplete}
+                              profileLoading= {profileLoading}
+                            />
                           )}
                         </div>
                       </a>

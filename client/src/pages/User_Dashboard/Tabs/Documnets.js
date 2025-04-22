@@ -12,7 +12,7 @@ export const Documents = () => {
 
   const [memberData, setMemberData] = useState({
     qualificationProof: null,
-    photo: null,
+    // photo: null,
     adhaarCard: null,
     panCard: null,
   });
@@ -28,7 +28,7 @@ export const Documents = () => {
         const providerData = data.data;
         setUploadedImages({
           qualificationProof: providerData.qualificationProof?.imageUrl,
-          photo: providerData.photo?.imageUrl,
+          // photo: providerData.photo?.imageUrl,
           adhaarCard: providerData.adhaarCard?.imageUrl,
           panCard: providerData.panCard?.imageUrl,
         });
@@ -102,7 +102,7 @@ export const Documents = () => {
       <h2 className="documents-heading">Upload Documents</h2>
       <form onSubmit={handleSubmit} className="documents-form">
         <div className="documents-grid">
-          {['qualificationProof', 'photo', 'adhaarCard', 'panCard'].map((field) => (
+          {['qualificationProof', 'adhaarCard', 'panCard'].map((field) => (
             <div className="document-field" key={field}>
               <label htmlFor={field} className="document-label">
                 {field.replace(/([A-Z])/g, ' $1').trim()}

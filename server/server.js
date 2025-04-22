@@ -97,7 +97,7 @@ io.on('connection', (socket) => {
     // Handle socket ID registration
     socket.on('send_socket_id', ({ socketId, role, userId }) => {
         try {
-            console.log("i am in send socket id")
+            console.log("i am in send socket id", socketId, role, userId)
             // console.log("socketId, role, userId", socketId, role, userId)
             if (!socketId || !role || !userId) {
                 throw new Error('Missing required parameters');
@@ -107,6 +107,7 @@ io.on('connection', (socket) => {
                 userConnections.set(userId, socketId);
             } else if (role === 'provider') {
                 providerConnections.set(userId, socketId);
+                console.log("providerConnections", providerConnections)
             } else {
                 throw new Error('Invalid role');
             }
@@ -156,7 +157,6 @@ io.on('connection', (socket) => {
                 console.log("Hey I Am providerConnections ", providerConnections)
                 const providerSocketId = providerConnections.get(astrologerId);
                 console.log("Hey I Am providerSocketId ", providerSocketId)
-
                 if (providerSocketId) {
                     const findRoom = roomMemberships.get(socket.id);
                     const roomId = findRoom.room;
@@ -367,6 +367,7 @@ io.on('connection', (socket) => {
     // On server side
     socket.on('end_chat', async (data) => {
         const { userId, astrologerId, role, room } = data;
+        console.log("role end",role)
 
         try {
             // Clean up as in the disconnect handler
@@ -383,8 +384,8 @@ io.on('connection', (socket) => {
                 status: 'offline'
             });
 
-            console.log("role hitesh",role)
-            console.log("providerHasConnected hitesh",providerHasConnected)
+            console.log("role hitesh", role)
+            console.log("providerHasConnected hitesh", providerHasConnected)
 
             // Role-specific handling
             if (role === 'provider') {
@@ -395,6 +396,20 @@ io.on('connection', (socket) => {
                 socket.to(room).emit('provider_disconnected', {
                     message: 'The provider has ended the chat.'
                 });
+
+
+                // End chat if provider was connected
+                if (providerHasConnected) {
+                    console.log("provider deduct", providerHasConnected)
+                    try {
+                        const response = await chatEnd(userId, astrologerId);
+                        if (response.success) {
+                            providerHasConnected = false;
+                        }
+                    } catch (error) {
+                        console.error('Error ending chat:', error);
+                    }
+                }
             } else if (role === 'user') {
                 await changeAvailableStatus(room, false);
                 // Notify provider that user has left
@@ -406,7 +421,7 @@ io.on('connection', (socket) => {
 
                 // End chat if provider was connected
                 if (providerHasConnected) {
-                    console.log("providerHasConnected", providerHasConnected)
+                    console.log("user deduct", providerHasConnected)
                     try {
                         const response = await chatEnd(userId, astrologerId);
                         if (response.success) {

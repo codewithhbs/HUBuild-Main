@@ -486,6 +486,49 @@ exports.updateDocuments = async (req, res) => {
     }
 }
 
+exports.updateProfileImage = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const existingData = await providersModel.findById(id);
+        if (!existingData) {
+            return res.status(404).json({
+                success: false,
+                message: "Provider not found",
+                error: "Provider not found"
+            });
+        }
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: 'No file uploaded.',
+                error: 'No file uploaded.'
+            })
+        }
+        if (req.file) {
+            // const { photo } = req.file;
+            if (existingData?.photo?.public_id) {
+                await deleteImageFromCloudinary(existingData.photo.public_id)
+            }
+            const imgUrl = await uploadToCloudinary(req.file.buffer);
+            const { imageUrl, public_id } = imgUrl
+            existingData.photo = { public_id, imageUrl: imageUrl }
+            await existingData.save();
+            return res.status(200).json({
+                success: true,
+                message: 'Profile image updated successfully.',
+                data: existingData
+            })
+        }
+    } catch (error) {
+        console.log("Internal server error", error)
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error.message
+        })
+    }
+}
+
 exports.updatePassword = async (req, res) => {
     try {
         const { providerId } = req.params;
@@ -916,8 +959,10 @@ exports.changeProviderNumber = async (req, res) => {
         findProvider.changeNumberOtp = otp;
         findProvider.changeNumberOtpExpiresAt = expiresAt;
         await findProvider.save();
+        const number = findProvider.mobileNumber;
+        // console.log("number",number)
         const message = `Your otp for update Number is ${otp}.`
-        await SendWhatsapp(newMobileNumber, message);
+        await SendWhatsapp(number, message);
         return res.status(200).json({
             success: true,
             message: "Otp send successfully",
