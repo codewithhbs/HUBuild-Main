@@ -21,6 +21,8 @@ const ChatDemo = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
 
+    const [isFetchingChatStatus, setIsFetchingChatStatus] = useState(false);
+
 
     const [message, setMessage] = useState("")
     const [messages, setMessages] = useState([])
@@ -97,21 +99,41 @@ const ChatDemo = () => {
         setShowChatList(true)
     }
 
-    useEffect(() => {
-        const fetchStatusOfChatStart = async () => {
+    const fetchWithRetry = async (url, retries = 3, delay = 1000) => {
+        for (let i = 0; i < retries; i++) {
             try {
-                const { data } = await axios.get(`${ENDPOINT}api/v1/get-chat-by-id/${isRoomId}`)
-                const chatData = data.data
-                // console.log("chatData.isChatStarted", chatData.isChatStarted)
-                setIsAbleToJoinChat(chatData.isChatStarted)
+                return await axios.get(url);
             } catch (error) {
-                console.log("Internal server error", error)
+                if (i === retries - 1) throw error;
+                await new Promise(resolve => setTimeout(resolve, delay));
+                console.log(`Retrying fetch attempt ${i + 1}...`);
             }
         }
+    };
+
+    useEffect(() => {
+        const fetchStatusOfChatStart = async () => {
+            if (!isRoomId) return;
+
+            setIsFetchingChatStatus(true);
+            try {
+                const { data } = await fetchWithRetry(`${ENDPOINT}api/v1/get-chat-by-id/${isRoomId}`);
+                const chatData = data.data;
+                console.log("chatData.isChatStarted", chatData.isChatStarted);
+                setIsAbleToJoinChat(chatData.isChatStarted);
+            } catch (error) {
+                console.log("Internal server error", error);
+                toast.error("Failed to fetch chat status");
+                setIsAbleToJoinChat(false);
+            } finally {
+                setIsFetchingChatStatus(false);
+            }
+        };
+
         if (isRoomId) {
-            fetchStatusOfChatStart()
+            fetchStatusOfChatStart();
         }
-    }, [isRoomId])
+    }, [isRoomId]);
 
     // Fetch chat history
     const fetchChatHistory = useCallback(async () => {
@@ -185,11 +207,14 @@ const ChatDemo = () => {
     )
 
     useEffect(() => {
-        if (selectedUserId || selectedProviderId) {
-            const room = `${selectedUserId}_${selectedProviderId}`
-            setEsRoomId(room)
+        if (selectedUserId && selectedProviderId) {
+            const room = `${selectedUserId}_${selectedProviderId}`;
+            setEsRoomId(room);
+            console.log("Room ID set:", room); // Add logging
+        } else {
+            setEsRoomId(null); // Clear room ID when dependencies are missing
         }
-    }, [selectedUserId, selectedProviderId])
+    }, [selectedUserId, selectedProviderId]);
 
     const handleStartChat = useCallback(() => {
         if (!selectedUserId || !selectedProviderId) {
