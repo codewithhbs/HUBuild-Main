@@ -411,6 +411,7 @@ io.on('connection', (socket) => {
                     }
                 }
             } else if (role === 'user') {
+                await update_profile_status(astrologerId);
                 await changeAvailableStatus(room, false);
                 // Notify provider that user has left
                 socket.to(room).emit('user_left_chat', {
@@ -518,6 +519,7 @@ io.on('connection', (socket) => {
             }
             // Handle user disconnection
             else if (role === 'user') {
+                await update_profile_status(astrologerId);
                 if (hasProviderSocket) {
                     const providerSocketId = roomSocketIds.find(id => {
                         const member = roomMemberships.get(id);
