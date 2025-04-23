@@ -32,6 +32,17 @@
     border-radius: 8px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
+
+  @media (max-width:760px) {
+    
+  
+  .document-field {
+    padding: 0rem;
+  }
+  .documents-section{
+    padding: 0rem;
+  }
+  }
   
   .document-field:hover {
     transform: translateY(-2px);
@@ -150,9 +161,9 @@
       grid-template-columns: 1fr;
     }
     
-    .documents-section {
+    /* .documents-section {
       padding: 1rem;
-    }
+    } */
     
     .documents-form {
       padding: 1.5rem;

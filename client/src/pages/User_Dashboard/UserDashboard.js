@@ -34,6 +34,11 @@ const UserDashboard = () => {
 
   const [walletAmount, setWalletAmount] = useState(0);
 
+  const [statuses, setStatuses] = useState({
+    chatStatus: "",
+    callStatus: "",
+  });
+
   // Get token from session storage
   const GetToken = () => {
     const data = GetData('token');
@@ -67,6 +72,70 @@ const UserDashboard = () => {
     }
   };
 
+  const handleFetchProvider = async () => {
+    try {
+      // console.log("providerId",providerId)
+      const { data } = await axios.get(
+        `https://api.helpubuild.co.in/api/v1/get-single-provider/${providerId}`
+      );
+      const allData = data.data;
+      setStatuses({
+        chatStatus: allData.chatStatus || '',
+        callStatus: allData.callStatus || '',
+
+      });
+    } catch (error) {
+      console.log('Error fetching provider data', error);
+      toast.error('Failed to fetch profile data.');
+    }
+  };
+
+  // useEffect(() => {
+  //   if (providerId) {
+  //     handleFetchProvider();
+  //   }
+  // }, [])
+
+  const handleToggle = async (statusType) => {
+    const updatedStatus = !statuses[statusType];
+    const previousStatuses = { ...statuses };
+    setStatuses({ ...statuses, [statusType]: updatedStatus });
+
+    try {
+      const response = await axios.put(
+        `https://api.helpubuild.co.in/api/v1/update-available-status/${providerId}`,
+        { [statusType]: updatedStatus }
+      );
+      if (response.data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: `${response.data.message}`,
+        })
+
+      } else {
+        // toast.error('Failed to update status');
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to update status',
+          icon: 'error', // use lowercase
+          confirmButtonText: 'Okay'
+        });
+        setStatuses(previousStatuses); // Revert to previous state on failure
+      }
+    } catch (error) {
+      console.log('Internal server error', error);
+      // toast.error('Error updating status');
+      Swal.fire({
+        title: 'Error!',
+        text: 'Error updating status',
+        icon: 'error', // use lowercase
+        confirmButtonText: 'Okay'
+      });
+      setStatuses(previousStatuses); // Revert to previous state on failure
+    }
+  };
+
   const onDrop = (acceptedFiles) => {
     setFiles([...files, ...acceptedFiles]);
   };
@@ -77,6 +146,7 @@ const UserDashboard = () => {
   useEffect(() => {
     if (token) {
       GetMyProfile(); // Fetch profile only if token exists
+      handleFetchProvider(); // Fetch profile only if token exists
     }
   }, [token]);
 
@@ -411,14 +481,14 @@ const UserDashboard = () => {
                               imageSrc={selectedImage}
                               onClose={() => setShowCropper(false)}
                               onCropComplete={handleCropComplete}
-                              profileLoading= {profileLoading}
+                              profileLoading={profileLoading}
                             />
                           )}
                         </div>
                       </a>
                     </div>
                     <div style={{}} className=''>
-                      <h3 className="mb-3 foraligncenter">{myProfile.name}</h3>
+                      <h3 className="mb-1 foraligncenter">{myProfile.name}</h3>
                       <p className="small mb-2 foraligncenter">
                         {/* <i className="fas fa-star fa-lg text-warning" />{" "} */}
                         <span>{myProfile?.type}</span>
@@ -441,6 +511,36 @@ const UserDashboard = () => {
                           );
                         }) || ''}</span>
                       </p>
+                      <div className='toggle_btn_parent'>
+                        <div className='chat_toggle_btn'>
+                          <span>Chat</span>
+                          <div class="form-check form-switch">
+                            {/* <label class="form-check-label" for="flexSwitchCheckDefault">Call</label> */}
+                            <input
+                              class="form-check-input"
+                              type="checkbox"
+                              role="switch"
+                              checked={statuses.chatStatus}
+                              onChange={() => handleToggle('chatStatus')}
+                              id="flexSwitchCheckDefault"
+                            />
+                          </div>
+                        </div>
+                        <div className='chat_toggle_btn'>
+                          <span>Call</span>
+                          <div class="form-check form-switch">
+                            {/* <label class="form-check-label" for="flexSwitchCheckDefault">Call</label> */}
+                            <input
+                              class="form-check-input"
+                              type="checkbox"
+                              role="switch"
+                              id="flexSwitchCheckDefault"
+                              checked={statuses.callStatus}
+                              onChange={() => handleToggle('callStatus')}
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <div style={{ display: 'flex' }} className=" flex-column gap-2 align-items-center justify-content-center">
