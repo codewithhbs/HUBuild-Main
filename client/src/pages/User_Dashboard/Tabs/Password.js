@@ -55,7 +55,7 @@ const Password = () => {
         <h3 className="text-center mb-4">Update Password</h3>
         <form onSubmit={handleSubmit}>
           <div className="row mb-3">
-            <div className="col">
+            <div className="col-xl-6 col-md-12 mb-2">
               <label htmlFor="password" className="form-label">
                 Current Password
               </label>
@@ -70,10 +70,10 @@ const Password = () => {
                 required
               />
             </div>
-          </div>
+            {/* </div> */}
 
-          <div className="row mb-3">
-            <div className="col">
+            {/* <div className="row mb-3"> */}
+            <div className="col-xl-6 col-md-12 mb-2">
               <label htmlFor="newPassword" className="form-label">
                 New Password
               </label>
