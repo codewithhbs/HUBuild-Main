@@ -23,8 +23,8 @@ const Settings = () => {
       { id: 2, title: 'Documents' },
       { id: 3, title: 'Bank Detail' },
       { id: 4, title: 'Change Password' },
-      { id: 5, title: 'Enquiry' },
-      { id: 6, title: 'Availability Status' },
+      // { id: 5, title: 'Enquiry' },
+      // { id: 6, title: 'Availability Status' },
     ];
   } else {
     tabs = [
@@ -33,7 +33,7 @@ const Settings = () => {
       { id: 2, title: 'Documents' },
       { id: 3, title: 'Bank Detail' },
       { id: 4, title: 'Change Password' },
-      { id: 5, title: 'Availability Status' },
+      // { id: 5, title: 'Availability Status' },
     ];
   }
 

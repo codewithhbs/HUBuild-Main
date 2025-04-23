@@ -12,7 +12,6 @@ function StatusPage() {
     const [statuses, setStatuses] = useState({
         chatStatus: "",
         callStatus: "",
-
     });
 
     const handleFetchProvider = async () => {
