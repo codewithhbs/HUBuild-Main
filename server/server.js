@@ -157,10 +157,10 @@ io.on('connection', (socket) => {
                 console.log("Hey I Am providerConnections ", providerConnections)
                 const providerSocketId = providerConnections.get(astrologerId);
                 console.log("Hey I Am providerSocketId ", providerSocketId)
+                await changeAvailableStatus(room, true);
                 if (providerSocketId) {
                     const findRoom = roomMemberships.get(socket.id);
                     const roomId = findRoom.room;
-                    await changeAvailableStatus(roomId, true);
                     io.to(providerSocketId).emit('user_connected_notification', {
                         userId,
                         message: 'A user has joined your chat!',
