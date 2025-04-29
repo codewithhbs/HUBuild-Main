@@ -366,6 +366,7 @@ const ChatDemo = () => {
     }
 
     // Socket event listeners
+    // Socket event listeners with proper endChat reference
     useEffect(() => {
         socket.on("connect", () => {
             setSocketId(socket.id)
@@ -439,11 +440,26 @@ const ChatDemo = () => {
             }
         })
 
+        socket.on("inactivity_notice", async (data) => {
+            toast.success(data.message)
+            if (userData?.role === "user") {
+                await endChat()
+            }
+        })
+
+        // Fixed provider_disconnected handler
         socket.on("provider_disconnected", (data) => {
             toast.success(data.message)
-            setIsProviderConnected(false)
-            setIsAbleToJoinChat(false)
-            setIsChatStarted(false)
+
+            // Call the endChat function if chat was started
+            if (isChatStarted) {
+                endChat();
+            } else {
+                // Otherwise just update the UI states
+                setIsProviderConnected(false)
+                setIsAbleToJoinChat(false)
+                setIsChatStarted(false)
+            }
         })
 
         return () => {
@@ -458,9 +474,10 @@ const ChatDemo = () => {
             socket.off("user_left_chat")
             socket.off("timeout_disconnect")
             socket.off("chat_ended")
+            socket.off("inactivity_notice")
             socket.off("provider_disconnected")
         }
-    }, [id, socket, userData])
+    }, [id, socket, userData, endChat, isChatStarted]) // Make sure to include endChat in the dependency array
 
     // Handle chat timeout
     useEffect(() => {

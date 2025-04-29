@@ -13,6 +13,12 @@ const PartnerLogin = () => {
         loginFrom: 'provider'
     });
 
+    const [showPassword, setShowPassword] = useState(false);
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(prev => !prev);
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target
 
@@ -118,30 +124,6 @@ const PartnerLogin = () => {
                 window.location.href = '/profile?role=provider'
             }
 
-            // if (user.role === 'provider') {
-            //     if (user.isProfileComplete === false) {
-            //         window.location.href = `/profile-page/${user._id}`;
-            //         toast.error('Please complete your profile before login.');
-            //         return;
-            //     } else {
-            //         console.log("I am else");
-            //         toast.success(message);
-
-            //         if (redirectPath && typeof redirectPath === 'string' && redirectPath.trim() !== "") {
-            //             console.log("redirectPath", redirectPath);
-            //             toast.success(message);
-            //             window.location.href = redirectPath;
-            //         } else if (redirectPath && typeof redirectPath === 'object' && Object.keys(redirectPath).length === 0) {
-            //             toast.success(message);
-            //             window.location.href = '/';
-            //         } else {
-            //             toast.success(message);
-            //             window.location.href = '/';
-            //         }
-            //     }
-            // } else {
-            // }
-
 
         } catch (error) {
             console.log(error)
@@ -199,19 +181,30 @@ const PartnerLogin = () => {
                                                     />
                                                 </div>
 
-                                                <div data-mdb-input-init="" className="form-outline mb-4">
+                                                <div data-mdb-input-init="" className="form-outline mb-4 position-relative">
                                                     <label className="form-label text-white" htmlFor="form2Example27">
                                                         Password
                                                     </label>
                                                     <input
                                                         onChange={handleChange}
                                                         name="password"
-                                                        type="password"
+                                                        type={showPassword ? "text" : "password"}
                                                         value={logindata.password}
                                                         id="form2Example27"
                                                         className="form-control form-control-lg input-shape"
                                                     />
-
+                                                    <i
+                                                        className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}
+                                                        onClick={togglePasswordVisibility}
+                                                        style={{
+                                                            position: 'absolute',
+                                                            top: '70%',
+                                                            right: '15px',
+                                                            transform: 'translateY(-50%)',
+                                                            cursor: 'pointer',
+                                                            color: '#999'
+                                                        }}
+                                                    ></i>
                                                 </div>
                                                 <div className="pt-1 mb-4">
                                                     <button

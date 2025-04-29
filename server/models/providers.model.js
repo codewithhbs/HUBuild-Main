@@ -125,7 +125,7 @@ const ProviderProfileSchema = new mongoose.Schema({
     },
     chatStatus: {
         type: Boolean,
-        default: true
+        default: false
     },
     callStatus: {
         type: Boolean,

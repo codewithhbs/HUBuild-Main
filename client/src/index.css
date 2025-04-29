@@ -382,3 +382,43 @@ a {
     margin: 0rem;
   }
 }
+
+.carousel-item img{
+  height: 418px;
+}
+
+@media (max-width:1210px) {
+  .carousel-item img{
+    height: 340px;
+  }
+}
+
+@media (max-width:950px) {
+  .carousel-item img{
+    height: 242px;
+  }
+}
+
+@media (max-width:654px) {
+  .carousel-item img{
+    height: 195px;
+  }
+}
+
+@media (max-width:516px) {
+  .carousel-item img{
+    height: 156px;
+  }
+}
+
+@media (max-width:516px) {
+  .carousel-item img{
+    height: 156px;
+  }
+}
+
+@media (max-width:442px) {
+  .carousel-item img{
+    height: 140px;
+  }
+}

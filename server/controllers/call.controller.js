@@ -278,10 +278,9 @@ exports.call_status = async (req, res) => {
 
 
 
-exports.update_profile_status = async (id) => {
+exports.update_profile_status = async (id,status) => {
     try {
         console.log("I am in update_profile_status", id)
-        console.log("I am Hit")
         const user = await Provider.findById(id).select('-chatTransition');
         console.log("before is_on_chat ", user.is_on_chat)
 
@@ -290,7 +289,7 @@ exports.update_profile_status = async (id) => {
             throw new Error('User not found');
         }
 
-        user.is_on_chat = !user.is_on_chat; // Toggle the status
+        user.is_on_chat = status; // Toggle the status
         await user.save(); // Save changes to the database
         console.log("update is_on_chat ", user.is_on_chat)
         return user;

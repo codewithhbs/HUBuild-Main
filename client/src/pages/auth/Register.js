@@ -151,7 +151,7 @@ function Register() {
 
                                                     </div>
 
-                                                    <div className='col-lg-6'>
+                                                    <div className='col-lg-6 position-relative'>
                                                         <div style={{display:'flex'}} className="flex-row mb-4">
                                                             <i className="fas fa-lock fa-lg me-3 fa-fw lable-icon" />
                                                             <div
