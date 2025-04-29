@@ -10,11 +10,11 @@ const useLogout = (id) => {
             await axios.get(`https://api.helpubuild.co.in/api/v1/universal_logout/${id}`);
 
             // Clear localStorage
-            localStorage.clear(); 
+            localStorage.clear();
 
             // Redirect to login or home page
             // navigate('/login'); 
-            window.location.href = '/login';
+            window.location.href = '/';
         } catch (error) {
             console.log('Logout failed:', error);
         }

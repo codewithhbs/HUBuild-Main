@@ -50,7 +50,7 @@ const Profile = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Special handling for mobile number
     if (name === 'mobileNumber') {
       setNewMobileNumber(value);
@@ -96,7 +96,7 @@ const Profile = () => {
         expertiseSpecialization: allData.expertiseSpecialization.map(exp => ({ label: exp, value: exp })) || [],
         yearOfExperience: allData.yearOfExperience || ''
       });
-      
+
       // Store both original and current mobile number
       setOriginalMobileNumber(allData.mobileNumber || '');
       setNewMobileNumber(allData.mobileNumber || '');
@@ -110,14 +110,14 @@ const Profile = () => {
 
   const handleSendOtp = async () => {
     console.log("Sending OTP for new number:", newMobileNumber);
-    
+
     // Don't send OTP if number hasn't changed
     if (newMobileNumber === originalMobileNumber) {
       console.log("Mobile number unchanged, no OTP needed");
       setMobileVerified(true);
       return;
     }
-    
+
     setOtpLoading(true);
     try {
       const response = await axios.post(
@@ -129,12 +129,12 @@ const Profile = () => {
           },
         }
       );
-      
+
       if (response.data.success) {
         setShowOtpModal(true);
         setOtp(''); // Clear previous OTP if any
         toast.success('OTP sent successfully');
-        
+
         // Focus on OTP input when modal opens
         setTimeout(() => {
           if (otpInputRef.current) {
@@ -160,9 +160,9 @@ const Profile = () => {
     try {
       const response = await axios.post(
         `https://api.helpubuild.co.in/api/v1/verify_provider_change_number/${UserId}`,
-        { 
+        {
           otp,
-          newMobileNumber 
+          newMobileNumber
         },
         {
           headers: {
@@ -170,21 +170,21 @@ const Profile = () => {
           },
         }
       );
-      
+
       if (response.data.success) {
         setShowOtpModal(false);
         setOtp('');
         setMobileVerified(true);
-        
+
         // Update the formData with verified number
         setFormData(prevFormData => ({
           ...prevFormData,
           mobileNumber: newMobileNumber
         }));
-        
+
         // Update the original mobile number to the new one
         setOriginalMobileNumber(newMobileNumber);
-        
+
         Swal.fire({
           title: 'Success!',
           text: 'Mobile number verified successfully',
@@ -207,13 +207,13 @@ const Profile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // If mobile number is changed but not verified, send OTP first
     if (!mobileVerified) {
       handleSendOtp();
       return;
     }
-    
+
     setLoading(true);
 
     try {
@@ -267,7 +267,7 @@ const Profile = () => {
   return (
     <div className="mt-5">
       <h1 className="text-center mb-4">Profile</h1>
-      
+
       {/* OTP Modal - Extracted outside main component to prevent re-renders */}
       {showOtpModal && (
         <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
@@ -275,21 +275,21 @@ const Profile = () => {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">Verify OTP</h5>
-                <button 
-                  type="button" 
-                  className="btn-close" 
+                <button
+                  type="button"
+                  className="btn-close"
                   onClick={() => setShowOtpModal(false)}
                   aria-label="Close"
                 ></button>
               </div>
               <div className="modal-body">
-                <p>We've sent an OTP to your new mobile number: {newMobileNumber}</p>
+                <p>We've sent an OTP to your mobile number: {formData.mobileNumber}</p>
                 <div className="mb-3">
                   <label htmlFor="otp" className="form-label">Enter OTP</label>
-                  <input 
-                    type="text" 
-                    className="form-control" 
-                    id="otp" 
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="otp"
                     value={otp}
                     onChange={handleOtpChange}
                     placeholder="Enter 6-digit OTP"
@@ -298,16 +298,16 @@ const Profile = () => {
                 </div>
               </div>
               <div className="modal-footer">
-                <button 
-                  type="button" 
-                  className="btn btn-secondary" 
+                <button
+                  type="button"
+                  className="btn btn-secondary"
                   onClick={() => setShowOtpModal(false)}
                 >
                   Cancel
                 </button>
-                <button 
-                  type="button" 
-                  className="btn btn-primary" 
+                <button
+                  type="button"
+                  className="btn btn-primary"
                   onClick={handleVerifyOtp}
                   disabled={otpLoading}
                 >
@@ -318,7 +318,7 @@ const Profile = () => {
           </div>
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit} className="card p-4">
         <div className="row mb-3">
           <div className="col-md-6">
@@ -391,7 +391,7 @@ const Profile = () => {
                 onChange={handleChange}
               />
               {!mobileVerified && (
-                <button 
+                <button
                   type="button"
                   className="btn btn-outline-primary"
                   onClick={handleSendOtp}
@@ -488,13 +488,15 @@ const Profile = () => {
             rows="3"
           ></textarea>
         </div>
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={loading || !mobileVerified}
-        >
-          {loading ? 'Saving...' : 'Update Profile'}
-        </button>
+        <div className="col-md-12 mt-2 submit-button-container">
+          <button
+            type="submit"
+            className="btn as_btn text-white"
+            disabled={loading || !mobileVerified}
+          >
+            {loading ? 'Saving...' : 'Update Profile'}
+          </button>
+        </div>
         {!mobileVerified && (
           <div className="alert alert-warning mt-3">
             Please verify your new mobile number before updating your profile.
