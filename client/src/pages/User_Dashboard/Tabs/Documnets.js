@@ -128,7 +128,7 @@ export const Documents = () => {
           <div className="submit-button-container">
             <button
               type="as_btn"
-              className="submit-button"
+              className="btn as_btn text-white"
               disabled={loading}
             >
               {loading ? (

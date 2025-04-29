@@ -106,7 +106,7 @@ function UserForgetPassword() {
           <div className="text-center">
             <button
               type="submit"
-              className="btn btn-primary"
+              className="btn as_btn btn-primary"
               disabled={loading}
             >
               {loading ? (

@@ -170,7 +170,7 @@ function UpdateServices() {
                                     </div>
                                 ))}
                             </div>
-                            <button className="btn as_btn w-100 mt-3" onClick={() => handleSubmit(category)} disabled={loading}>
+                            <button className="btn as_btn w-100 mt-3 text-white" onClick={() => handleSubmit(category)} disabled={loading}>
                                 {loading && category === selectedCategory ? "Updating..." : "Update"}
                             </button>
                         </div>

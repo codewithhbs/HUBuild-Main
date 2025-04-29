@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import image from './hero-banner.webp';
 import './slider.css'
-import chat from './chat.png';
-import arc from './arc.png';
 import vastu from './vastu.png';
-import int from './int.webp';
 import engineer from './engineer.png'
 import interior from './interior-design.png'
 import support from './support.png'
-import mobilehero from './mobile-hero.webp'
-
-import toast from 'react-hot-toast'
 import axios from "axios";
 
 
@@ -37,11 +30,11 @@ const Slider = () => {
   }, [])
   return (
     <div className="container-fluid new_banner text-center">
-      <div id="carouselExampleFade" class="carousel slide carousel-fade" data-bs-ride="carousel">
+      <div id="carouselExampleFade" class="carousel slide carousel-fade fix_height_banner" data-bs-ride="carousel">
         <div class="carousel-inner">
           {
             desktopBanner.map((item, index) => (
-              <div key={index}class="carousel-item active">
+              <div key={index} class="carousel-item active">
                 <img src={item?.bannerImage?.url} class="d-block w-100" alt="hero-banner" />
               </div>
             ))

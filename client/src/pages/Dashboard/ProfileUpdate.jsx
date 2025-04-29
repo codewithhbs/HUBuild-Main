@@ -172,13 +172,15 @@ function ProfileUpdate() {
                         />
                     </div>
                 </div>
+                <div className='submit-button-container'>
                 <button
                     type="submit"
-                    className="btn btn-primary"
+                    className="btn as_btn text-white"
                     disabled={loading}
                 >
                     {loading ? 'Saving...' : 'Update Profile'}
                 </button>
+                </div>
             </form>
         </div>
     );

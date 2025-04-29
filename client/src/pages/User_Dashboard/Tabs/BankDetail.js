@@ -89,9 +89,11 @@ function BankDetail() {
                         </div>
                     ))}
                 </div>
-                <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+                <div className='submit-button-container'>
+                <button type="submit" className="btn as_btn text-white" disabled={loading}>
                     {loading ? 'Updating...' : 'Update Bank Details'}
                 </button>
+                </div>
             </form>
         </div>
     );
