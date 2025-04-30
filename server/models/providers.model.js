@@ -242,8 +242,6 @@ const ProviderProfileSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "MemberShip",
     },
-
-
     razorpayOrderId: {
         type: String
     },
@@ -273,6 +271,10 @@ const ProviderProfileSchema = new mongoose.Schema({
     },
     changeNumberOtpExpiresAt: {
         type: Date
+    },
+    isDeactived: {
+        type: Boolean,
+        default: false
     }
 });
 

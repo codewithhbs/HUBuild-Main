@@ -52,8 +52,9 @@ function TalkToInterior() {
       const { data } = await axios.get('https://api.helpubuild.co.in/api/v1/get-all-provider');
       const allData = data.data.filter((item) => item.type === 'Interior');
       const shownProvider = allData.filter((item) => item.accountVerified === 'Verified')
-      setAllProviders(shownProvider);
-      setFilteredProviders(shownProvider);
+      const filterByDeactivate = shownProvider.filter(item => item.isDeactived === false)
+      setAllProviders(filterByDeactivate);
+      setFilteredProviders(filterByDeactivate);
     } catch (error) {
       console.error("Internal server error in fetching providers", error);
       toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later");
