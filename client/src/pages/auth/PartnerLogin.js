@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { setData } from '../../utils/sessionStoreage';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
+// axios.defaults.withCredentials = true;
 
 const PartnerLogin = () => {
     const [logindata, setLoginData] = useState({

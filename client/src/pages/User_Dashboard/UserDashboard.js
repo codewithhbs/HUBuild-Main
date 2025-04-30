@@ -19,21 +19,16 @@ const UserDashboard = () => {
   const [uploading, setUploading] = useState(false);
   const [reUploadTrue, setReUploadTrue] = useState(true);
   const [showGalleryUpload, setShowGalleryUpload] = useState(false);
-
   const [showCropper, setShowCropper] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
   const [profileLoading, setProfileLoading] = useState(false)
-
   const [token, setToken] = useState(null);
   const [providerId, setProviderId] = useState(null);
   const [myProfile, setMyProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('Gallery')
   const [mobileNumber, setMobileNumber] = useState('')
-
   const [walletAmount, setWalletAmount] = useState(0);
-
   const [statuses, setStatuses] = useState({
     chatStatus: "",
     callStatus: "",
@@ -43,23 +38,28 @@ const UserDashboard = () => {
   const GetToken = () => {
     const data = GetData('token');
     const user = GetData('user');
+    console.log("user",user)
     const UserData = JSON.parse(user);
     if (data) {
       setToken(data);
     }
     if (UserData) {
       setProviderId(UserData._id)
+    } else {
+      // Clear any remaining data and redirect to login
+      localStorage.clear();
+      window.location.href = '/login'; // adjust path as per your routes
     }
   };
 
-  // console.log("token ",myProfile)
+  console.log("token ",providerId)
 
   const GetMyProfile = async () => {
     if (!token) return;
     setLoading(true);
     try {
       const { data } = await axios.get(`https://api.helpubuild.co.in/api/v1/get-single-provider/${providerId}`);
-      // console.log(data)
+      console.log(data)
       setMyProfile(data.data);
       setMobileNumber(data.data.mobileNumber)
       const formattedAmount = data.data.walletAmount.toFixed(2);
@@ -69,6 +69,9 @@ const UserDashboard = () => {
     } catch (error) {
       setLoading(false);
       console.error('Error fetching profile:', error);
+      localStorage.clear();
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,12 +92,6 @@ const UserDashboard = () => {
       toast.error('Failed to fetch profile data.');
     }
   };
-
-  // useEffect(() => {
-  //   if (providerId) {
-  //     handleFetchProvider();
-  //   }
-  // }, [])
 
   const handleToggle = async (statusType) => {
     const updatedStatus = !statuses[statusType];
@@ -187,6 +184,18 @@ const UserDashboard = () => {
     }
   };
 
+  const handleIsDeactived = async (id, isDeactived) => {
+    try {
+      const res = await axios.patch(`https://api.helpubuild.co.in/api/v1/update-provider-deactive-status/${id}`)
+      if (res.data.success) {
+        toast.success(res.data.message);
+        window.location.reload()
+      }
+    } catch (error) {
+      console.log("Internal server error", error)
+    }
+  };
+
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     const imageUrl = URL.createObjectURL(file);
@@ -214,10 +223,6 @@ const UserDashboard = () => {
     }
 
   };
-
-  // const handleLogout = () => {
-  //   window.location.href = '/'
-  // }
 
   const handleLogout = useLogout(providerId);
 
@@ -621,6 +626,15 @@ const UserDashboard = () => {
                   >
                     Logout  <i className="fas fa-sign-out-alt text-body"></i>
                   </button>
+                  <button
+                    type="button"
+                    className="btn forbtnwidth logout_btn mt-2 mx-2 btn-sm btn-floating"
+                    title={myProfile?.isDeactived ? "Activate Account" : "Deactivate Account"}
+                    onClick={() => handleIsDeactived(providerId, !myProfile.isDeactived)}
+                  >
+                    {myProfile.isDeactived ? "Activate Account" : "Deactivate Account"} <i className="fas fa-user-slash text-body"></i>
+                  </button>
+
                 </div>
               </div>
             </div>

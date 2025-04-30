@@ -4,6 +4,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { setData } from '../../utils/sessionStoreage';
 import Swal from 'sweetalert2';
+// axios.defaults.withCredentials = true;
 
 function Login() {
     const [logindata, setLoginData] = useState({
