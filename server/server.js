@@ -118,208 +118,209 @@ io.on('connection', (socket) => {
     });
 
     // Handle room joining
-socket.on('join_room', async ({ userId, astrologerId, role }, callback) => {
-    try {
-        if (!userId || !astrologerId || !role) {
-            throw new Error('Missing required parameters');
-        }
-
-        console.log("Join room userId, astrologerId, role", userId, astrologerId, role);
-
-        const room = `${userId}_${astrologerId}`;
-        socket.join(room);
-
-        roomMemberships.set(socket.id, {
-            userId,
-            astrologerId,
-            role,
-            room,
-            providerConnected: false
-        });
-
-        // Moved chat start logic from 'message' to here for user role
-        if (role === 'user') {
-            console.log("Hey I Am User ", astrologerId);
-            console.log("Hey I Am providerConnections ", providerConnections);
-            const providerSocketId = providerConnections.get(astrologerId);
-            console.log("Hey I Am providerSocketId ", providerSocketId);
-            await changeAvailableStatus(room, true);
-
-            // Start chat session when user joins - moved from message handler
-            const result = await chatStart(userId, astrologerId);
-            if (!result.success) {
-                throw new Error(result.message);
+    socket.on('join_room', async ({ userId, astrologerId, role }, callback) => {
+        try {
+            if (!userId || !astrologerId || !role) {
+                throw new Error('Missing required parameters');
             }
 
-            // Emit remaining chat time to the user
-            socket.emit('time_out', {
-                time: result.data.chatTimingRemaining
+            console.log("Join room userId, astrologerId, role", userId, astrologerId, role);
+
+            const room = `${userId}_${astrologerId}`;
+            socket.join(room);
+
+            roomMemberships.set(socket.id, {
+                userId,
+                astrologerId,
+                role,
+                room,
+                providerConnected: false
             });
 
-            // Set timer for provider connection timeout
-            const timer = setTimeout(async () => {
-                const connectedSockets = await io.in(room).fetchSockets();
-                const providerConnected = connectedSockets.some(s => {
-                    const member = roomMemberships.get(s.id);
-                    return member?.role === 'provider';
+            // Moved chat start logic from 'message' to here for user role
+            if (role === 'user') {
+                console.log("Hey I Am User ", astrologerId);
+                console.log("Hey I Am providerConnections ", providerConnections);
+                const providerSocketId = providerConnections.get(astrologerId);
+                console.log("Hey I Am providerSocketId ", providerSocketId);
+                await changeAvailableStatus(room, true);
+
+                // Start chat session when user joins - moved from message handler
+                const result = await chatStart(userId, astrologerId);
+                if (!result.success) {
+                    throw new Error(result.message);
+                }
+
+                // Emit remaining chat time to the user
+                socket.emit('time_out', {
+                    time: result.data.chatTimingRemaining
                 });
 
-                if (!providerConnected) {
-                    const userSocket = connectedSockets.find(s => {
+                // Set timer for provider connection timeout
+                const timer = setTimeout(async () => {
+                    const connectedSockets = await io.in(room).fetchSockets();
+                    const providerConnected = connectedSockets.some(s => {
                         const member = roomMemberships.get(s.id);
-                        return member?.role === 'user';
+                        return member?.role === 'provider';
                     });
 
-                    if (userSocket) {
-                        io.to(userSocket.id).emit('timeout_disconnect', {
-                            message: 'Provider did not connect. Chat ended.'
+                    if (!providerConnected) {
+                        const userSocket = connectedSockets.find(s => {
+                            const member = roomMemberships.get(s.id);
+                            return member?.role === 'user';
                         });
+
+                        if (userSocket) {
+                            io.to(userSocket.id).emit('timeout_disconnect', {
+                                message: 'Provider did not connect. Chat ended.'
+                            });
+                        }
                     }
+                }, TIMEOUT_DURATION);
+
+                activeTimers.set(room, timer);
+                console.log("providerSocketId",providerSocketId)
+
+                // Notify provider if they're connected
+                if (providerSocketId) {
+                    io.to(providerSocketId).emit('user_connected_notification', {
+                        userId,
+                        message: 'A user has joined your chat!',
+                        status: true
+                    });
                 }
-            }, TIMEOUT_DURATION);
-
-            activeTimers.set(room, timer);
-
-            // Notify provider if they're connected
-            if (providerSocketId) {
-                io.to(providerSocketId).emit('user_connected_notification', {
-                    userId,
-                    message: 'A user has joined your chat!',
-                    status: true
-                });
-            }
-        }
-
-        if (role === 'provider') {
-            const result = await chatStartFromProvider(userId, astrologerId);
-
-            if (!result.success) {
-                throw new Error(result.message);
             }
 
-            const findProvider = roomMemberships.get(socket.id);
-            findProvider.providerConnected = true;
-            roomMemberships.set(socket.id, findProvider);
-            console.log("Hey i am set provider connected", findProvider);
+            if (role === 'provider') {
+                const result = await chatStartFromProvider(userId, astrologerId);
 
-            await update_profile_status(astrologerId, true);
-            socket.to(room).emit('provider_connected', { room });
-        }
-
-        socket.to(room).emit('user_status', {
-            userId,
-            astrologerId,
-            status: 'online'
-        });
-
-        // Initialize inactivity timer when a user/provider joins the room
-        setupInactivityTimer(room);
-
-        socket.emit('room_joined', {
-            message: 'Welcome back. Start chat',
-            room
-        });
-
-        if (callback) {
-            callback({ success: true, message: 'Welcome back. Start chat' });
-        }
-    } catch (error) {
-        socket.emit('error_message', { message: error.message });
-
-        if (callback) {
-            callback({ success: false, message: error.message });
-        }
-    }
-});
-
-// Function to setup or reset the inactivity timer
-function setupInactivityTimer(room) {
-    // Clear any existing inactivity timer for this room
-    if (inactivityTimers.has(room)) {
-        clearTimeout(inactivityTimers.get(room));
-    }
-
-    // Set a new inactivity timer - 1 minute
-    const inactivityTimer = setTimeout(async () => {
-        console.log(`No activity in room ${room} for 1 minute`);
-
-        // Send inactivity notification to all users in the room
-        io.in(room).emit('inactivity_notice', {
-            message: 'There has been no activity in this chat for 1 minute. Please continue your conversation or the chat may end soon.'
-        });
-
-    }, 60000); // 1 minute in milliseconds
-
-    inactivityTimers.set(room, inactivityTimer);
-}
-
-// Handle chat messages
-socket.on('message', async ({ room, message, senderId, timestamp, role }) => {
-    try {
-        if (!room || !message || !senderId || !role) {
-            throw new Error('Missing required parameters');
-        }
-        let roomData = roomMemberships.get(socket.id);
-
-        console.log("Trying to get roomData by socket.id:", socket.id);
-        if (roomData && roomData.astrologerId) {
-            console.log("Result:", roomData.astrologerId);
-            await update_profile_status(roomData.astrologerId, true);
-        }
-
-        if (!roomData) {
-            console.log("roomData not found by socket.id. Trying fallback search using astrologerId...");
-
-            for (let [key, data] of roomMemberships) {
-                console.log(`Checking entry: key = ${key}, data =`, data);
-                if (data.astrologerId === senderId && data.room === room) {
-                    roomData = data;
-                    console.log("Match found via astrologerId fallback:", roomData);
-                    break;
+                if (!result.success) {
+                    throw new Error(result.message);
                 }
+
+                const findProvider = roomMemberships.get(socket.id);
+                findProvider.providerConnected = true;
+                roomMemberships.set(socket.id, findProvider);
+                console.log("Hey i am set provider connected", findProvider);
+
+                await update_profile_status(astrologerId, true);
+                socket.to(room).emit('provider_connected', { room });
+            }
+
+            socket.to(room).emit('user_status', {
+                userId,
+                astrologerId,
+                status: 'online'
+            });
+
+            // Initialize inactivity timer when a user/provider joins the room
+            setupInactivityTimer(room);
+
+            socket.emit('room_joined', {
+                message: 'Welcome back. Start chat',
+                room
+            });
+
+            if (callback) {
+                callback({ success: true, message: 'Welcome back. Start chat' });
+            }
+        } catch (error) {
+            socket.emit('error_message', { message: error.message });
+
+            if (callback) {
+                callback({ success: false, message: error.message });
+            }
+        }
+    });
+
+    // Function to setup or reset the inactivity timer
+    function setupInactivityTimer(room) {
+        // Clear any existing inactivity timer for this room
+        if (inactivityTimers.has(room)) {
+            clearTimeout(inactivityTimers.get(room));
+        }
+
+        // Set a new inactivity timer - 1 minute
+        const inactivityTimer = setTimeout(async () => {
+            console.log(`No activity in room ${room} for 1 minute`);
+
+            // Send inactivity notification to all users in the room
+            io.in(room).emit('inactivity_notice', {
+                message: 'There has been no activity in this chat for 1 minute. Please continue your conversation or the chat may end soon.'
+            });
+
+        }, 60000); // 1 minute in milliseconds
+
+        inactivityTimers.set(room, inactivityTimer);
+    }
+
+    // Handle chat messages
+    socket.on('message', async ({ room, message, senderId, timestamp, role }) => {
+        try {
+            if (!room || !message || !senderId || !role) {
+                throw new Error('Missing required parameters');
+            }
+            let roomData = roomMemberships.get(socket.id);
+
+            console.log("Trying to get roomData by socket.id:", socket.id);
+            if (roomData && roomData.astrologerId) {
+                console.log("Result:", roomData.astrologerId);
+                await update_profile_status(roomData.astrologerId, true);
             }
 
             if (!roomData) {
-                console.error("No roomData found for senderId:", senderId, "and room:", room);
-                throw new Error('User not properly registered in roomMemberships');
-            }
-        }
+                console.log("roomData not found by socket.id. Trying fallback search using astrologerId...");
 
-        if (PROHIBITED_PATTERNS.some(pattern => pattern.test(message))) {
-            socket.emit('wrong_message', {
-                message: 'Your message contains prohibited content.'
-            });
-            return;
-        }
-
-        // Reset inactivity timer whenever a message is sent
-        setupInactivityTimer(room);
-
-        // Save message to database
-        await Chat.findOneAndUpdate(
-            { room },
-            {
-                $push: {
-                    messages: {
-                        sender: senderId,
-                        text: message,
-                        timestamp: timestamp || new Date().toISOString()
+                for (let [key, data] of roomMemberships) {
+                    console.log(`Checking entry: key = ${key}, data =`, data);
+                    if (data.astrologerId === senderId && data.room === room) {
+                        roomData = data;
+                        console.log("Match found via astrologerId fallback:", roomData);
+                        break;
                     }
                 }
-            },
-            { upsert: true, new: true }
-        );
 
-        // Broadcast message to room
-        socket.to(room).emit('return_message', {
-            text: message,
-            sender: senderId,
-            timestamp: timestamp || new Date().toISOString()
-        });
-    } catch (error) {
-        socket.emit('error_message', { message: `Message failed: ${error.message}` });
-    }
-});
+                if (!roomData) {
+                    console.error("No roomData found for senderId:", senderId, "and room:", room);
+                    throw new Error('User not properly registered in roomMemberships');
+                }
+            }
+
+            if (PROHIBITED_PATTERNS.some(pattern => pattern.test(message))) {
+                socket.emit('wrong_message', {
+                    message: 'Your message contains prohibited content.'
+                });
+                return;
+            }
+
+            // Reset inactivity timer whenever a message is sent
+            setupInactivityTimer(room);
+
+            // Save message to database
+            await Chat.findOneAndUpdate(
+                { room },
+                {
+                    $push: {
+                        messages: {
+                            sender: senderId,
+                            text: message,
+                            timestamp: timestamp || new Date().toISOString()
+                        }
+                    }
+                },
+                { upsert: true, new: true }
+            );
+
+            // Broadcast message to room
+            socket.to(room).emit('return_message', {
+                text: message,
+                sender: senderId,
+                timestamp: timestamp || new Date().toISOString()
+            });
+        } catch (error) {
+            socket.emit('error_message', { message: `Message failed: ${error.message}` });
+        }
+    });
 
     // Handle file uploads
     socket.on('file_upload', async ({ room, fileData, senderId, timestamp }) => {
