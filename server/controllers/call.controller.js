@@ -167,6 +167,11 @@ exports.call_status = async (req, res) => {
         const findProviderId = findHistory?.providerId?._id;
         console.log("findProviderId finding id",findProviderId)
 
+        const findUserId = findHistory?.userId?._id;
+        console.log("findUserId from findhistory",findUserId)
+        const findUser = await User.findById(findUserId);
+        console.log("findUser from findhistory",findUser)
+
         const findedProvider = await Provider.findById(findProviderId);
         console.log("findedProvider finding",findedProvider)
 
@@ -235,12 +240,12 @@ exports.call_status = async (req, res) => {
             }
             console.log("findHistory.providerId",findHistory.providerId)
             findedProvider.walletAmount += Number(HowManyCostOfTalkTime);
-            findHistory.userId.walletAmount -= Number(HowManyCostOfTalkTime);
+            findUser.walletAmount -= Number(HowManyCostOfTalkTime);
             findedProvider.is_on_call = false;
 
             await findedProvider.save();
             console.log("findedProvider call start and done",findedProvider)
-            await findHistory.userId.save();
+            await findUser.save();
         }
 
 
