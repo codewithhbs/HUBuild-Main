@@ -21,6 +21,7 @@ const StepWizard = () => {
         couponCode: "",
         agree: false,
     });
+    const [discountedPrice, setDiscountedPrice] = useState(null);
     const [couponDetail, setCouponDetail] = useState(null);
     const [couponMessage, setCouponMessage] = useState("");
 
@@ -212,40 +213,72 @@ const StepWizard = () => {
         }
     };
 
-    const handleCheckCouponCode = async () => {
-        if (!memberData.couponCode) {
+    const handleCheckCouponCode = async (code = null) => {
+        const couponToCheck = code || memberData.couponCode;
+
+        if (!couponToCheck) {
             toast.error("Please enter a coupon code.");
             return;
         }
-        setLoading(true);
+
+
+
         try {
             const res = await axios.post("https://api.helpubuild.co.in/api/v1/check_coupon_code", {
-                couponCode: memberData.couponCode,
+                couponCode: couponToCheck,
             });
+
             if (res.data.success) {
                 setCouponMessage(res.data.message);
                 setCouponDetail(res.data.data);
-                toast.success(res.data.message);
-            } else {
+
+                // Calculate discounted price
+                let discountPercent = 0;
+
+                if (res.data.message.includes("Refer by admin")) {
+                    discountPercent = res.data.data.discount;
+                } else if (res.data.message.includes("Refer by provider")) {
+                    discountPercent = res.data.data?.discount?.discountPercent || 0;
+                }
+
+                const discounted = memberShip - (memberShip * (discountPercent / 100));
+                setDiscountedPrice(discounted);
+
                 Swal.fire({
-                    title: 'Error!',
-                    text: "Invalid coupon code.",
-                    icon: 'error', // use lowercase
-                    confirmButtonText: 'Okay'
+                    title: 'Coupon Applied!',
+                    text: `${res.data.message}. You saved ₹${(memberShip * (discountPercent / 100)).toFixed(2)}!`,
+                    icon: 'success',
+                    confirmButtonText: 'Great!'
+                });
+            } else {
+                setCouponDetail(null);
+                setCouponMessage("");
+                setDiscountedPrice(memberShip);
+
+                Swal.fire({
+                    title: 'Invalid Coupon',
+                    text: "The coupon code you entered is invalid or expired.",
+                    icon: 'error',
+                    confirmButtonText: 'Try Another'
                 });
             }
         } catch (error) {
             console.error("Error checking coupon:", error);
+
             Swal.fire({
-                title: 'Error!',
-                text: error?.response?.data?.message || "Please try again later",
-                icon: 'error', // use lowercase
+                title: 'Coupon Error',
+                text: error?.response?.data?.message || "Failed to verify coupon. Please try again.",
+                icon: 'error',
                 confirmButtonText: 'Okay'
             });
-        } finally {
-            setLoading(false);
+
+            setCouponDetail(null);
+            setCouponMessage("");
+            setDiscountedPrice(memberShip);
         }
     };
+
+
     return (
         <div className="container mt-5 mb-5">
             <form onSubmit={handleSubmit}>
@@ -278,53 +311,91 @@ const StepWizard = () => {
                         </div>
                     </div>
 
-                    <div className="col-lg-6 mb-3">
-                        <label className="form-label">Coupon Code</label>
-                        <div className="input-group">
-                            <input type="text" name="couponCode" value={memberData.couponCode} onChange={handleChange} className="form-control" />
-                            <button type="button" className="btn btn-outline-primary" onClick={handleCheckCouponCode}>Apply</button>
-                        </div>
-                    </div>
+                    <div className="step-content">
+                        <h4 className="mb-4 text-primary">Membership Details</h4>
 
-                    {/* Display Coupon Details Based on Message */}
-                    {couponDetail && (
-                        <div className="col-lg-12">
-                            <div className="alert alert-success mt-3">
-                                <h5>Coupon Details</h5>
-                                {couponMessage.includes("Refer by admin") && (
-                                    <>
-                                        <p>
-                                            <strong>Coupon Code:</strong> {couponDetail.couponCode}
-                                        </p>
-                                        <p>
-                                            <strong>Discount:</strong> {couponDetail.discount}%
-                                        </p>
-                                    </>
-                                )}
+                        <div className="card mb-4 shadow-sm border-0 bg-light">
+                            <div className="card-body text-center p-4">
+                                <div className="mb-3">
+                                    <span className="badge bg-primary p-2 fs-6">Premium Membership</span>
+                                </div>
 
-                                {couponMessage.includes("Refer by provider") && (
-                                    <>
-                                        <p>
-                                            <strong>Coupon Code:</strong> {couponDetail.couponCode}
-                                        </p>
-                                        <p>
-                                            <strong>Discount:</strong> {couponDetail?.discount?.discountPercent}%
-                                        </p>
-                                    </>
+                                <h3 className="card-title fw-bold mb-3">
+                                    {memberShip !== null ? (
+                                        <>
+                                            {couponDetail ? (
+                                                <div className="d-flex justify-content-center align-items-center">
+                                                    <span className="text-decoration-line-through text-muted me-2">₹{memberShip}</span>
+                                                    <span className="text-success">₹{discountedPrice}</span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-success">₹{memberShip}</span>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <div className="spinner-border text-primary" role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    )}
+                                </h3>
+
+                                <div className="mb-4">
+                                    <ul className="list-group list-group-flush">
+                                        <li className="list-group-item bg-transparent">
+                                            <i className="fas fa-check-circle text-success me-2"></i>
+                                            Get exclusive access to premium features.
+                                        </li>
+
+                                    </ul>
+                                </div>
+
+                                {couponDetail && (
+                                    <div className="alert alert-success d-flex align-items-center mb-3">
+                                        <i className="fas fa-tag me-2"></i>
+                                        <div>
+                                            <strong>Coupon Applied:</strong> {couponMessage}
+                                            {couponMessage.includes("Refer by admin") && (
+                                                <span className="d-block mt-1">
+                                                    You save {couponDetail.discount}% (₹{(memberShip * (couponDetail.discount / 100)).toFixed(2)})
+                                                </span>
+                                            )}
+                                            {couponMessage.includes("Refer by provider") && (
+                                                <span className="d-block mt-1">
+                                                    You save {couponDetail?.discount?.discountPercent}% (₹{(memberShip * (couponDetail?.discount?.discountPercent / 100)).toFixed(2)})
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
                                 )}
                             </div>
                         </div>
-                    )}
-                    <div className="card text-center mb-4 shadow-sm border-0">
-                        <div className="card-body">
-                            <h3 className="card-title text-primary fw-bold">Membership Plan</h3>
-                            <p className="card-text fs-4">
-                                <strong className="text-success">
-                                    {memberShip !== null ? `₹${memberShip}` : "Loading..."}
-                                </strong>
-                            </p>
-                            <p className="text-muted">Get exclusive access to premium features.</p>
+
+                        <div className="mb-4">
+                            <label className="form-label">Have a Coupon Code?</label>
+                            <div className="input-group">
+                                <input
+                                    type="text"
+                                    name="couponCode"
+                                    value={memberData.couponCode}
+                                    onChange={handleChange}
+                                    className="form-control form-control-lg"
+                                    placeholder="Enter coupon code if available"
+                                />
+                                <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick={() => handleCheckCouponCode()}
+
+                                >
+                                    Apply
+
+                                </button>
+                            </div>
                         </div>
+
+                      
+
+
                     </div>
                     <div className="col-lg-12">
                         <div style={{ display: 'flex' }} className="form-check justify-content-start mb-4">
