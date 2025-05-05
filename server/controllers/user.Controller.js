@@ -201,55 +201,78 @@ exports.verifyEmail = async (req, res) => {
 exports.Changepassword = async (req, res) => {
     try {
         const { mobileNumber, otp, password } = req.body;
-        console.log("Received data:", req.body);
+        console.log("[Changepassword] Request received with mobileNumber:", mobileNumber);
 
-        if (!mobileNumber) return res.status(400).json({ success: false, message: "Please enter a Mobile Number" });
-        if (!otp) return res.status(400).json({ success: false, message: "Please enter the OTP" });
-        if (!password) return res.status(400).json({ success: false, message: "Please enter a new password" });
+        // Validation
+        if (!mobileNumber) {
+            console.log("[Changepassword] Mobile number is missing");
+            return res.status(400).json({ success: false, message: "Please enter a Mobile Number" });
+        }
+        if (!otp) {
+            console.log("[Changepassword] OTP is missing");
+            return res.status(400).json({ success: false, message: "Please enter the OTP" });
+        }
+        if (!password) {
+            console.log("[Changepassword] Password is missing");
+            return res.status(400).json({ success: false, message: "Please enter a new password" });
+        }
 
+        // Find account in User or Provider
         let account = await User.findOne({ PhoneNumber: mobileNumber });
         let isProvider = false;
 
         if (!account) {
+            console.log("[Changepassword] User not found in User collection, checking Provider collection...");
             account = await Provider.findOne({ mobileNumber: mobileNumber });
             isProvider = true;
         }
 
         if (!account) {
+            console.log("[Changepassword] No account found for mobileNumber:", mobileNumber);
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
+        console.log("[Changepassword] Account found. Verifying OTP...");
+
+        // OTP validation
         const accountOtp = account.resetPasswordOtp;
-        if (!accountOtp) {
+        const otpExpiry = account.resetPasswordExpiresAt;
+
+        if (!accountOtp || !otpExpiry || new Date() > otpExpiry) {
+            console.log("[Changepassword] OTP not found or expired for account:", mobileNumber);
             return res.status(400).json({ success: false, message: "OTP not found or expired, request a new one." });
         }
 
         if (accountOtp !== otp) {
+            console.log("[Changepassword] Invalid OTP provided for account:", mobileNumber);
             return res.status(400).json({ success: false, message: "Invalid OTP." });
         }
 
-        // Hash the new password before saving
-        // const salt = await bcrypt.genSalt(10);
-        // const hashedPassword = await bcrypt.hash(password, salt);
-
+        // Set new password
         if (isProvider) {
-            account.password = password; // Provider's password field
+            account.password = password;
+            console.log("[Changepassword] Password updated for Provider account.");
         } else {
-            account.Password = password; // User's password field
+            account.Password = password;
+            console.log("[Changepassword] Password updated for User account.");
         }
 
+        // Clear OTP data
         account.resetPasswordOtp = null;
         account.resetPasswordExpiresAt = null;
 
         await account.save();
+        console.log("[Changepassword] Account saved successfully.");
 
         const verificationMessage = "Password changed successfully.";
-        await sendToken(account, res, 200, verificationMessage);
+        return await sendToken(account, res, 200, verificationMessage);
+
     } catch (error) {
-        console.error("Error during password change:", error);
-        return res.status(500).json({ success: false, message: "An error occurred during password change." });
+        console.error("[Changepassword] Error occurred:", error);
+        return res.status(500).json({ success: false, message: "Internal server error." });
     }
 };
+
 
 
 exports.resendOtp = async (req, res) => {

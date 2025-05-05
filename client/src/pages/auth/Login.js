@@ -30,14 +30,7 @@ function Login() {
     const handleloginSubmit = async (e) => {
         e.preventDefault();
         try {
-            const { data } = await axios.post('https://api.helpubuild.co.in/api/v1/login', logindata, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*`',
-                    'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token'
-                }
-            });
+            const { data } = await axios.post('http://localhost:5000/api/v1/login', logindata);
             const { token, user, message } = data;
             setData('token', token);
             setData('islogin', token ? true : false);
