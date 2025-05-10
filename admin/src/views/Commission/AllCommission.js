@@ -14,7 +14,7 @@ const AllCommission = () => {
     const fetchCoupons = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('https://api.helpubuild.co.in/api/v1/get-all-commision');
+            const { data } = await axios.get('https://api.helpubuild.in/api/v1/get-all-commision');
             setCoupons(data.data.reverse() || []);
         } catch (error) {
             console.error('Error fetching coupons:', error);
@@ -27,7 +27,7 @@ const AllCommission = () => {
     const deleteCoupon = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`https://api.helpubuild.co.in/api/v1/delete_admin_coupon/${id}`);
+            await axios.delete(`https://api.helpubuild.in/api/v1/delete_admin_coupon/${id}`);
             fetchCoupons();
             toast.success('Coupon deleted successfully!');
         } catch (error) {

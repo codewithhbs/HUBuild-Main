@@ -33,7 +33,7 @@ function AllUser() {
     const handleFetchBanner = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('https://api.helpubuild.co.in/api/v1/users',
+            const { data } = await axios.get('https://api.helpubuild.in/api/v1/users',
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -58,7 +58,7 @@ function AllUser() {
         setLoading(true);
         try {
             const updatedStatus = !currentStatus;
-            const res = await axios.put(`https://api.helpubuild.co.in/api/v1/user-ban/${id}`, {
+            const res = await axios.put(`https://api.helpubuild.in/api/v1/user-ban/${id}`, {
                 isBanned: updatedStatus,
             });
             handleFetchBanner();
@@ -84,7 +84,7 @@ function AllUser() {
     const handleDeleteBanner = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`https://api.helpubuild.co.in/api/v1/user-delete/${id}`);
+            await axios.delete(`https://api.helpubuild.in/api/v1/user-delete/${id}`);
             // setBanners((prevBanners) => prevBanners.filter((banner) => banner._id !== id));
             handleFetchBanner()
             toast.success('User deleted successfully!');
