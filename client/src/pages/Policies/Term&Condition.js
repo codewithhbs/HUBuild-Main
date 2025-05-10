@@ -9,7 +9,7 @@ const TermCondition = () => {
   useEffect(() => {
     const fetchTerm = async () => {
       try {
-        const { data } = await axios.get(`https://api.helpubuild.co.in/api/v1/single_term/${id}`)
+        const { data } = await axios.get(`https://api.helpubuild.in/api/v1/single_term/${id}`)
         setTerm(data.data)
       } catch (error) {
         console.log("Internal server error", error)

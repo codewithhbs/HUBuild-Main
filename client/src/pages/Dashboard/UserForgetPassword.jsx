@@ -31,7 +31,7 @@ function UserForgetPassword() {
     setLoading(true);
     try {
       const res = await axios.put(
-        `https://api.helpubuild.co.in/api/v1/update-user-password/${UserId}`,
+        `https://api.helpubuild.in/api/v1/update-user-password/${UserId}`,
         passwordData
       );
       // toast.success(res.data.message || 'Password updated successfully!');

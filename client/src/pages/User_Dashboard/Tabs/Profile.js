@@ -36,7 +36,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchExpertise = async () => {
       try {
-        const { data } = await axios.get('https://api.helpubuild.co.in/api/v1/all_expertise');
+        const { data } = await axios.get('https://api.helpubuild.in/api/v1/all_expertise');
         const formattedExpertise = data.data.map((exp) => ({ label: exp.expertise, value: exp.expertise }));
         setExpertise(formattedExpertise);
       } catch (error) {
@@ -80,7 +80,7 @@ const Profile = () => {
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `https://api.helpubuild.co.in/api/v1/get-single-provider/${UserId}`
+        `https://api.helpubuild.in/api/v1/get-single-provider/${UserId}`
       );
       const allData = data.data;
       setFormData({
@@ -121,7 +121,7 @@ const Profile = () => {
     setOtpLoading(true);
     try {
       const response = await axios.post(
-        `https://api.helpubuild.co.in/api/v1/provider_number_change_request/${UserId}`,
+        `https://api.helpubuild.in/api/v1/provider_number_change_request/${UserId}`,
         { newMobileNumber },
         {
           headers: {
@@ -159,7 +159,7 @@ const Profile = () => {
     setOtpLoading(true);
     try {
       const response = await axios.post(
-        `https://api.helpubuild.co.in/api/v1/verify_provider_change_number/${UserId}`,
+        `https://api.helpubuild.in/api/v1/verify_provider_change_number/${UserId}`,
         {
           otp,
           newMobileNumber
@@ -225,7 +225,7 @@ const Profile = () => {
       };
 
       const response = await axios.put(
-        `https://api.helpubuild.co.in/api/v1/update-provider-profile/${UserId}`,
+        `https://api.helpubuild.in/api/v1/update-provider-profile/${UserId}`,
         payload,
         {
           headers: {

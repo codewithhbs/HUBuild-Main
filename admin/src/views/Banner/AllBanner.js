@@ -22,7 +22,7 @@ function AllBanner() {
     const handleFetchBanner = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('https://api.helpubuild.co.in/api/v1/get-all-banner');
+            const { data } = await axios.get('https://api.helpubuild.in/api/v1/get-all-banner');
             setBanners(data.data);
         } catch (error) {
             console.log('Internal server error in getting banner', error);
@@ -36,7 +36,7 @@ function AllBanner() {
         try {
             // API call to update active status
             const updatedStatus = !currentStatus;
-            await axios.put(`https://api.helpubuild.co.in/api/v1/update-banner-status/${id}`, {
+            await axios.put(`https://api.helpubuild.in/api/v1/update-banner-status/${id}`, {
                 active: updatedStatus,
             });
 
@@ -57,7 +57,7 @@ function AllBanner() {
     const handleDeleteBanner = async (id) => {
         try {
             setLoading(true);
-            await axios.delete(`https://api.helpubuild.co.in/api/v1/delete-banner/${id}`);
+            await axios.delete(`https://api.helpubuild.in/api/v1/delete-banner/${id}`);
             setBanners((prevBanners) => prevBanners.filter((banner) => banner._id !== id));
             toast.success('Banner deleted successfully');
         } catch (error) {

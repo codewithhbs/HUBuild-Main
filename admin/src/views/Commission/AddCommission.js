@@ -22,7 +22,7 @@ const AddCommission = () => {
 
         setLoading(true);
         try {
-            const res = await axios.post('https://api.helpubuild.co.in/api/v1/create-commission', {
+            const res = await axios.post('https://api.helpubuild.in/api/v1/create-commission', {
                 commissionPercent,
             });
             toast.success(res.data.message || 'Commission added successfully');
