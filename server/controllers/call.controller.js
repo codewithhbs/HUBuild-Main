@@ -83,7 +83,7 @@ exports.createCall = async (req, res) => {
             {
                 from_number: userNumber,
                 to_number: providerNumber,
-                callback_url: "https://www.api.helpubuild.co.in/api/v1/call_status-call",
+                callback_url: "https://www.api.helpubuild.in/api/v1/call_status-call",
                 callback_method: "POST",
                 max_duration: max_duration_allowed
 
@@ -279,7 +279,7 @@ exports.update_profile_status = async (id,status) => {
         const user = await Provider.findById(id).select('-chatTransition');
         console.log("before is_on_chat ", user.is_on_chat)
 
-        console.log("I am user", user)
+        // console.log("I am user", user)
         if (!user) {
             throw new Error('User not found');
         }

@@ -397,24 +397,24 @@ exports.updateProfile = async (req, res) => {
     }
 };
 
-exports.updateUserProfileImage = async(req, res) => {
+exports.updateUserProfileImage = async (req, res) => {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
         const existingUser = await User.findById(id);
-        if(!existingUser){
+        if (!existingUser) {
             return res.status(404).json({
                 success: false,
                 message: 'Internal server error'
             })
         }
-        if(!req.file){
+        if (!req.file) {
             return res.status(400).json({
                 success: false,
                 message: 'No file uploaded.',
                 error: 'No file uploaded.'
             })
         }
-        if(existingUser?.ProfileImage?.public_id){
+        if (existingUser?.ProfileImage?.public_id) {
             await deleteImageFromCloudinary(existingUser.ProfileImage.public_id)
         }
         const imgUrl = await uploadToCloudinary(req.file.buffer);
@@ -427,7 +427,7 @@ exports.updateUserProfileImage = async(req, res) => {
             data: existingUser
         })
     } catch (error) {
-        console.log("Internal server error",error)
+        console.log("Internal server error", error)
         res.status(500).json({
             success: false,
             message: "Internal server error",
@@ -690,7 +690,7 @@ exports.deleteAccount = async (req, res) => {
         }
 
         const userChat = await ChatAndPayment.deleteMany({ userId: userId });
-        
+
         res.status(200).json({ success: true, message: "User account deleted successfully" });
     } catch (error) {
         console.error("Error deleting account:", error);
@@ -1180,7 +1180,7 @@ exports.chatStartFromProvider = async (userId, astrologerId) => {
         const currentTime = new Date().toISOString();
         // user.chatTransition = user.chatTransition || []; // Initialize if undefined
         provider.chatTransition = provider.chatTransition || []; // Initialize if undefined
-       
+
         const newChatTransitionProvider = {
             _id: newChatTransitionId,
             startChatTime: currentTime,
@@ -1220,7 +1220,10 @@ exports.chatStartFromProvider = async (userId, astrologerId) => {
     }
 }
 
-exports.chatEnd = async (userId, astrologerId) => {
+// SECOND FILE CHANGES (for your chatEnd controller function)
+
+// Modified chatEnd function to accept actualStartTime parameter
+exports.chatEnd = async (userId, astrologerId, actualStartTime = null) => {
     try {
         console.log("i am hit for deduction in chat")
         // First, find the user by userId
@@ -1295,7 +1298,12 @@ exports.chatEnd = async (userId, astrologerId) => {
 
         // Calculate the chat end details
         const endTime = new Date();
-        const durationSeconds = Math.ceil((endTime - new Date(lastTransition.startChatTime)) / 1000); // total seconds
+
+        // KEY CHANGE: Use actualStartTime if provided, otherwise use the original startChatTime
+        const startTime = actualStartTime || new Date(lastTransition.startChatTime);
+
+        // Calculate duration based on the actual start time (when both were connected)
+        const durationSeconds = Math.ceil((endTime - startTime) / 1000); // total seconds
         const providerPricePerMinInPaise = lastTransition.providerPricePerMin * 100;
 
         // Calculate whole minutes and remainder seconds
@@ -1313,26 +1321,31 @@ exports.chatEnd = async (userId, astrologerId) => {
         // Final amount to deduct
         const walletUsedInPaise = Math.min(billableMinutes * providerPricePerMinInPaise, user.walletAmount * 100);
 
-
         // Set the chat ending details
         lastTransition.endingChatTime = endTime.toISOString();
         lastTransition.endingChatAmount = (user.walletAmount * 100 - walletUsedInPaise) / 100; // Deducted amount in rupees
         user.walletAmount -= walletUsedInPaise / 100;  // Deduct wallet amount for chat duration (converted back to rupees)
         user.lastChatTransitionId = null;
         lastTransition.deductionAmount = walletUsedInPaise / 100;
-        lastTransition.Date = endTime
+        lastTransition.Date = endTime;
 
-        // Set the chat ending details
+        // Set the chat ending details for provider
         providerLastTransition.endingChatTime = endTime.toISOString();
-        // providerLastTransition.endingChatAmount = (user.walletAmount * 100 - walletUsedInPaise) / 100; // Deducted amount in rupees
-        findProvider.walletAmount += walletUsedInPaise / 100;  // Deduct wallet amount for chat duration (converted back to rupees)
+        findProvider.walletAmount += walletUsedInPaise / 100;  // Add amount to provider wallet (converted back to rupees)
         findProvider.lastChatTransitionId = null;
         providerLastTransition.deductionAmount = walletUsedInPaise / 100;
-        providerLastTransition.Date = endTime
+        providerLastTransition.Date = endTime;
 
         // Save the updated user data
         await user.save();
         await findProvider.save();
+
+        // Log the timing information for debugging
+        if (actualStartTime) {
+            console.log(`Chat ended with actual start time: ${actualStartTime.toISOString()}`);
+            console.log(`Original chat start time was: ${new Date(lastTransition.startChatTime).toISOString()}`);
+            console.log(`Actual billing duration: ${durationSeconds} seconds (${billableMinutes} billable minutes)`);
+        }
 
         return {
             success: true,
@@ -1421,9 +1434,9 @@ exports.getDetailForVerification = async (req, res) => {
 }
 
 exports.changeAvailableStatus = async (id, status) => {
-    console.log("room id for set",id, status)
+    console.log("room id for set", id, status)
     try {
-        const chatroom = await ChatAndPayment.findOne({room:id})
+        const chatroom = await ChatAndPayment.findOne({ room: id })
         if (!chatroom) {
             return {
                 success: false,
@@ -1432,7 +1445,7 @@ exports.changeAvailableStatus = async (id, status) => {
             };
         }
         chatroom.isChatStarted = status
-        console.log("chatroom.isChatStarted",chatroom.isChatStarted)
+        console.log("chatroom.isChatStarted", chatroom.isChatStarted)
         await chatroom.save()
         return {
             success: true,
