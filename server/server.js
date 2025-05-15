@@ -69,6 +69,10 @@ const activeTimers = new Map();
 const inactivityTimers = new Map();
 let providerHasConnected = false;
 
+// First, add a new Map to track when actual chat timing should start
+const chatStartTimestamps = new Map(); // Stores the real start time when both are connected
+const roomChatInfo = new Map(); // Stores chat information for each room
+
 const TIMEOUT_DURATION = 60000; // 1 minute
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
@@ -151,6 +155,13 @@ io.on('connection', (socket) => {
                     throw new Error(result.message);
                 }
 
+                // Store original start time in our map
+                roomChatInfo.set(room, {
+                    originalStartTime: new Date(),
+                    userId,
+                    astrologerId
+                });
+
                 // Emit remaining chat time to the user
                 socket.emit('time_out', {
                     time: result.data.chatTimingRemaining
@@ -179,7 +190,7 @@ io.on('connection', (socket) => {
                 }, TIMEOUT_DURATION);
 
                 activeTimers.set(room, timer);
-                console.log("providerSocketId",providerSocketId)
+                console.log("providerSocketId", providerSocketId)
 
                 // Notify provider if they're connected
                 if (providerSocketId) {
@@ -204,6 +215,24 @@ io.on('connection', (socket) => {
                 console.log("Hey i am set provider connected", findProvider);
 
                 await update_profile_status(astrologerId, true);
+
+                // Check if both user and provider are now connected
+                const userConnected = Array.from(roomMemberships.values()).some(
+                    member => member.room === room && member.role === 'user'
+                );
+
+                if (userConnected) {
+                    // Both are now connected - store the actual chat start timestamp
+                    chatStartTimestamps.set(room, new Date());
+                    console.log(`Both user and provider connected in room ${room}. Starting actual chat timing.`);
+
+                    // Notify room that actual chat has begun
+                    io.in(room).emit('chat_officially_started', {
+                        room,
+                        startTime: chatStartTimestamps.get(room)
+                    });
+                }
+
                 socket.to(room).emit('provider_connected', { room });
             }
 
@@ -362,7 +391,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Handle provider connected event
+    // Add event handler for when provider connects later
     socket.on('provider_connected', ({ room }) => {
         try {
             if (!room) {
@@ -373,6 +402,23 @@ io.on('connection', (socket) => {
             if (timer) {
                 clearTimeout(timer);
                 activeTimers.delete(room);
+            }
+
+            // Check if user is already connected in this room
+            const userConnected = Array.from(roomMemberships.values()).some(
+                member => member.room === room && member.role === 'user'
+            );
+
+            if (userConnected) {
+                // Both are now connected - store the actual chat start timestamp
+                chatStartTimestamps.set(room, new Date());
+                console.log(`Provider joined and user already present in room ${room}. Starting actual chat timing.`);
+
+                // Notify room that actual chat has begun
+                io.in(room).emit('chat_officially_started', {
+                    room,
+                    startTime: chatStartTimestamps.get(room)
+                });
             }
 
             const roomSocketIds = Array.from(socket.adapter.rooms.get(room) || []);
@@ -427,9 +473,14 @@ io.on('connection', (socket) => {
                 if (providerHasConnected) {
                     console.log("provider deduct", providerHasConnected)
                     try {
-                        const response = await chatEnd(userId, astrologerId);
+                        // Get the actual timing info to pass to chatEnd
+                        const actualStartTime = chatStartTimestamps.get(room);
+                        const response = await chatEnd(userId, astrologerId, actualStartTime);
                         if (response.success) {
                             providerHasConnected = false;
+                            // Clean up stored timestamps
+                            chatStartTimestamps.delete(room);
+                            roomChatInfo.delete(room);
                         }
                     } catch (error) {
                         console.error('Error ending chat:', error);
@@ -461,9 +512,14 @@ io.on('connection', (socket) => {
                 if (providerHasConnected) {
                     console.log("user deduct", providerHasConnected)
                     try {
-                        const response = await chatEnd(userId, astrologerId);
+                        // Get the actual timing info to pass to chatEnd
+                        const actualStartTime = chatStartTimestamps.get(room);
+                        const response = await chatEnd(userId, astrologerId, actualStartTime);
                         if (response.success) {
                             providerHasConnected = false;
+                            // Clean up stored timestamps
+                            chatStartTimestamps.delete(room);
+                            roomChatInfo.delete(room);
                         }
                     } catch (error) {
                         console.error('Error ending chat:', error);
@@ -579,11 +635,17 @@ io.on('connection', (socket) => {
                 // End chat if provider connected during session
                 if (roomData.providerConnected || providerHasConnected) {
                     try {
-                        const response = await chatEnd(userId, astrologerId);
+                        // Get the actual timing info to pass to chatEnd
+                        const actualStartTime = chatStartTimestamps.get(room);
+                        const response = await chatEnd(userId, astrologerId, actualStartTime);
                         if (response.success) {
                             providerHasConnected = false;
+                            // Clean up stored timestamps
+                            chatStartTimestamps.delete(room);
+                            roomChatInfo.delete(room);
                         }
                     } catch (error) {
+                        console.log("Graceful handling of disconnect errors", error)
                         // Graceful handling of disconnect errors
                     }
                 }
@@ -597,6 +659,7 @@ io.on('connection', (socket) => {
             });
         } catch (error) {
             // Can't send to disconnected client
+            console.log("Internale server error", error)
         }
     });
 });

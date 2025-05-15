@@ -34,7 +34,7 @@ const Contact = () => {
                                         <span class="as_icon">
                                             <img src="assets/images/svg/message.svg" alt="" />
                                         </span>
-                                        <p><a href="javascript:;">info@helpubuild.co.in  </a></p>
+                                        <p><a href="javascript:;">info@helpubuild.in  </a></p>
                                     </li>
                                 </ul>
                                 <div class="as_map">
