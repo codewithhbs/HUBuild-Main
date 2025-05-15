@@ -71,7 +71,7 @@ const Footer = () => {
               </li>
               <li className="footer-contact-item">
                 <Mail className="footer-contact-icon" />
-                <a style={{color:'white'}} href="mailto:info@helpubuild.co.in">info@helpubuild.co.in</a>
+                <a style={{color:'white'}} href="mailto:info@helpubuild.in">info@helpubuild.in</a>
               </li>
             </ul>
           </div>
