@@ -875,7 +875,7 @@ exports.PaymentVerify = async (req, res) => {
             await findOrder.save();
 
             return res.redirect(
-                `https://helpubuild.co.in/payment-failure?error=Payment failed via ${method || 'unknown method'}&transactionId=${razorpay_payment_id}&amount=${failedAmount}&date=${currentTime}`
+                `https://helpubuild.in/payment-failure?error=Payment failed via ${method || 'unknown method'}&transactionId=${razorpay_payment_id}&amount=${failedAmount}&date=${currentTime}`
             );
         }
 
@@ -905,7 +905,7 @@ exports.PaymentVerify = async (req, res) => {
         //         rechargeHistory: findOrder.rechargeHistory,
         //     },
         // });
-        return res.redirect(`https://helpubuild.co.in/successfull-recharge?amount=${price}&transactionId=${razorpay_payment_id}&date=${currentTime}`)
+        return res.redirect(`https://helpubuild.in/successfull-recharge?amount=${price}&transactionId=${razorpay_payment_id}&date=${currentTime}`)
     } catch (error) {
         console.log('Internal server error', error);
         return res.status(500).json({
