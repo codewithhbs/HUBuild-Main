@@ -113,6 +113,10 @@
     background-color: rgba(99, 102, 241, 0.1);
 }
 
+.active{
+    color: #EAB936 !important;
+}
+
 .avatar {
     position: relative;
     width: 3rem;
