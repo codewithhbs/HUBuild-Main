@@ -266,8 +266,8 @@ const Header = () => {
                         </Link>
                       </li>
                       <li>
-                        <Link style={{ color: 'black' }} onClick={handleLinkClick} to="/blog" className={active === "/blog" ? "active" : ""}>
-                          blog
+                        <Link style={{ color: 'black' }} onClick={handleLinkClick} to="/contact" className={active === "/contact" ? "active" : ""}>
+                          Contact
                         </Link>
                       </li>
                       {

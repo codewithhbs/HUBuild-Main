@@ -28,7 +28,7 @@ const Contact = () => {
                                         <span class="as_icon">
                                             <img src="assets/images/svg/contact.svg" alt="" />
                                         </span>
-                                        <p>+91 8826465693</p>
+                                        <p>+91 9220441214</p>
                                     </li>
                                     <li class="as_info_box">
                                         <span class="as_icon">
