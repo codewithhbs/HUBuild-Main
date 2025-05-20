@@ -9,6 +9,7 @@ import UpdateServices from './Tabs/UpdateServices';
 import { GetData } from '../../utils/sessionStoreage';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import CallDeductionProvider from './Tabs/CallDeductionProvider';
 
 const Settings = () => {
   const Data = GetData('user');
@@ -23,6 +24,7 @@ const Settings = () => {
       { id: 2, title: 'Documents' },
       { id: 3, title: 'Bank Detail' },
       { id: 4, title: 'Change Password' },
+      { id: 5, title: 'Call History' },
       // { id: 5, title: 'Enquiry' },
       // { id: 6, title: 'Availability Status' },
     ];
@@ -33,6 +35,7 @@ const Settings = () => {
       { id: 2, title: 'Documents' },
       { id: 3, title: 'Bank Detail' },
       { id: 4, title: 'Change Password' },
+      { id: 5, title: 'Call History' },
       // { id: 5, title: 'Availability Status' },
     ];
   }
@@ -146,7 +149,7 @@ const Settings = () => {
         {activeTab === 2 && <Documents />}
         {activeTab === 3 && isOtpVerified && <BankDetail />}
         {activeTab === 4 && <Password />}
-        {activeTab === 5 && <StatusPage />}
+        {activeTab === 5 && <CallDeductionProvider />}
         {activeTab === 6 && <UpdateServices />}
       </div>
     </>
