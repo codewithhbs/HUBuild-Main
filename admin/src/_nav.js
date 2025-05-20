@@ -80,6 +80,12 @@ const _nav = [
   },
   {
     component: CNavItem,
+    name: 'All Call',
+    to: '/call/all_call',
+    icon: <CIcon icon={cilChatBubble} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
     name: 'Withdraw Request',
     to: '/withdraw/all_withdraw',
     icon: <CIcon icon={cilWallet} customClassName="nav-icon" />,

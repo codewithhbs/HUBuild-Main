@@ -97,7 +97,7 @@ exports.createCall = async (req, res) => {
         );
 
         const callData = response.data;
-        console.log("callData",callData)
+        console.log("callData", callData)
         const newCallData = new CallHistory({
             userId: userId,
             from_number: userNumber,
@@ -150,9 +150,9 @@ exports.call_status = async (req, res) => {
             from_number: callStatusQuery.from_number,
             to_number: callStatusQuery.to_number,
         })
-        .sort({ createdAt: -1 })
-        .populate('userId')
-        .populate('providerId');
+            .sort({ createdAt: -1 })
+            .populate('userId')
+            .populate('providerId');
 
         if (!findHistory) {
             return res.status(404).json({
@@ -278,7 +278,7 @@ exports.call_status = async (req, res) => {
 
 
 
-exports.update_profile_status = async (id,status) => {
+exports.update_profile_status = async (id, status) => {
     try {
         console.log("I am in update_profile_status", id)
         const user = await Provider.findById(id).select('-chatTransition');
@@ -301,3 +301,78 @@ exports.update_profile_status = async (id,status) => {
 
 
 
+
+
+exports.get_call_history_by_user = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        console.log("object", userId)
+        const provider = await CallHistory.find({ userId: userId }).populate('userId').populate('providerId');
+        if (!provider) {
+            return res.status(404).json({ success: false, message: "Provider not found" });
+        }
+        const callHistory = provider;
+        return res.status(200).json({ success: true, message: "Call history fetched successfully", data: callHistory });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
+    }
+};
+
+exports.get_call_history_by_provider = async (req, res) => {
+    try {
+        const providerId = req.params.providerId;
+        const provider = await CallHistory.find({ providerId: providerId }).populate('userId').populate('providerId');
+        if (!provider) {
+            return res.status(404).json({ success: false, message: "Provider not found" });
+        }
+        const callHistory = provider;
+        return res.status(200).json({ success: true, message: "Call history fetched successfully", data: callHistory });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
+    }
+};
+
+exports.getAllCallHistory = async (req,res) => {
+    try {
+        const allHistory = await CallHistory.find().populate('userId').populate('providerId');
+        if(!allHistory){
+            return res.status(404).json({
+                success: false,
+                message: "No call history found"
+            })
+        }
+        return res.status(200).json({
+            success: true,
+            message: 'All call history fetched successfully',
+            data: allHistory
+        })
+    } catch (error) {
+        console.log("Internal server error", error)
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message
+        })
+    }
+}
+
+exports.delete_call_history = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const callHistory = await CallHistory.findById(id);
+        if (!callHistory) {
+            return res.status(404).json({ success: false, message: "Call history not found" });
+        }
+        const deletedCallHistory = await CallHistory.findByIdAndDelete(id);
+        return res.status(200).json({ success: true, message: "Call history deleted successfully" });
+    } catch (error) {
+        console.log("Internal server error",error)
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message
+        })
+    }
+}

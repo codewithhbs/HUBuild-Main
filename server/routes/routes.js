@@ -16,7 +16,7 @@ const { createChatWithNew, getAllChatRecord, getChatByProviderid, getChatByUseri
 const { createWithdrawal, updateWithdrawStatus, deleteWithdrawRequest, getWithdrawalsByProviderId, getAllWithdrawals, getTotalWithdrawAndCommission } = require('../controllers/withdraw.controller');
 const { createCommission, updateCommission, getSingleCommission, getAllCommissions, deleteCommission } = require('../controllers/commission.controller');
 const { createProviderService, getAllProviderService, getProviderServiceById, updateProviderService, deleteProviderService, findbyProvider } = require('../controllers/providerService.controller');
-const { createCall, call_status } = require('../controllers/call.controller');
+const { createCall, call_status, get_call_history_by_provider, get_call_history_by_user, delete_call_history, getAllCallHistory } = require('../controllers/call.controller');
 const { createMemberShip, getAllMemberShip, getSingleMemberShip, updateMemberShip, deleteMemberShip, checkCouponCode, buyMemberShip, membershipPaymentVerify } = require('../controllers/memberShip.controller');
 const { createGlobelUserRefDis, getAllGlobelUserRefDis, updateGlobelUserRef, deleteGlobelUserRef, getSingleGlobelUserRef } = require('../controllers/globelUserRefDis.controller');
 const { createAdminCoupon, getAllAdminCoupon, getSingleAdminCoupon, updateAdminCoupon, deleteAdminCoupon } = require('../controllers/adminCoupon.controller');
@@ -219,6 +219,10 @@ router.get('/get-service-by-provider/:providerId/:category', findbyProvider);
 
 router.post('/create-call', createCall)
 router.post('/call_status-call', call_status)
+router.get('/get-call-by-provider/:providerId', get_call_history_by_provider)
+router.get('/get-call-by-user/:userId', get_call_history_by_user)
+router.get('/get-call-by-admin', getAllCallHistory)
+router.delete('/delete-call-by-admin/:id', delete_call_history)
 
 
 router.post('/provider_status/:provider_id', getProviderStatus)

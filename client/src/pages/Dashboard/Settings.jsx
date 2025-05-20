@@ -4,6 +4,7 @@ import ProfileUpdate from './ProfileUpdate';
 import RechargeHistory from './RechargeHistory';
 import ChatDeductionHistory from './ChatDeductionHistory';
 import UserForgetPassword from './UserForgetPassword';
+import CallDeductionHistory from './CallDeductionHistory';
 
 function Settings({ myProfile }) {
     const tabs = [
@@ -11,7 +12,7 @@ function Settings({ myProfile }) {
         { id: 4, title: 'Forget Password', content: 'Share your profile with others' },
         { id: 2, title: 'Recharge History', content: 'Tab 2 content' },
         { id: 3, title: 'Chat Deductions History', content: 'Tab 3 content' },
-        // { id: 5, title: 'Enquiry', content: 'Tab 3 content' }
+        { id: 5, title: 'Call Deductions History', content: 'Tab 5 content' }
     ];
 
     const [activeTab, setActiveTab] = useState(tabs[0].id);
@@ -45,7 +46,7 @@ function Settings({ myProfile }) {
                 {activeTab === 2 && <RechargeHistory />}
                 {activeTab === 3 && <ChatDeductionHistory />}
                 {activeTab === 4 && <UserForgetPassword />}
-                {/* {activeTab === 5 && <></>} */}
+                {activeTab === 5 && <CallDeductionHistory/>}
             </div>
         </>
     )
