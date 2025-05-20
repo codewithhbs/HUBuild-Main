@@ -177,11 +177,16 @@ exports.call_status = async (req, res) => {
         // Calculate talk time
         const startTime = parseInt(callStatusQuery.start_time);
         const endTime = parseInt(callStatusQuery.end_time);
-        let talkTimeInSeconds = endTime - startTime;
+        // let talkTimeInSeconds = endTime - startTime;
+        let talkTimeInSeconds = callStatusQuery.to_number_answer_time;
 
-        if (isNaN(startTime) || isNaN(endTime) || talkTimeInSeconds < 0) {
+        if (talkTimeInSeconds < 0) {
             talkTimeInSeconds = 0;
         }
+
+        // if (isNaN(startTime) || isNaN(endTime) || talkTimeInSeconds < 0) {
+        //     talkTimeInSeconds = 0;
+        // }
 
         const talkTimeInMinutes = (talkTimeInSeconds / 60).toFixed(2);
 
