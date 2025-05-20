@@ -18,7 +18,7 @@ export const SocketProvider = ({ children }) => {
         const storedUser = GetData('user');
         const userData = storedUser ? JSON.parse(storedUser) : null;
 
-        console.log("✅ userData from session:", userData);
+        // console.log("✅ userData from session:", userData);
 
         socket.connect();
 
