@@ -86,7 +86,6 @@ exports.createCall = async (req, res) => {
                 callback_url: "https://www.api.helpubuild.in/api/v1/call_status-call",
                 callback_method: "POST",
                 max_duration: max_duration_allowed
-
             },
             {
                 headers: {
