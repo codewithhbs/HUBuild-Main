@@ -45,7 +45,12 @@ app.use('/public', express.static('public'));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({
+    origin: (origin, callback) => {
+        callback(null, origin);
+    },
+    credentials: true,
+}));
 
 // Create HTTP server and Socket.IO instance
 const server = createServer(app);
