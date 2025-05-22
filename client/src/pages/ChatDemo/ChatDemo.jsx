@@ -117,7 +117,7 @@ const ChatDemo = () => {
 
             setIsFetchingChatStatus(true);
             try {
-                const { data } = await fetchWithRetry(`${ENDPOINT}api/v1/get-chat-by-id/${isRoomId}`);
+                const { data } = await fetchWithRetry(`${ENDPOINT}api/v1/get-chat-by-id/${isRoomId}?role=${userData?.role}`);
                 const chatData = data.data;
                 console.log("chatData.isChatStarted", chatData.isChatStarted);
                 setIsAbleToJoinChat(chatData.isChatStarted);
@@ -161,7 +161,7 @@ const ChatDemo = () => {
 
     const handleDeleteChatByRoom = async () => {
         try {
-            await axios.delete(`${ENDPOINT}api/v1/delete_chat_bt_room/${isRoomId}`)
+            await axios.delete(`${ENDPOINT}api/v1/delete-messages-by-room/${isRoomId}?role=${userData?.role}`)
             toast.success("Chat deleted successfully")
             fetchChatHistory()
             setIsChatBoxActive(false)
@@ -175,36 +175,40 @@ const ChatDemo = () => {
     // Handle selecting a chat from the sidebar
     const handleChatStart = useCallback(
         async (chatId) => {
-            if (!chatId) return
+            if (!chatId) return;
 
             try {
-                const { data } = await axios.get(`${ENDPOINT}api/v1/get-chat-by-id/${chatId}`)
-                const chatData = data.data
+                const { data } = await axios.get(
+                    `${ENDPOINT}api/v1/get-chat-by-id/${chatId}?role=${userData?.role}`
+                );
+
+                const chatData = data.data;
 
                 if (!chatData) {
-                    toast.error("Chat not found")
-                    return
+                    toast.error("Chat not found");
+                    return;
                 }
 
-                const userId = chatData?.userId?._id
-                const providerId = chatData?.providerId?._id
+                const userId = chatData?.userId?._id;
+                const providerId = chatData?.providerId?._id;
 
-                setMessages(chatData.messages || [])
-                setSelectedUserId(userId)
-                setSelectedProviderId(providerId)
-                setIsChatBoxActive(true)
+                setMessages(chatData.messages || []);
+                setSelectedUserId(userId);
+                setSelectedProviderId(providerId);
+                setIsChatBoxActive(true);
 
                 if (userData?.role === "provider") {
-                    setAstroId(userId)
+                    setAstroId(userId);
                 } else {
-                    setAstroId(providerId)
+                    setAstroId(providerId);
                 }
             } catch (error) {
-                toast.error("Failed to load chat details")
+                toast.error("Failed to load chat details");
             }
         },
         [userData],
-    )
+    );
+
 
     useEffect(() => {
         if (selectedUserId && selectedProviderId) {

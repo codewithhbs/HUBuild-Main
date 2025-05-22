@@ -51,7 +51,21 @@ const ChatAndPaymentSchema = new mongoose.Schema({
             timestamp: { type: Date, default: Date.now },
         },
     ],
-},{timestamps:true})
+    deleteByUser: {
+        type: Boolean,
+        default: false
+    },
+    deletedDateByUser: {
+        type: Date
+    },
+    deleteByProvider: {
+        type: Boolean,
+        default: false
+    },
+    deletedDateByProvider: {
+        type: Date
+    }
+}, { timestamps: true })
 
 const ChatAndPayment = mongoose.model('ChatAndPayment', ChatAndPaymentSchema)
 module.exports = ChatAndPayment

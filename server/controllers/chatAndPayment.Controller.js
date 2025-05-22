@@ -83,27 +83,54 @@ exports.getAllChatRecord = async (req, res) => {
 exports.getChatById = async (req, res) => {
     try {
         const { id } = req.params;
-        // console.log("ids", id)
+        const { role } = req.query; // role should be passed as a query param
 
-        let chat = await ChatAndPayment.findOne({ room: id }).populate('userId').populate('providerId')
+        let chat = await ChatAndPayment.findOne({ room: id }).populate('userId').populate('providerId');
         if (!chat) {
-            chat = await ChatAndPayment.findById(id).populate('userId').populate('providerId')
+            chat = await ChatAndPayment.findById(id).populate('userId').populate('providerId');
         }
-        console.log(chat)
+
+        if (!chat) {
+            return res.status(404).json({
+                success: false,
+                message: "Chat not found",
+            });
+        }
+
+        // Filter messages according to the role and deletion timestamp
+        let filteredMessages = chat.messages || [];
+
+        if (role === 'user' && chat.deletedDateByUser) {
+            filteredMessages = filteredMessages.filter(
+                msg => new Date(msg.timestamp).getTime() > new Date(chat.deletedDateByUser).getTime()
+            );
+        }
+
+        if (role === 'provider' && chat.deletedDateByProvider) {
+            filteredMessages = filteredMessages.filter(
+                msg => new Date(msg.timestamp).getTime() > new Date(chat.deletedDateByProvider).getTime()
+            );
+        }
+
         res.status(200).json({
             success: true,
             message: 'Chat fetched successfully',
-            data: chat
-        })
+            data: {
+                ...chat._doc,
+                messages: filteredMessages
+            }
+        });
+
     } catch (error) {
-        console.log("Internal server error", error)
+        console.log("Internal server error", error);
         res.status(500).json({
             success: false,
             message: "Internal server error",
             error: error.message
-        })
+        });
     }
 }
+
 
 exports.getChatByProviderid = async (req, res) => {
     try {
@@ -192,7 +219,7 @@ exports.markUserChatsAsRead = async (req, res) => {
 exports.markProviderChatsAsRead = async (req, res) => {
     try {
         const { providerId } = req.params; // Get providerId from the request parameters
-        console.log("provider", providerId)
+        // console.log("provider", providerId)
 
         // Find all chats related to the provider and where newChat is true, then update them to false
         const result = await ChatAndPayment.updateMany(
@@ -224,17 +251,10 @@ exports.deleteChatRoom = async (req, res) => {
     try {
         const { chatRoomId } = req.params;
         const result = await ChatAndPayment.findByIdAndDelete(chatRoomId);
-        if (result.deletedCount > 0) {
-            return res.status(200).json({
-                message: 'Chat room deleted successfully.',
-                deletedCount: result.deletedCount,
-            });
-        } else {
-            return res.status(404).json({
-                message: 'Chat room not found.',
-                error: 'Chat room not found.',
-            });
-        }
+        return res.status(200).json({
+            message: 'Chat room deleted successfully.',
+            deletedCount: result.deletedCount,
+        });
     } catch (error) {
         console.log("Internal server error", error)
         return res.status(500).json({
@@ -294,3 +314,84 @@ exports.deleteChatByRoom = async (req, res) => {
         });
     }
 }
+
+exports.deleteMessageFromRoom = async (req, res) => {
+    try {
+        const { chatRoomId } = req.params;
+        const { role } = req.query;
+
+        const findChat = await ChatAndPayment.findOne({ room: chatRoomId });
+        if (!findChat) {
+            return res.status(404).json({
+                success: false,
+                message: 'Chat not found.',
+            });
+        }
+
+        // If role is user
+        if (role === 'user') {
+            // if (findChat.deleteByProvider) {
+            //     const deleteChat = await ChatAndPayment.deleteOne({ room: chatRoomId });
+            //     if (deleteChat.deletedCount === 0) {
+            //         return res.status(404).json({
+            //             success: false,
+            //             message: 'Chat not found or already deleted.',
+            //         });
+            //     }
+            //     return res.status(200).json({
+            //         success: true,
+            //         message: 'Chat deleted successfully.',
+            //     });
+            // } else {
+            findChat.deleteByUser = true;
+            findChat.deletedDateByUser = new Date();
+            await findChat.save();
+            return res.status(200).json({
+                success: true,
+                message: 'Message deleted successfully by user.',
+            });
+            // }
+        }
+
+        // If role is provider
+        else if (role === 'provider') {
+            // if (findChat.deleteByUser) {
+            //     const deleteChat = await ChatAndPayment.deleteOne({ room: chatRoomId });
+            //     if (deleteChat.deletedCount === 0) {
+            //         return res.status(404).json({
+            //             success: false,
+            //             message: 'Chat not found or already deleted.',
+            //         });
+            //     }
+            //     return res.status(200).json({
+            //         success: true,
+            //         message: 'Chat deleted successfully.',
+            //     });
+            // } else {
+            findChat.deleteByProvider = true;
+            findChat.deletedDateByProvider = new Date();
+            await findChat.save();
+            return res.status(200).json({
+                success: true,
+                message: 'Message deleted successfully by provider.',
+            });
+            // }
+        }
+
+        // If role is missing or invalid
+        else {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid role provided.',
+            });
+        }
+
+    } catch (error) {
+        console.error("Internal server error", error);
+        return res.status(500).json({
+            success: false,
+            message: 'An error occurred while deleting the message.',
+            error: error.message,
+        });
+    }
+};
