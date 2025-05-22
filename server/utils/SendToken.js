@@ -15,6 +15,7 @@ const sendToken = async (user, res, status, message) => {
             secure: true, // set to false in local dev
             sameSite: 'None', // use 'Lax' or 'Strict' if on same origin
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            credentials: true
         };
 
         // Send token in cookie
