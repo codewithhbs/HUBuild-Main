@@ -438,78 +438,100 @@ exports.updateUserProfileImage = async (req, res) => {
 
 exports.login = async (req, res) => {
     try {
-
         const { any, password, loginFrom } = req.body;
-        // console.log(req.body)
+        console.log("📥 Received login request with:", { any, password, loginFrom });
+
         if (!any || !password) {
+            console.log("❌ Missing email/phone or password");
             return res.status(400).json({ success: false, message: "Please provide both your email/phone number and password." });
         }
 
-        console.log("loginFrom", any)
-
-        // First, try finding the user in the User collection
+        // Step 1: Check in User collection
+        console.log("🔍 Searching in User collection...");
         let user = await User.findOne({
             $or: [{ email: any }, { PhoneNumber: any }]
         });
+        console.log("🧑 Found in User collection:", user ? user.email || user.PhoneNumber : null);
 
         let isProvider = false;
 
-        // If not found in User, try finding the provider in the Provider collection
+        // Step 2: If not found, check in Provider collection
         if (!user) {
+            console.log("❌ Not found in User. Searching in Provider collection...");
             user = await Provider.findOne({
                 $or: [{ email: any }, { mobileNumber: any }]
             });
-            isProvider = true; // Flag to indicate a provider login
-            if (user?.accountVerified == 'Pending') {
+            isProvider = true;
+            console.log("🏥 Found in Provider collection:", user ? user.email || user.mobileNumber : null);
+
+            // Step 3: Check if account is pending
+            if (user?.accountVerified === 'Pending') {
+                console.log("🚫 Provider account not verified yet.");
                 return res.status(400).json({
                     success: false,
                     message: "Your account is not verified yet. Please wait for the admin to verify your account."
-                })
+                });
             }
         }
 
+        // Step 4: Check if user or provider was found
         if (!user) {
+            console.log("❌ No account found.");
             return res.status(404).json({
                 success: false,
                 message: `No account found with that email/phone number${isProvider ? " for provider" : " for user"}.`
             });
         }
 
+        console.log("✅ Account found:", user.email || user.PhoneNumber || user.mobileNumber);
+
+        // Step 5: Role mismatch check
         if (user.role !== loginFrom) {
+            console.log("❌ Role mismatch. Expected:", loginFrom, "| Found:", user.role);
             return res.status(404).json({
                 success: false,
                 message: `No account found with that email/phone number${isProvider ? " for user" : " for provider"}.`
             });
         }
 
-        // Check if the password matches
+        // Step 6: Check password
+        console.log("🔐 Checking password...");
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
+            console.log("❌ Incorrect password");
             return res.status(400).json({ success: false, message: "The password you entered is incorrect. Please try again." });
         }
+        console.log("✅ Password matched");
 
-
+        // Step 7: Check ban status
         if (user.isBanned) {
+            console.log("🚫 Account is banned");
             return res.status(403).json({
                 success: false,
                 message: `Your ${isProvider ? "provider" : "user"} account has been banned. Please contact our support team.`
             });
         }
 
+        // Step 8: Update provider statuses
         if (user.role === "provider") {
+            console.log("🔄 Updating provider statuses: loginStatus, chatStatus, callStatus");
             user.loginStatus = true;
             user.chatStatus = true;
             user.callStatus = true;
             await user.save();
+            console.log("✅ Provider status updated and saved");
         }
 
-        // Send token and login success message
+        // Step 9: Send token and login success
+        console.log("✅ Sending token and login success response...");
         await sendToken(user, res, 200, `Login successful! Welcome back, ${isProvider ? "Provider" : "User"}!`);
+
     } catch (error) {
-        console.error("Login error:", error);
+        console.error("💥 Login error:", error);
         return res.status(500).json({ success: false, message: "An error occurred during login. Please try again later." });
     }
 };
+
 
 exports.updateUserPassword = async (req, res) => {
     try {
