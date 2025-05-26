@@ -176,8 +176,8 @@ const CallDeductionProvider = () => {
                                                     <th style={{whiteSpace:'nowrap'}}>Date & Time</th>
                                                     <th style={{whiteSpace:'nowrap'}}>Duration</th>
                                                     <th style={{whiteSpace:'nowrap'}}>Cost</th>
-                                                    <th style={{whiteSpace:'nowrap'}}>Your Response Satus</th>
                                                     <th style={{whiteSpace:'nowrap'}}>User Response Satus</th>
+                                                    <th style={{whiteSpace:'nowrap'}}>Your Response Satus</th>
                                                     {/* <th style={{whiteSpace:'nowrap'}}>Status</th> */}
                                                 </tr>
                                             </thead>
@@ -222,18 +222,18 @@ const CallDeductionProvider = () => {
                                                                 </div>
                                                             </td>
                                                             <td>
-                                                                <span className={getStatusBadgeClass(call.to_number_status || call.status)}>
-                                                                    {call.to_number_status || call.status}
+                                                                <span className={getStatusBadgeClass(call.from_number_status || call.status)}>
+                                                                    {call.from_number_status || call.status}
                                                                 </span>
-                                                                
                                                                 {call.cancel_reason && (
                                                                     <div className="small text-muted mt-1">{call.cancel_reason}</div>
                                                                 )}
                                                             </td>
                                                             <td>
-                                                                <span className={getStatusBadgeClass(call.from_number_status || call.status)}>
-                                                                    {call.from_number_status || call.status}
+                                                                <span className={getStatusBadgeClass(call.to_number_status || call.status)}>
+                                                                    {call.to_number_status || call.status}
                                                                 </span>
+                                                                
                                                                 {call.cancel_reason && (
                                                                     <div className="small text-muted mt-1">{call.cancel_reason}</div>
                                                                 )}
