@@ -108,7 +108,8 @@ exports.createCall = async (req, res) => {
             max_duration_allowed: max_duration_allowed,
         })
 
-        provider.is_on_call = true;
+        // provider.is_on_call = true;
+        
         await provider.save()
         await newCallData.save();
         return res.status(200).json({
