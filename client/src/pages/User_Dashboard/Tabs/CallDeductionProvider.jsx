@@ -178,7 +178,7 @@ const CallDeductionProvider = () => {
                                                     <th style={{whiteSpace:'nowrap'}}>Cost</th>
                                                     <th style={{whiteSpace:'nowrap'}}>Your Response Satus</th>
                                                     <th style={{whiteSpace:'nowrap'}}>User Response Satus</th>
-                                                    <th style={{whiteSpace:'nowrap'}}>Status</th>
+                                                    {/* <th style={{whiteSpace:'nowrap'}}>Status</th> */}
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -238,14 +238,14 @@ const CallDeductionProvider = () => {
                                                                     <div className="small text-muted mt-1">{call.cancel_reason}</div>
                                                                 )}
                                                             </td>
-                                                            <td>
+                                                            {/* <td>
                                                                 <span className={getStatusBadgeClass(call.status)}>
                                                                     {call.status}
                                                                 </span>
                                                                 {call.cancel_reason && (
                                                                     <div className="small text-muted mt-1">{call.cancel_reason}</div>
                                                                 )}
-                                                            </td>
+                                                            </td> */}
                                                         </tr>
                                                     ))
                                                 ) : (
