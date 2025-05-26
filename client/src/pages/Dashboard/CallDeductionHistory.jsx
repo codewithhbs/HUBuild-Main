@@ -19,6 +19,7 @@ const CallDeductionHistory = () => {
         try {
             const userId = UserData._id;
             const { data } = await axios.get(`https://api.helpubuild.in/api/v1/get-call-by-user/${userId}`)
+            console.log("data.data",data.data)
             setData(data.data.reverse());
             setLoading(false);
         } catch (error) {
@@ -186,12 +187,12 @@ const CallDeductionHistory = () => {
                                                                 <div>
                                                                     <div className="fw-bold">
                                                                         <i className="bi bi-telephone me-2"></i>
-                                                                        <span>{call.from_number} ➔ {call.to_number}</span>
+                                                                        <span>{call.userId?.name} ➔ {call.providerId?.name}</span>
                                                                     </div>
-                                                                    <div className="small text-muted">
+                                                                    {/* <div className="small text-muted">
                                                                         <i className="bi bi-person me-1"></i>
                                                                         <span>{call.providerId?.name || 'Unknown Provider'}</span>
-                                                                    </div>
+                                                                    </div> */}
                                                                     <div className="small text-muted">ID: {call.callerId}</div>
                                                                 </div>
                                                             </td>
@@ -205,8 +206,8 @@ const CallDeductionHistory = () => {
                                                                 <div>
                                                                     <i className="bi bi-clock me-2"></i>
                                                                     <span className="fw-semibold">
-                                                                        {formatDuration(call.start_time, call.end_time)}
-                                                                        {/* {call?.} */}
+                                                                        {/* {formatDuration(call.start_time, call.end_time)} */}
+                                                                        {call?.TalkTime}
                                                                     </span>
                                                                 </div>
                                                             </td>
