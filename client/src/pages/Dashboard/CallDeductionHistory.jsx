@@ -69,6 +69,8 @@ const CallDeductionHistory = () => {
         switch (status) {
             case 'Answered':
                 return 'badge bg-success';
+            case 'ANSWER':
+                return 'badge bg-success';
             case 'Missed':
                 return 'badge bg-warning';
             case 'Cancelled':
