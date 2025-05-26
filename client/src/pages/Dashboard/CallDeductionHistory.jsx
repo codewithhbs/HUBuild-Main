@@ -76,9 +76,9 @@ const CallDeductionHistory = () => {
             case 'No Answer':
                 return 'badge bg-secondary';
             case 'NOANSWER':
-                return 'badge bg-secondary';
+                return 'badge bg-danger';
             default:
-                return 'badge bg-info';
+                return 'badge bg-danger';
         }
     };
 
