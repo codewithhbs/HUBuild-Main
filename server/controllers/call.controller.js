@@ -200,6 +200,8 @@ exports.call_status = async (req, res) => {
             findHistory.status = callStatusQuery.status;
             findHistory.start_time = callStatusQuery.start_time;
             findHistory.end_time = callStatusQuery.end_time;
+            findHistory.from_number_status = callStatusQuery.from_number_status;
+            findHistory.to_number_status = callStatusQuery.to_number_status;
             findHistory.TalkTime = talkTimeFormatted;
             findedProvider.is_on_call = false;
             await Promise.all([findedProvider.save(), findHistory.save()]);
@@ -216,6 +218,9 @@ exports.call_status = async (req, res) => {
             findHistory.status = callStatusQuery.to_number_status;
             findHistory.start_time = callStatusQuery.start_time;
             findHistory.end_time = callStatusQuery.end_time;
+            findHistory.from_number_status = callStatusQuery.from_number_status;
+            findHistory.to_number_status = callStatusQuery.to_number_status;
+            findHistory.TalkTime = talkTimeFormatted;
             findedProvider.is_on_call = false;
             findHistory.cancel_reason = 'Provider did not answer the call.';
             await Promise.all([findedProvider.save(), findHistory.save()]);
@@ -253,6 +258,8 @@ exports.call_status = async (req, res) => {
         findHistory.start_time = callStatusQuery.start_time;
         findHistory.end_time = callStatusQuery.end_time;
         findHistory.cost_of_call = costToDeduct;
+        findHistory.from_number_status = callStatusQuery.from_number_status;
+        findHistory.to_number_status = callStatusQuery.to_number_status;
         findHistory.TalkTime = talkTimeFormatted;
         findHistory.money_deducetation_amount = costToDeduct;
         findHistory.recording_url = callStatusQuery.recording_url;

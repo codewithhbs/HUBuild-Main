@@ -60,7 +60,13 @@ const CallHistorySchema = new Schema({
     money_deducetation_amount: {
         type: Number,
         default: 0
-    }
+    },
+    from_number_status: {
+        type: String
+    },
+    to_number_status: {
+        type: String
+    },
 
 }, {
     timestamps: true
