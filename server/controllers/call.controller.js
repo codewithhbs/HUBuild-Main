@@ -178,19 +178,22 @@ exports.call_status = async (req, res) => {
         const startTime = parseInt(callStatusQuery.start_time);
         const endTime = parseInt(callStatusQuery.end_time);
         // let talkTimeInSeconds = endTime - startTime;
-        let talkTimeInSeconds = callStatusQuery.to_number_answer_time;
+        let talkTimeInSeconds = Number(callStatusQuery.to_number_answer_time);
 
-        if (talkTimeInSeconds < 0) {
+        if (isNaN(talkTimeInSeconds) || talkTimeInSeconds < 0) {
             talkTimeInSeconds = 0;
         }
 
-        // if (isNaN(startTime) || isNaN(endTime) || talkTimeInSeconds < 0) {
-        //     talkTimeInSeconds = 0;
-        // }
+        const minutes = Math.floor(talkTimeInSeconds / 60);
+        const seconds = talkTimeInSeconds % 60;
 
-        const talkTimeInMinutes = (talkTimeInSeconds / 60).toFixed(2);
-        console.log("talkTimeInSeconds",talkTimeInSeconds)
-        console.log("talkTimeInMinutes",talkTimeInMinutes)
+        // Pad seconds with leading zero if needed
+        const talkTimeFormatted = parseFloat(`${minutes}.${seconds.toString().padStart(2, '0')}`);
+
+        console.log("talkTimeInSeconds", talkTimeInSeconds);
+        console.log("Formatted talkTimeInMinutes", talkTimeFormatted);
+
+
 
         // Handle FAILED status
         if (callStatusQuery?.status === 'FAILED') {
@@ -336,10 +339,10 @@ exports.get_call_history_by_provider = async (req, res) => {
     }
 };
 
-exports.getAllCallHistory = async (req,res) => {
+exports.getAllCallHistory = async (req, res) => {
     try {
         const allHistory = await CallHistory.find().populate('userId').populate('providerId');
-        if(!allHistory){
+        if (!allHistory) {
             return res.status(404).json({
                 success: false,
                 message: "No call history found"
@@ -370,7 +373,7 @@ exports.delete_call_history = async (req, res) => {
         const deletedCallHistory = await CallHistory.findByIdAndDelete(id);
         return res.status(200).json({ success: true, message: "Call history deleted successfully" });
     } catch (error) {
-        console.log("Internal server error",error)
+        console.log("Internal server error", error)
         res.status(500).json({
             success: false,
             message: "Internal server error",
