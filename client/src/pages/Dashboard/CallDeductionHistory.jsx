@@ -19,7 +19,7 @@ const CallDeductionHistory = () => {
         try {
             const userId = UserData._id;
             const { data } = await axios.get(`https://api.helpubuild.in/api/v1/get-call-by-user/${userId}`)
-            console.log("data.data",data.data)
+            console.log("data.data", data.data)
             setData(data.data.reverse());
             setLoading(false);
         } catch (error) {
@@ -66,7 +66,7 @@ const CallDeductionHistory = () => {
 
     // Get status badge class based on call status
     const getStatusBadgeClass = (status) => {
-        switch(status) {
+        switch (status) {
             case 'Answered':
                 return 'badge bg-success';
             case 'Missed':
@@ -74,6 +74,8 @@ const CallDeductionHistory = () => {
             case 'Cancelled':
                 return 'badge bg-danger';
             case 'No Answer':
+                return 'badge bg-secondary';
+            case 'NOANSWER':
                 return 'badge bg-secondary';
             default:
                 return 'badge bg-info';
@@ -91,21 +93,21 @@ const CallDeductionHistory = () => {
                             <span aria-hidden="true">&laquo;</span>
                         </button>
                     </li>
-                    
+
                     {/* First page */}
                     {currentPage > 2 && (
                         <li className="page-item">
                             <button className="page-link" onClick={() => paginate(1)}>1</button>
                         </li>
                     )}
-                    
+
                     {/* Ellipsis if needed */}
                     {currentPage > 3 && (
                         <li className="page-item disabled">
                             <span className="page-link">...</span>
                         </li>
                     )}
-                    
+
                     {/* Current page and neighbors */}
                     {Array.from(
                         { length: Math.min(3, totalPages) },
@@ -121,21 +123,21 @@ const CallDeductionHistory = () => {
                             );
                         }
                     ).filter(Boolean)}
-                    
+
                     {/* Ellipsis if needed */}
                     {currentPage < totalPages - 2 && (
                         <li className="page-item disabled">
                             <span className="page-link">...</span>
                         </li>
                     )}
-                    
+
                     {/* Last page */}
                     {currentPage < totalPages - 1 && totalPages > 1 && (
                         <li className="page-item">
                             <button className="page-link" onClick={() => paginate(totalPages)}>{totalPages}</button>
                         </li>
                     )}
-                    
+
                     {/* Next button */}
                     <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
                         <button className="page-link" onClick={nextPage} aria-label="Next">
@@ -172,11 +174,14 @@ const CallDeductionHistory = () => {
                                         <table className="table table-striped table-hover mb-0">
                                             <thead className="table-light">
                                                 <tr>
-                                                    <th>Call Details</th>
-                                                    <th>Date & Time</th>
-                                                    <th>Duration</th>
-                                                    <th>Cost</th>
-                                                    <th>Status</th>
+                                                    <th style={{whiteSpace:'nowrap'}}>Call Details</th>
+                                                    <th style={{whiteSpace:'nowrap'}}>Date & Time</th>
+                                                    <th style={{whiteSpace:'nowrap'}}>Duration</th>
+                                                    <th style={{whiteSpace:'nowrap'}}>Cost</th>
+                                                    <th style={{whiteSpace:'nowrap'}}>Your Response Satus</th>
+                                                    <th style={{whiteSpace:'nowrap'}}>Consultant Response Satus</th>
+                                                    {/* <th>Cost</th> */}
+                                                    <th style={{whiteSpace:'nowrap'}}>Status</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -213,11 +218,27 @@ const CallDeductionHistory = () => {
                                                             </td>
                                                             <td>
                                                                 <div>
-                                                                   ₹
+                                                                    ₹
                                                                     <span className="fw-semibold">
                                                                         {call.cost_of_call || call.money_deducetation_amount || 0}
                                                                     </span>
                                                                 </div>
+                                                            </td>
+                                                            <td>
+                                                                <span className={getStatusBadgeClass(call.from_number_status || call.status)}>
+                                                                    {call.from_number_status || call.status}
+                                                                </span>
+                                                                {call.cancel_reason && (
+                                                                    <div className="small text-muted mt-1">{call.cancel_reason}</div>
+                                                                )}
+                                                            </td>
+                                                            <td>
+                                                                <span className={getStatusBadgeClass(call.to_number_status || call.status)}>
+                                                                    {call.to_number_status || call.status}
+                                                                </span>
+                                                                {call.cancel_reason && (
+                                                                    <div className="small text-muted mt-1">{call.cancel_reason}</div>
+                                                                )}
                                                             </td>
                                                             <td>
                                                                 <span className={getStatusBadgeClass(call.status)}>

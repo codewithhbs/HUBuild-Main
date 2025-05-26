@@ -172,11 +172,13 @@ const CallDeductionProvider = () => {
                                         <table className="table table-striped table-hover mb-0">
                                             <thead className="table-light">
                                                 <tr>
-                                                    <th>Call Details</th>
-                                                    <th>Date & Time</th>
-                                                    <th>Duration</th>
-                                                    <th>Cost</th>
-                                                    <th>Status</th>
+                                                    <th style={{whiteSpace:'nowrap'}}>Call Details</th>
+                                                    <th style={{whiteSpace:'nowrap'}}>Date & Time</th>
+                                                    <th style={{whiteSpace:'nowrap'}}>Duration</th>
+                                                    <th style={{whiteSpace:'nowrap'}}>Cost</th>
+                                                    <th style={{whiteSpace:'nowrap'}}>Your Response Satus</th>
+                                                    <th style={{whiteSpace:'nowrap'}}>User Response Satus</th>
+                                                    <th style={{whiteSpace:'nowrap'}}>Status</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -218,6 +220,23 @@ const CallDeductionProvider = () => {
                                                                         {call.cost_of_call || call.money_deducetation_amount || 0}
                                                                     </span>
                                                                 </div>
+                                                            </td>
+                                                            <td>
+                                                                <span className={getStatusBadgeClass(call.to_number_status || call.status)}>
+                                                                    {call.to_number_status || call.status}
+                                                                </span>
+                                                                
+                                                                {call.cancel_reason && (
+                                                                    <div className="small text-muted mt-1">{call.cancel_reason}</div>
+                                                                )}
+                                                            </td>
+                                                            <td>
+                                                                <span className={getStatusBadgeClass(call.from_number_status || call.status)}>
+                                                                    {call.from_number_status || call.status}
+                                                                </span>
+                                                                {call.cancel_reason && (
+                                                                    <div className="small text-muted mt-1">{call.cancel_reason}</div>
+                                                                )}
                                                             </td>
                                                             <td>
                                                                 <span className={getStatusBadgeClass(call.status)}>
