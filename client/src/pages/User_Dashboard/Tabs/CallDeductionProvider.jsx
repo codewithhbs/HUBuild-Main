@@ -74,8 +74,10 @@ const CallDeductionProvider = () => {
                 return 'badge bg-danger';
             case 'No Answer':
                 return 'badge bg-secondary';
+            case 'NOANSWER':
+                return 'badge bg-secondary';
             default:
-                return 'badge bg-danger';
+                return 'badge bg-info';
         }
     };
 
