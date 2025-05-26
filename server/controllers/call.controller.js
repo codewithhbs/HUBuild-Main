@@ -200,7 +200,7 @@ exports.call_status = async (req, res) => {
             findHistory.status = callStatusQuery.status;
             findHistory.start_time = callStatusQuery.start_time;
             findHistory.end_time = callStatusQuery.end_time;
-            findHistory.TalkTime = talkTimeInMinutes;
+            findHistory.TalkTime = talkTimeFormatted;
             findedProvider.is_on_call = false;
             await Promise.all([findedProvider.save(), findHistory.save()]);
             return res.status(200).json({
@@ -253,7 +253,7 @@ exports.call_status = async (req, res) => {
         findHistory.start_time = callStatusQuery.start_time;
         findHistory.end_time = callStatusQuery.end_time;
         findHistory.cost_of_call = costToDeduct;
-        findHistory.TalkTime = talkTimeInMinutes;
+        findHistory.TalkTime = talkTimeFormatted;
         findHistory.money_deducetation_amount = costToDeduct;
         findHistory.recording_url = callStatusQuery.recording_url;
         await findHistory.save();
@@ -263,7 +263,7 @@ exports.call_status = async (req, res) => {
             message: "Call status received successfully.",
             talkTime: {
                 seconds: talkTimeInSeconds,
-                minutes: talkTimeInMinutes
+                minutes: talkTimeFormatted
             },
             cost: costToDeduct,
             callData: callStatusQuery,
