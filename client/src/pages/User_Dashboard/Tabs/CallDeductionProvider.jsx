@@ -187,12 +187,12 @@ const CallDeductionProvider = () => {
                                                                 <div>
                                                                     <div className="fw-bold">
                                                                         <i className="bi bi-telephone me-2"></i>
-                                                                        <span>{call.from_number} ➔ {call.to_number}</span>
+                                                                        <span>{call.userId?.name} ➔ {call.providerId?.name}</span>
                                                                     </div>
-                                                                    <div className="small text-muted">
+                                                                    {/* <div className="small text-muted">
                                                                         <i className="bi bi-person me-1"></i>
                                                                         <span>{call.userId?.name || 'Unknown User'}</span>
-                                                                    </div>
+                                                                    </div> */}
                                                                     <div className="small text-muted">ID: {call.callerId}</div>
                                                                 </div>
                                                             </td>
@@ -206,8 +206,8 @@ const CallDeductionProvider = () => {
                                                                 <div>
                                                                     <i className="bi bi-clock me-2"></i>
                                                                     <span className="fw-semibold">
-                                                                        {formatDuration(call.start_time, call.end_time)}
-                                                                        {/* {call?.} */}
+                                                                        {/* {formatDuration(call.start_time, call.end_time)} */}
+                                                                        {call?.TalkTime}
                                                                     </span>
                                                                 </div>
                                                             </td>
