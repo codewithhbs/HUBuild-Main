@@ -109,7 +109,7 @@ exports.createCall = async (req, res) => {
         })
 
         // provider.is_on_call = true;
-        
+
         await provider.save()
         await newCallData.save();
         return res.status(200).json({
@@ -189,6 +189,8 @@ exports.call_status = async (req, res) => {
         // }
 
         const talkTimeInMinutes = (talkTimeInSeconds / 60).toFixed(2);
+        console.log("talkTimeInSeconds",talkTimeInSeconds)
+        console.log("talkTimeInMinutes",talkTimeInMinutes)
 
         // Handle FAILED status
         if (callStatusQuery?.status === 'FAILED') {
