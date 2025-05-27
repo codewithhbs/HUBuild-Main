@@ -2,3 +2,14 @@
     color: white !important;
     background-color: #DB3C4B !important;
 }
+
+.formarginbottommore{
+    margin-bottom: 0px;
+}
+
+@media (max-width:750px){
+    .formarginbottommore{
+        margin-bottom: 3px !important;
+    }
+    
+}

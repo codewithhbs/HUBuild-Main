@@ -176,12 +176,12 @@ const CallDeductionProvider = () => {
                                         <table className="table table-striped table-hover mb-0">
                                             <thead className="table-light">
                                                 <tr>
-                                                    <th style={{whiteSpace:'nowrap'}}>Call Details</th>
-                                                    <th style={{whiteSpace:'nowrap'}}>Date & Time</th>
-                                                    <th style={{whiteSpace:'nowrap'}}>Duration</th>
-                                                    <th style={{whiteSpace:'nowrap'}}>Cost</th>
-                                                    <th style={{whiteSpace:'nowrap'}}>User Response Satus</th>
-                                                    <th style={{whiteSpace:'nowrap'}}>Your Response Satus</th>
+                                                    <th style={{ whiteSpace: 'nowrap' }}>Call Details</th>
+                                                    <th style={{ whiteSpace: 'nowrap' }}>Date & Time</th>
+                                                    <th style={{ whiteSpace: 'nowrap' }}>Duration</th>
+                                                    <th style={{ whiteSpace: 'nowrap' }}>Cost</th>
+                                                    <th style={{ whiteSpace: 'nowrap' }}>User Response Satus</th>
+                                                    <th style={{ whiteSpace: 'nowrap' }}>Your Response Satus</th>
                                                     {/* <th style={{whiteSpace:'nowrap'}}>Status</th> */}
                                                 </tr>
                                             </thead>
@@ -212,11 +212,29 @@ const CallDeductionProvider = () => {
                                                                 <div>
                                                                     <i className="bi bi-clock me-2"></i>
                                                                     <span className="fw-semibold">
-                                                                        {/* {formatDuration(call.start_time, call.end_time)} */}
-                                                                        {call?.TalkTime}
+                                                                        {call?.TalkTime !== undefined && (() => {
+                                                                            const strTime = call.TalkTime.toString();
+                                                                            const parts = strTime.split('.').map(part => parseInt(part, 10) || 0);
+
+                                                                            let [hr, min, sec] = [0, 0, 0];
+                                                                            if (parts.length === 3) {
+                                                                                [hr, min, sec] = parts;
+                                                                            } else if (parts.length === 2) {
+                                                                                [min, sec] = parts;
+                                                                            } else if (parts.length === 1) {
+                                                                                sec = parts[0];
+                                                                            }
+
+                                                                            const hrStr = hr ? `${hr} hr ` : '';
+                                                                            const minStr = min ? `${min} min ` : '';
+                                                                            const secStr = `${sec} sec`;
+
+                                                                            return `${hrStr}${minStr}${secStr}`;
+                                                                        })()}
                                                                     </span>
                                                                 </div>
                                                             </td>
+
                                                             <td>
                                                                 <div>
                                                                     ₹
@@ -237,7 +255,7 @@ const CallDeductionProvider = () => {
                                                                 <span className={getStatusBadgeClass(call.to_number_status || call.status)}>
                                                                     {call.to_number_status || call.status}
                                                                 </span>
-                                                                
+
                                                                 {call.cancel_reason && (
                                                                     <div className="small text-muted mt-1">{call.cancel_reason}</div>
                                                                 )}
