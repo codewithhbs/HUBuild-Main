@@ -37,9 +37,14 @@ function ChatDeductionHistory() {
         const startTime = new Date(startChatTime);
         const endTime = new Date(endChatTime);
         const durationInMilliseconds = endTime - startTime;
-        const durationInMinutes = durationInMilliseconds / (1000 * 60); // Convert to minutes
-        return durationInMinutes.toFixed(2); // Return the duration rounded to two decimal places
+
+        const totalSeconds = Math.floor(durationInMilliseconds / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+
+        return `${minutes} min ${seconds} sec`;
     };
+
 
     // Pagination logic
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -94,6 +99,7 @@ function ChatDeductionHistory() {
                                                 ? calculateDuration(chat.startChatTime, chat.endingChatTime)
                                                 : 'N/A'}
                                         </td>
+
                                     </tr>
                                 ))}
                             </tbody>
