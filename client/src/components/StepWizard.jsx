@@ -116,8 +116,18 @@ const StepWizard = () => {
             const res = await axios.post(`https://api.helpubuild.in/api/v1/buy_membership/${providerId}`, {
                 couponCode: memberData.couponCode,
             });
-            const order = res.data.data.razorpayOrder;
+            const message = res.data?.message;
+            if (message === 'Membership successfully applied') {
+                const { token, user, message } = res.data
+                setData('token', token)
+                setData('islogin', token ? true : false)
+                setData('user', user)
+                // toast.success("Membership purchase successful!");
+                // navigate("/"); // or wherever you want
+                return window.location.href = '/profile'
+            }
             const amount = res.data.data.discountAmount;
+            const order = res.data.data.razorpayOrder;
             const providerData = res.data.data.provider;
             if (order) {
                 const options = {
@@ -393,7 +403,7 @@ const StepWizard = () => {
                             </div>
                         </div>
 
-                      
+
 
 
                     </div>

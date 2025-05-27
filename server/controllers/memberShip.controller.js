@@ -244,6 +244,25 @@ exports.buyMemberShip = async (req, res) => {
             console.log("No coupon provided. Full price used.");
         }
 
+        console.log("Final Amount:", finalAmount);
+
+        if (finalAmount === 0) {
+            provider.memberShip = memberShip._id;
+            provider.isMember = true;
+            provider.PaymentStatus = 'success';
+            await provider.save();
+            return await sendToken(provider, res, 201, 'Membership successfully applied');
+            // return res.status(200).json({
+            //     success: true,
+            //     message: "Membership successfully applied",
+            //     data: {
+            //         provider,
+            //         discountAmount,
+            //         finalAmount
+            //     }
+            // })
+        }
+
         // Razorpay Order Options
         const razorpayOptions = {
             amount: finalAmount * 100, // Convert to paise
@@ -318,7 +337,7 @@ exports.membershipPaymentVerify = async (req, res) => {
         });
 
         const { method, status, amount } = paymentDetails.data;
-        console.log("method, status, amount",method, status, amount)
+        console.log("method, status, amount", method, status, amount)
         const currentTime = new Date().toISOString();
 
         const findProvider = await Provider.findOne({ razorpayOrderId: razorpay_order_id });

@@ -332,7 +332,7 @@ function Dashboard() {
                     <p
                       onClick={() => setActiveTab('settings')}
                       style={{ fontWeight: '700' }}
-                      className="mb-0 text-uppercase marginrightmore"
+                      className="formarginbottommore text-uppercase marginrightmore"
                     >
                       <i className="fas fa-cog me-2" />{' '}
                       <span
@@ -349,7 +349,7 @@ function Dashboard() {
 
                     <button
                       type="button"
-                      className="btn logout_btn mx-2 btn-sm btn-floating"
+                      className="formarginbottommore btn logout_btn mx-2 btn-sm btn-floating"
                       title="Delete Account"
                       onClick={() => handleDeleteAccount(userId)}
                     >
