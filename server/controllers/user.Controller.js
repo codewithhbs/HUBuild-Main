@@ -1333,12 +1333,23 @@ exports.chatEnd = async (userId, astrologerId, actualStartTime = null) => {
         const seconds = durationSeconds % 60;
 
         // Apply 10 seconds grace logic
-        let billableMinutes;
-        if (seconds <= 10) {
-            billableMinutes = minutes;
+        let billableMinutes = 0;
+
+        if (durationSeconds <= 60) {
+            // Always charge full 1 minute if chat is 60 seconds or less
+            billableMinutes = 1;
         } else {
-            billableMinutes = minutes + 1;
+            const minutes = Math.floor(durationSeconds / 60);
+            const seconds = durationSeconds % 60;
+
+            billableMinutes = minutes;
+
+            // After 1 minute, apply 10 sec grace
+            if (seconds > 10) {
+                billableMinutes += 1;
+            }
         }
+
 
         // Final amount to deduct
         const walletUsedInPaise = Math.min(billableMinutes * providerPricePerMinInPaise, user.walletAmount * 100);
