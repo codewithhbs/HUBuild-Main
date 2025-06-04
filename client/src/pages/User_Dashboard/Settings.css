@@ -16,7 +16,7 @@
 
 .nav-pills .nav-link.active {
     background-color: #0066cc;
-    color: #fff;
+    color: #fff !important;
 }
 
 /* Tab Content Styling */

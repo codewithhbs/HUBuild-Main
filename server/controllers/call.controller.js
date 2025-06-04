@@ -234,24 +234,39 @@ exports.call_status = async (req, res) => {
 
         // Calculate cost with 10-second grace logic
         let costToDeduct = 0;
-        if (talkTimeInSeconds > 0) {
-            const baseMinutes = Math.floor(talkTimeInSeconds / 60);
-            const remainingSeconds = talkTimeInSeconds % 60;
-            const providerRate = findHistory.providerId?.pricePerMin || 0;
 
-            let billableMinutes = baseMinutes;
-            if (remainingSeconds > 10) {
-                billableMinutes += 1;
+        if (talkTimeInSeconds > 0) {
+            const providerRate = findHistory.providerId?.pricePerMin || 0;
+            let billableMinutes = 0;
+
+            if (talkTimeInSeconds <= 60) {
+                // Always charge full 1 minute (no grace)
+                billableMinutes = 1;
+            } else {
+                const baseMinutes = Math.floor(talkTimeInSeconds / 60);
+                const remainingSeconds = talkTimeInSeconds % 60;
+
+                billableMinutes = baseMinutes;
+
+                // After first 60 seconds, provide 10 seconds grace
+                if (remainingSeconds > 10) {
+                    billableMinutes += 1;
+                }
             }
 
             costToDeduct = billableMinutes * providerRate;
 
+            // Update wallets
             findedProvider.walletAmount += costToDeduct;
             findUser.walletAmount -= costToDeduct;
             findedProvider.is_on_call = false;
 
-            await Promise.all([findedProvider.save(), findUser.save()]);
+            await Promise.all([
+                findedProvider.save(),
+                findUser.save()
+            ]);
         }
+
 
         // Update call history
         findHistory.status = callStatusQuery.status;
