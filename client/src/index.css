@@ -313,9 +313,14 @@ a {
     text-align: center;
   }
 
-  .architectur-bar:nth-child(2) {
+  /* .architectur-bar:nth-child(2) {
+    display: none;
+  } */
+
+  .text-remove{
     display: none;
   }
+
 }
 
 @media (max-width: 822px) {
