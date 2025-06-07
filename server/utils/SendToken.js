@@ -9,10 +9,11 @@ const sendToken = async (user, res, status, message) => {
 
         const options = {
             httpOnly: true,
-            secure: true, // set to false in local dev
-            sameSite: 'None', // use 'Lax' or 'Strict' if on same origin
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            secure: true,
+            sameSite: 'None',
+            maxAge: 7 * 24 * 60 * 60 * 1000
         };
+
 
         // Send token in cookie
         res.status(status).cookie('token', token, options).json({
