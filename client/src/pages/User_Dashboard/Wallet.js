@@ -1,12 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Wallet.css'; // Create a new CSS file for custom styling
 
 function Wallet({ data }) {
-    const [filteredData, setFilteredData] = useState(data?.chatTransition.reverse() || []);
+    const [filteredData, setFilteredData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOrder, setSortOrder] = useState('asc');
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5; // Number of items to display per page
+    const itemsPerPage = 5;
+
+    // Initialize data when component mounts or data changes
+    useEffect(() => {
+        if (data?.chatTransition) {
+            const reversedData = [...data.chatTransition].reverse();
+            setFilteredData(reversedData);
+        }
+    }, [data]);
 
     const calculateDuration = (start, end) => {
         const startDate = new Date(start);
@@ -18,44 +26,58 @@ function Wallet({ data }) {
 
         const durationInSeconds = (endDate - startDate) / 1000;
         const minutes = Math.floor(durationInSeconds / 60);
-        const seconds = durationInSeconds % 60;
+        const seconds = Math.floor(durationInSeconds % 60);
 
-        return `${minutes} min ${seconds.toFixed(0)} sec`;
+        return `${minutes} min ${seconds} sec`;
     };
 
     const handleSearch = (event) => {
         const query = event.target.value.toLowerCase();
         setSearchTerm(query);
-        setFilteredData(
-            data?.chatTransition.filter(transition =>
-                transition.user?.name.toLowerCase().includes(query)
-            )
-        );
+        setCurrentPage(1); // Reset to first page when searching
+        
+        if (data?.chatTransition) {
+            const filtered = data.chatTransition.filter(transition =>
+                transition.user?.name?.toLowerCase().includes(query)
+            );
+            setFilteredData(filtered);
+        }
     };
 
     const handleSort = () => {
+        const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+        setSortOrder(newSortOrder);
+        setCurrentPage(1); // Reset to first page when sorting
+        
         const sortedData = [...filteredData].sort((a, b) => {
             const dateA = new Date(a.Date);
             const dateB = new Date(b.Date);
-            return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+            
+            if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) {
+                return 0;
+            }
+            
+            return newSortOrder === 'asc' ? dateA - dateB : dateB - dateA;
         });
+        
         setFilteredData(sortedData);
-        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     };
 
     const handlePageChange = (pageNumber) => {
-        if (pageNumber >= 1 && pageNumber <= Math.ceil(filteredData.length / itemsPerPage)) {
+        const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+        if (pageNumber >= 1 && pageNumber <= totalPages) {
             setCurrentPage(pageNumber);
         }
     };
 
+    // Calculate pagination values
     const totalItems = filteredData.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
 
-    // Pagination: Show 5 page numbers at a time
+    // Pagination: Show 4 page numbers at a time (as in your original code)
     const pageNumbersToShow = 4;
     const startPage = Math.max(1, currentPage - Math.floor(pageNumbersToShow / 2));
     const endPage = Math.min(totalPages, startPage + pageNumbersToShow - 1);
@@ -63,7 +85,7 @@ function Wallet({ data }) {
 
     return (
         <div className="container wallet-list mt-4">
-            <div style={{display:'flex'}} className=" gap-2 justify-content-between mb-3">
+            <div style={{display:'flex'}} className="gap-2 justify-content-between mb-3">
                 <input
                     type="text"
                     className="form-control wallet-search"
@@ -92,49 +114,56 @@ function Wallet({ data }) {
                                 currentItems.map((transition, index) => (
                                     <tr key={index}>
                                         <td>
-                                            <span className="ml-2">{transition.user?.name}</span>
+                                            <span className="ml-2">{transition.user?.name || 'N/A'}</span>
                                         </td>
                                         <td>{transition.deductionAmount ? transition.deductionAmount.toFixed(2) : '0.00'}</td>
-                                        <td>{new Date(transition.Date).toLocaleString()}</td>
+                                        <td>{transition.Date ? new Date(transition.Date).toLocaleString() : 'N/A'}</td>
                                         <td>{calculateDuration(transition.startChatTime, transition.endingChatTime)}</td>
                                     </tr>
                                 ))
                             ) : (
-                                <div>
-                                    <p className=' mb-0'>There in no previous chat history.</p>
-                                </div>
+                                <tr>
+                                    <td colSpan="4">
+                                        <div>
+                                            <p className='mb-0'>
+                                                {searchTerm ? 'No results found for your search.' : 'There is no previous chat history.'}
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
                             )}
                         </tbody>
                     </table>
                 </div>
 
-
                 {/* Pagination */}
-                <div className="pagination">
-                    <button
-                        className="page-btn"
-                        disabled={currentPage === 1}
-                        onClick={() => handlePageChange(currentPage - 1)}
-                    >
-                        Previous
-                    </button>
-                    {visiblePages.map(page => (
+                {totalPages > 1 && (
+                    <div className="pagination">
                         <button
-                            key={page}
-                            className={`page-btn ${currentPage === page ? 'active' : ''}`}
-                            onClick={() => handlePageChange(page)}
+                            className="page-btn"
+                            disabled={currentPage === 1}
+                            onClick={() => handlePageChange(currentPage - 1)}
                         >
-                            {page}
+                            Previous
                         </button>
-                    ))}
-                    <button
-                        className="page-btn"
-                        disabled={currentPage === totalPages}
-                        onClick={() => handlePageChange(currentPage + 1)}
-                    >
-                        Next
-                    </button>
-                </div>
+                        {visiblePages.map(page => (
+                            <button
+                                key={page}
+                                className={`page-btn ${currentPage === page ? 'active' : ''}`}
+                                onClick={() => handlePageChange(page)}
+                            >
+                                {page}
+                            </button>
+                        ))}
+                        <button
+                            className="page-btn"
+                            disabled={currentPage === totalPages}
+                            onClick={() => handlePageChange(currentPage + 1)}
+                        >
+                            Next
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

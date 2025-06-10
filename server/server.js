@@ -45,18 +45,14 @@ app.use('/public', express.static('public'));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-const allowedOrigins = ['https://helpubuild.in', 'https://www.helpubuild.in', 'http://localhost:3000'];
-
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
+        // Allow all origins, but echo them back explicitly
+        callback(null, origin || true);
     },
     credentials: true
 }));
+
 
 // Create HTTP server and Socket.IO instance
 const server = createServer(app);
