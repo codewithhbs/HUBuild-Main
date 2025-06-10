@@ -1248,6 +1248,7 @@ exports.chatStartFromProvider = async (userId, astrologerId) => {
 exports.chatEnd = async (userId, astrologerId, actualStartTime = null) => {
     try {
         console.log("i am hit for deduction in chat")
+        console.log("actualStartTime",actualStartTime)
         // First, find the user by userId
         const findUser = await User.findById(userId);
         if (!findUser) {
