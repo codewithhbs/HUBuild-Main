@@ -12,6 +12,7 @@ function Register() {
         agree: false,
     })
     const [isPasswordShow, setIsPasswordShow] = useState(false)
+    const [isConfirmPasswordShow, setIsConfirmPasswordShow] = useState(false)
     const location = new URLSearchParams(window.location.search)
     const redirectPath = location.get('redirect') || {}
     const [loading, setloading] = useState(false)
@@ -175,7 +176,7 @@ function Register() {
                                                         <span type='button' onClick={() => setIsPasswordShow(!isPasswordShow)}><i class="far fa-eye user-registration-eye"></i></span>
                                                     </div>
 
-                                                    <div className='col-lg-6'>
+                                                    <div className='col-lg-6 position-relative'>
                                                         <div style={{display:'flex'}} className="flex-row mb-4">
                                                             <i className="fas fa-key fa-lg me-3 fa-fw lable-icon" />
                                                             <div data-mdb-input-init=""
@@ -188,11 +189,12 @@ function Register() {
                                                                     id="form3Example4cd"
                                                                     name='cPassword'
                                                                     value={formData.cPassword}
-                                                                    type={isPasswordShow ? 'text' : 'password'}
+                                                                    type={isConfirmPasswordShow ? 'text' : 'password'}
                                                                     className="form-control input-shape px-5"
                                                                 />
                                                             </div>
                                                         </div>
+                                                        <span type='button' onClick={() => setIsConfirmPasswordShow(!isConfirmPasswordShow)}><i class="far fa-eye user-registration-eye"></i></span>
                                                     </div>
 
                                                 </div>

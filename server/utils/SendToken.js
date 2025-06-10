@@ -10,7 +10,10 @@ const sendToken = async (user, res, status, message) => {
         const options = {
             httpOnly: true,
             secure: true,
+            // production 
             sameSite: 'None',
+            // local 
+            // sameSite: 'Lax',
             maxAge: 7 * 24 * 60 * 60 * 1000
         };
 

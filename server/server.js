@@ -45,7 +45,7 @@ app.use('/public', express.static('public'));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-const allowedOrigins = ['https://helpubuild.in', 'https://www.helpubuild.in', 'http://localhost:3000'];
+const allowedOrigins = ['https://helpubuild.in', 'https://www.helpubuild.in', 'http://localhost:3000', 'http://localhost:3001'];
 
 app.use(cors({
     origin: (origin, callback) => {
@@ -54,7 +54,7 @@ app.use(cors({
         } else {
             callback(new Error('Not allowed by CORS'));
         }
-    },
+    },  
     credentials: true
 }));
 
