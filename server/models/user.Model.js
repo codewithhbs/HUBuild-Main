@@ -114,7 +114,8 @@ const userSchema = new mongoose.Schema({
     loginStatus: {
         type: Boolean,
         default: true
-    }
+    },
+    chatRoomIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ChatAndPayment' }]
 }, { timestamps: true });
 
 
