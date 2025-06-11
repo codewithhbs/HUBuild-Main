@@ -1128,7 +1128,7 @@ You have received a new message! The ${user?.name} is waiting for your reply.
 Keep the chat going! 🚀`;
         await SendWhatsapp(number, message)
         await user.save();
-        await provider.save();
+        // await provider.save();
 
         return {
             success: true,

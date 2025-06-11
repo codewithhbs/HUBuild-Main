@@ -11,6 +11,7 @@ const ChatAndPaymentSchema = new mongoose.Schema({
         ref: 'Provider',
         required: true
     },
+    providerIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Provider' }],
     room: { type: String, required: true, index: true },
     amount: {
         type: Number

@@ -395,3 +395,118 @@ exports.deleteMessageFromRoom = async (req, res) => {
         });
     }
 };
+
+
+// create manual chat room with multiple vendor and user
+
+exports.createManualChatRoom = async (req, res) => {
+    try {
+        const { userId, providerIds } = req.body;
+
+        // 1. Create chat room
+        const newChatRoom = new ChatAndPayment({
+            userId,
+            providerIds
+        });
+        const savedChatRoom = await newChatRoom.save();
+
+        // 2. Add chatRoom ID to user
+        await User.findByIdAndUpdate(userId, {
+            $addToSet: { chatRoomIds: savedChatRoom._id }
+        });
+
+        // 3. Add chatRoom ID to each provider
+        await Provider.updateMany(
+            { _id: { $in: providerIds } },
+            { $addToSet: { chatRoomIds: savedChatRoom._id } }
+        );
+
+        return res.status(200).json({
+            message: 'Chat room created successfully.',
+            data: savedChatRoom
+        });
+    } catch (error) {
+        console.error("Error creating chat room:", error);
+        return res.status(500).json({
+            message: 'An error occurred while creating the chat room.',
+            error: error.message
+        });
+    }
+};
+
+exports.addProvidersToChat = async (req, res) => {
+    try {
+        const { chatRoomId, providerIds } = req.body;
+
+        // Validate input
+        if (!chatRoomId) {
+            return res.status(400).json({
+                message: 'Chat room ID is required.'
+            });
+        }
+
+        if (!providerIds || (Array.isArray(providerIds) && providerIds.length === 0)) {
+            return res.status(400).json({
+                message: 'At least one provider ID is required.'
+            });
+        }
+
+        // Ensure providerIds is an array (handle single provider case)
+        const providerIdsArray = Array.isArray(providerIds) ? providerIds : [providerIds];
+
+        // 1. Check if chat room exists
+        const chatRoom = await ChatAndPayment.findById(chatRoomId);
+        if (!chatRoom) {
+            return res.status(404).json({
+                message: 'Chat room not found.'
+            });
+        }
+
+        // 2. Check if providers exist
+        const existingProviders = await Provider.find({ _id: { $in: providerIdsArray } });
+        if (existingProviders.length !== providerIdsArray.length) {
+            return res.status(404).json({
+                message: 'One or more providers not found.'
+            });
+        }
+
+        // 3. Filter out providers that are already in the chat room
+        const newProviderIds = providerIdsArray.filter(
+            providerId => !chatRoom.providerIds.includes(providerId)
+        );
+
+        if (newProviderIds.length === 0) {
+            return res.status(400).json({
+                message: 'All specified providers are already in the chat room.'
+            });
+        }
+
+        // 4. Update chat room with new providers
+        const updatedChatRoom = await ChatAndPayment.findByIdAndUpdate(
+            chatRoomId,
+            { $addToSet: { providerIds: { $each: newProviderIds } } },
+            { new: true }
+        );
+
+        // 5. Add chatRoom ID to each new provider
+        await Provider.updateMany(
+            { _id: { $in: newProviderIds } },
+            { $addToSet: { chatRoomIds: chatRoomId } }
+        );
+
+        return res.status(200).json({
+            message: `Successfully added ${newProviderIds.length} provider(s) to the chat room.`,
+            data: {
+                chatRoom: updatedChatRoom,
+                addedProviders: newProviderIds
+            }
+        });
+
+    } catch (error) {
+        console.error("Error adding providers to chat room:", error);
+        return res.status(500).json({
+            message: 'An error occurred while adding providers to the chat room.',
+            error: error.message
+        });
+    }
+};
