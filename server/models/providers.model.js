@@ -256,7 +256,7 @@ const ProviderProfileSchema = new mongoose.Schema({
     paymentMethod: {
         type: String
     },
-    updateOtp:{
+    updateOtp: {
         type: String
     },
     updateOtpExpiresAt: {
@@ -275,7 +275,8 @@ const ProviderProfileSchema = new mongoose.Schema({
     isDeactived: {
         type: Boolean,
         default: false
-    }
+    },
+    chatRoomIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ChatAndPayment' }]
 });
 
 // Password hashing
