@@ -14,7 +14,7 @@ const AllMembership = () => {
     const fetchMemberships = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('http://localhost:5000/api/v1/get_all_membership');
+            const { data } = await axios.get('https://api.helpubuild.in/api/v1/get_all_membership');
             setMemberships(data.data.reverse() || []);
         } catch (error) {
             console.error('Error fetching memberships:', error);
@@ -27,7 +27,7 @@ const AllMembership = () => {
     const deleteMembership = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`http://localhost:5000/api/v1/delete_membership/${id}`);
+            await axios.delete(`https://api.helpubuild.in/api/v1/delete_membership/${id}`);
             fetchMemberships();
             toast.success('Membership deleted successfully!');
         } catch (error) {

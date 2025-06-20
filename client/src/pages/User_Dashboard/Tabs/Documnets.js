@@ -23,7 +23,7 @@ export const Documents = () => {
     const fetchProvider = async () => {
       try {
         const { data } = await axios.get(
-          `http://localhost:5000/api/v1/get-single-provider/${UserId}`
+          `https://api.helpubuild.in/api/v1/get-single-provider/${UserId}`
         );
         const providerData = data.data;
         setUploadedImages({
@@ -64,7 +64,7 @@ export const Documents = () => {
     setLoading(true);
     try {
       const res = await axios.put(
-        `http://localhost:5000/api/v1/update-provider-documents/${UserId}`,
+        `https://api.helpubuild.in/api/v1/update-provider-documents/${UserId}`,
         formData,
         {
           headers: {

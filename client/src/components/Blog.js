@@ -17,7 +17,7 @@ const Blog = () => {
 
   const fetchBlogs = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5000/api/v1/get-all-blog')
+      const { data } = await axios.get('https://api.helpubuild.in/api/v1/get-all-blog')
       const blogs = data.data
       const reversedBlogs = blogs.reverse();
       setData(reversedBlogs)
