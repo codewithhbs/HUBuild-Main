@@ -159,7 +159,7 @@ exports.getChatByProviderid = async (req, res) => {
 
 exports.getChatByUserid = async (req, res) => {
     try {
-        const { userId } = req.params; 
+        const { userId } = req.params;
         const chat = await ChatAndPayment.find({ userId: userId }).populate('userId').populate('providerId')
         if (!chat) {
             return res.status(404).json({
@@ -511,7 +511,7 @@ exports.addOrUpdateProvidersInChat = async (req, res) => {
 exports.getCustomChatById = async (req, res) => {
     try {
         const { userId } = req.params;
-        console.log("userId",userId)
+        console.log("userId", userId)
         const chat = await ChatAndPayment.findById(userId).populate('userId').populate('providerIds');
         if (!chat) {
             return res.status(404).json({
@@ -595,6 +595,53 @@ exports.getManualChatByProviderId = async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Internal Server Error",
+            error: error.message,
+        });
+    }
+};
+
+exports.updateGroupChatISEnded = async (req, res) => {
+    try {
+        const chatRoomId = req.params.id;
+        const { isGroupChatEnded } = req.body;
+
+        if (!chatRoomId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Chat room ID is required',
+            });
+        }
+
+        if (typeof isGroupChatEnded !== 'boolean') {
+            return res.status(400).json({
+                success: false,
+                message: 'isGroupChatEnded must be a boolean',
+            });
+        }
+
+        const updatedChat = await ChatAndPayment.findByIdAndUpdate(
+            chatRoomId,
+            { isGroupChatEnded },
+            { new: true }
+        );
+
+        if (!updatedChat) {
+            return res.status(404).json({
+                success: false,
+                message: 'Chat not found',
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Chat updated successfully',
+            data: updatedChat,
+        });
+    } catch (error) {
+        console.log("Internal server error", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
             error: error.message,
         });
     }

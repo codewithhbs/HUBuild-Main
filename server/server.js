@@ -345,64 +345,64 @@ io.on('connection', (socket) => {
 
     // Handle group chat messages
     // Fixed backend socket event
-socket.on("manual_message", async ({ room, message, senderId, timestamp, role }) => {
-    try {
-        if (!room || !message || !senderId || !role) {
-            throw new Error("Missing required parameters")
-        }
+    socket.on("manual_message", async ({ room, message, senderId, timestamp, role }) => {
+        try {
+            if (!room || !message || !senderId || !role) {
+                throw new Error("Missing required parameters")
+            }
 
-        console.log(`Group message received in room ${room} from ${senderId}:`, message)
+            console.log(`Group message received in room ${room} from ${senderId}:`, message)
 
-        // Check for prohibited content
-        const PROHIBITED_PATTERNS = [
-            /\b\d{10}\b/,
-            /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/,
-            /18\+|\bsex\b|\bxxx\b|\bcall\b|\bphone\b|\bmobile|\bteliphone\b|\bnudes\b|\bporn\b|\bsex\scall\b|\btext\b|\bwhatsapp\b|\bskype\b|\btelegram\b|\bfacetime\b|\bvideo\schat\b|\bdial\snumber\b|\bmessage\b/i,
-        ]
+            // Check for prohibited content
+            const PROHIBITED_PATTERNS = [
+                /\b\d{10}\b/,
+                /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/,
+                /18\+|\bsex\b|\bxxx\b|\bcall\b|\bphone\b|\bmobile|\bteliphone\b|\bnudes\b|\bporn\b|\bsex\scall\b|\btext\b|\bwhatsapp\b|\bskype\b|\btelegram\b|\bfacetime\b|\bvideo\schat\b|\bdial\snumber\b|\bmessage\b/i,
+            ]
 
-        if (PROHIBITED_PATTERNS.some((pattern) => pattern.test(message))) {
-            socket.emit("wrong_message", {
-                message: "Your message contains prohibited content.",
-            })
-            return
-        }
+            if (PROHIBITED_PATTERNS.some((pattern) => pattern.test(message))) {
+                socket.emit("wrong_message", {
+                    message: "Your message contains prohibited content.",
+                })
+                return
+            }
 
-        // Save message to GroupChat DB
-        await Chat.findOneAndUpdate(
-            { _id: room },
-            {
-                $push: {
-                    messages: {
-                        sender: senderId,
-                        text: message,
-                        timestamp: timestamp || new Date().toISOString(),
+            // Save message to GroupChat DB
+            await Chat.findOneAndUpdate(
+                { _id: room },
+                {
+                    $push: {
+                        messages: {
+                            sender: senderId,
+                            text: message,
+                            timestamp: timestamp || new Date().toISOString(),
+                        },
                     },
                 },
-            },
-            { upsert: true, new: true },
-        )
+                { upsert: true, new: true },
+            )
 
-        // FIXED: Emit message to ENTIRE room (including sender)
-        // Use io.to(room) instead of socket.to(room) to include sender
-        io.to(room).emit("return_message", {
-            text: message,
-            sender: senderId,
-            senderId: senderId, // Add both for consistency
-            timestamp: timestamp || new Date().toISOString(),
-        })
+            // FIXED: Emit message to ENTIRE room (including sender)
+            // Use io.to(room) instead of socket.to(room) to include sender
+            io.to(room).emit("return_message", {
+                text: message,
+                sender: senderId,
+                senderId: senderId, // Add both for consistency
+                timestamp: timestamp || new Date().toISOString(),
+            })
 
-        // Optional: Still emit confirmation to sender
-        socket.emit("message_sent", {
-            success: true,
-            text: message,
-            timestamp: timestamp || new Date().toISOString(),
-        })
+            // Optional: Still emit confirmation to sender
+            socket.emit("message_sent", {
+                success: true,
+                text: message,
+                timestamp: timestamp || new Date().toISOString(),
+            })
 
-    } catch (error) {
-        console.error("Group message error:", error.message)
-        socket.emit("error_message", { message: `Message failed: ${error.message}` })
-    }
-})
+        } catch (error) {
+            console.error("Group message error:", error.message)
+            socket.emit("error_message", { message: `Message failed: ${error.message}` })
+        }
+    })
 
     // Handle chat messages
     socket.on('message', async ({ room, message, senderId, timestamp, role }) => {
@@ -513,63 +513,105 @@ socket.on("manual_message", async ({ room, message, senderId, timestamp, role })
         }
     });
 
-    // Handle file uploads in group chat
+    // Handle file upload for group chat
     socket.on("manual_file_upload", async ({ room, fileData, senderId, timestamp }) => {
         try {
             if (!room || !fileData || !senderId) {
-                throw new Error("Missing required parameters")
+                throw new Error("Missing required parameters for file upload")
             }
 
-            // Validate file type and size
-            const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"]
-            const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+            console.log(`File upload received in room ${room} from ${senderId}:`, fileData.name)
 
-            const isAllowedType = ALLOWED_FILE_TYPES.includes(fileData.type)
-            if (!isAllowedType) {
-                throw new Error("Invalid file type")
+            // Validate file data
+            if (!fileData.content || !fileData.name || !fileData.type) {
+                throw new Error("Invalid file data")
             }
 
-            const fileSize = Buffer.byteLength(fileData.content, "base64")
-            if (fileSize > MAX_FILE_SIZE) {
-                throw new Error("File size exceeds the maximum allowed")
+            // Check file type (only images allowed)
+            if (!fileData.type.startsWith('image/')) {
+                socket.emit("file_upload_error", {
+                    error: "Only image files are allowed"
+                })
+                return
             }
 
-            // Save to GroupChat DB
+            // Save file message to GroupChat DB
+            const fileMessage = {
+                sender: senderId,
+                file: {
+                    name: fileData.name,
+                    type: fileData.type,
+                    content: fileData.content
+                },
+                timestamp: timestamp || new Date().toISOString(),
+            }
+
             await Chat.findOneAndUpdate(
                 { _id: room },
                 {
                     $push: {
-                        messages: {
-                            sender: senderId,
-                            file: fileData,
-                            text: "",
-                            timestamp: timestamp || new Date().toISOString(),
-                        },
-                    },
+                        messages: fileMessage
+                    }
                 },
-                { upsert: true, new: true },
+                { upsert: true, new: true }
             )
 
-            // Notify other users in room
-            socket.to(room).emit("return_message", {
-                text: "Attachment received",
-                file: fileData,
+            // FIXED: Broadcast file to ENTIRE room (including sender)
+            // Use io.to(room) instead of socket.to(room) to include sender
+            io.to(room).emit("return_message", {
+                file: {
+                    name: fileData.name,
+                    type: fileData.type,
+                    content: fileData.content
+                },
                 sender: senderId,
+                senderId: senderId, // Add both for consistency
                 timestamp: timestamp || new Date().toISOString(),
             })
 
-            // Confirm back to sender
+            // Emit success confirmation to sender
             socket.emit("file_upload_success", {
                 message: "File uploaded successfully",
-                file: fileData,
-                timestamp: timestamp || new Date().toISOString(),
+                fileName: fileData.name
             })
+
+            console.log(`File ${fileData.name} successfully uploaded and broadcasted to room ${room}`)
+
         } catch (error) {
-            console.error("Group file upload error:", error.message)
-            socket.emit("file_upload_error", { error: error.message })
+            console.error("File upload error:", error.message)
+            socket.emit("file_upload_error", {
+                error: `File upload failed: ${error.message}`
+            })
         }
     })
 
+    // Optional: Handle file download requests
+    socket.on("request_file_download", async ({ room, messageId, senderId }) => {
+        try {
+            // Find the chat and specific message
+            const chat = await Chat.findById(room)
+            if (!chat) {
+                throw new Error("Chat not found")
+            }
+
+            const message = chat.messages.id(messageId)
+            if (!message || !message.file) {
+                throw new Error("File not found")
+            }
+
+            // Send file data back to requester
+            socket.emit("file_download_response", {
+                file: message.file,
+                messageId: messageId
+            })
+
+        } catch (error) {
+            console.error("File download error:", error.message)
+            socket.emit("file_download_error", {
+                error: error.message
+            })
+        }
+    })
 
     // Add event handler for when provider connects later
     socket.on('provider_connected', ({ room }) => {

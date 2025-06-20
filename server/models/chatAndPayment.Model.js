@@ -76,6 +76,10 @@ const ChatAndPaymentSchema = new mongoose.Schema({
     },
     groupName: {
         type: String
+    },
+    isGroupChatEnded: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true })
 

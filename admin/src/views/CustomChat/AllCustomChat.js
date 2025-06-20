@@ -48,6 +48,20 @@ const AllCustomChat = () => {
         }
     };
 
+    const handleUpdateIsChatEnded = async (id, isChatEnded) => {
+        const updatedField = !isChatEnded;
+        try {
+            const { data } = await axios.put(
+                `https://api.helpubuild.in/api/v1/update_manual_chat_ended/${id}`,
+                { isGroupChatEnded: updatedField }
+            );
+            handleFetchBanner()
+            toast.success(data.message);
+        } catch (error) {
+            console.log("Internal server error", error);
+        }
+    }
+
     const handleDeleteBanner = async (id) => {
         setLoading(true);
         try {
@@ -117,7 +131,7 @@ const AllCustomChat = () => {
         return message.text;
     };
 
-    const heading = ['S.No', 'Group Name', 'Chat Room', 'User Name', 'Provider Name', 'Action'];
+    const heading = ['S.No', 'Group Name', 'Chat Room', 'User Name', 'Providers Name', 'isChatEnded', 'Action'];
 
     return (
         <>
@@ -136,7 +150,7 @@ const AllCustomChat = () => {
                             currentData.map((item, index) => (
                                 <CTableRow key={item._id}>
                                     <CTableDataCell>{startIndex + index + 1}</CTableDataCell>
-                                        <CTableDataCell>{item?.groupName || 'N/A'}</CTableDataCell>
+                                    <CTableDataCell>{item?.groupName || 'N/A'}</CTableDataCell>
                                     <CTableDataCell>
                                         <button
                                             className="btn btn-link text-primary"
@@ -147,6 +161,15 @@ const AllCustomChat = () => {
                                     </CTableDataCell>
                                     <CTableDataCell>{item?.userId?.name}</CTableDataCell>
                                     <CTableDataCell>{item?.providerIds && item?.providerIds.map((provider) => provider.name).join(', ')}</CTableDataCell>
+                                    <CTableDataCell>
+                                        <button
+                                            className={`btn btn-sm ${item.isGroupChatEnded ? 'btn-danger' : 'btn-success'}`}
+                                            onClick={() => handleUpdateIsChatEnded(item._id, item.isGroupChatEnded)}
+                                        >
+                                            {item.isGroupChatEnded ? 'Reopen Chat' : 'End Chat'}
+                                        </button>
+                                    </CTableDataCell>
+
                                     {/* {console.log("item?.providerIds",item?.providerIds)} */}
                                     <CTableDataCell>
                                         <div className="action-parent">

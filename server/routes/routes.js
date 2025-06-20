@@ -12,7 +12,7 @@ const { createAboutImage, getAllAboutImage, deleteAboutImage, updateAboutActiveS
 const { createTestimonial, getAllTestimonial, getsingleTestimonial, deleteTestimonial, updateTestimonial, updateTestimonialActiveStatus } = require('../controllers/testimonial.controller');
 const { createBlog, getAllBlog, getSingleBlog, updateBlog, deleteBlog } = require('../controllers/blog.controller');
 const { createBlogComment, getAllComments, getBlogCommentByBlogId, deleteBlogComment } = require('../controllers/blogCommont.controller');
-const { createChatWithNew, getAllChatRecord, getChatByProviderid, getChatByUserid, getChatById, markAllChatsAsRead, markUserChatsAsRead, markProviderChatsAsRead, deleteChatRoom, getchatByRoom, deleteChatByRoom, deleteMessageFromRoom, createManualChatRoom, addOrUpdateProvidersInChat, getCustomChatById, getManualChatByProviderId, getManualChatBuUserId } = require('../controllers/chatAndPayment.Controller');
+const { createChatWithNew, getAllChatRecord, getChatByProviderid, getChatByUserid, getChatById, markAllChatsAsRead, markUserChatsAsRead, markProviderChatsAsRead, deleteChatRoom, getchatByRoom, deleteChatByRoom, deleteMessageFromRoom, createManualChatRoom, addOrUpdateProvidersInChat, getCustomChatById, getManualChatByProviderId, getManualChatBuUserId, updateGroupChatISEnded } = require('../controllers/chatAndPayment.Controller');
 const { createWithdrawal, updateWithdrawStatus, deleteWithdrawRequest, getWithdrawalsByProviderId, getAllWithdrawals, getTotalWithdrawAndCommission } = require('../controllers/withdraw.controller');
 const { createCommission, updateCommission, getSingleCommission, getAllCommissions, deleteCommission } = require('../controllers/commission.controller');
 const { createProviderService, getAllProviderService, getProviderServiceById, updateProviderService, deleteProviderService, findbyProvider } = require('../controllers/providerService.controller');
@@ -31,7 +31,7 @@ const router = express.Router();
 //User registration related routes
 router.post('/register', registeruser);
 router.put('/user/update-profile/:id', upload.single('ProfileImage'), updateProfile);
-router.put('/update_user_profile_image/:id',upload.single('ProfileImage'),updateUserProfileImage)
+router.put('/update_user_profile_image/:id', upload.single('ProfileImage'), updateUserProfileImage)
 router.post('/login', login);
 router.get('/universal_logout/:id', logout);
 router.post('/verify/:type', verifyEmail);
@@ -73,7 +73,7 @@ router.put('/update-provider-documents/:providerId', upload.fields([
     { name: 'qualificationProof', maxCount: 1 },
     { name: 'photo', maxCount: 1 }
 ]), updateDocuments)
-router.put('/update_provider_profile_image/:id',upload.single('photo'), updateProfileImage)
+router.put('/update_provider_profile_image/:id', upload.single('photo'), updateProfileImage)
 router.put('/update-provider-profile/:_id', updateProvider)
 router.put('/update-bank-detail/:providerId', updateBankDetail)
 router.put('/update-provider-password/:providerId', updatePassword)
@@ -100,8 +100,8 @@ router.delete('/delete-provider/:id', deleteprovider)
 
 router.put('/provider_verify/:id', accountVerification)
 
-router.post('/provider_number_change_request/:id',changeProviderNumber)
-router.post('/verify_provider_change_number/:id',verifyOtpForChangeNumber)
+router.post('/provider_number_change_request/:id', changeProviderNumber)
+router.post('/verify_provider_change_number/:id', verifyOtpForChangeNumber)
 
 //admin routes
 router.get('/users', getAllUsers);
@@ -287,6 +287,7 @@ router.post('/create_manual_chat_room', createManualChatRoom)
 router.put('/add_members_to_manual_chat_room/:id', addOrUpdateProvidersInChat)
 router.get('/get_manual_chat_by_userId/:userId', getManualChatBuUserId)
 router.get('/get_manual_chat_by_providerId/:providerId', getManualChatByProviderId)
+router.put('/update_manual_chat_ended/:id', updateGroupChatISEnded)
 
 // call for free module 
 
