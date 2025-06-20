@@ -406,13 +406,22 @@ exports.delete_call_history = async (req, res) => {
 
 exports.createCallFreeModule = async (req, res) => {
     try {
+        console.log("Received request body:", req.body);
+
         const { callFrom, callTo, roomId } = req.body;
+
         if (!callFrom || !callTo || !roomId) {
+            console.log("Validation failed: Missing fields");
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
-            })
+            });
         }
+
+        console.log("Making request to Cloudshope API with:", {
+            from_number: callFrom,
+            to_number: callTo,
+        });
 
         const response = await axios.post(
             'https://apiv1.cloudshope.com/api/sendClickToCall',
@@ -431,18 +440,20 @@ exports.createCallFreeModule = async (req, res) => {
             }
         );
 
+        console.log("Cloudshope API response:", response.data);
+
         return res.status(200).json({
             success: true,
             message: "Call created successfully",
             data: response.data
-        })
+        });
 
     } catch (error) {
-        console.log("Internal server error", error)
+        console.error("Internal server error:", error);
         res.status(500).json({
             success: false,
             message: "Internal server error",
             error: error.message
-        })
+        });
     }
-}
+};
