@@ -113,7 +113,7 @@
     background-color: rgba(99, 102, 241, 0.1);
 }
 
-.active{
+.active {
     color: #EAB936 !important;
 }
 
@@ -272,6 +272,8 @@
 
 .message-wrapper.incoming {
     justify-content: flex-start;
+    flex-direction: column; 
+    align-items: flex-start;
 }
 
 .message-wrapper.outgoing {
@@ -525,4 +527,37 @@
 
 ::-webkit-scrollbar-thumb:hover {
     background-color: var(--text-secondary);
+}
+
+/* Add this CSS to your chat.css file */
+
+.sender-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 4px;
+    margin-left: 8px;
+}
+
+.message-wrapper.incoming .sender-name {
+    text-align: left;
+}
+
+.message-wrapper.outgoing .sender-name {
+    text-align: right;
+    margin-right: 8px;
+    margin-left: 0;
+}
+
+/* Optional: Add different colors for different users */
+.sender-name.user {
+    color: #3b82f6;
+}
+
+.sender-name.provider {
+    color: #10b981;
+}
+
+.sender-name.current-user {
+    color: #8b5cf6;
 }

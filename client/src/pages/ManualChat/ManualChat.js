@@ -43,6 +43,7 @@ const GroupChat = () => {
   const [selectedChat, setSelectedChat] = useState(null)
   const [connectedProviders, setConnectedProviders] = useState(new Set())
   const [groupMembers, setGroupMembers] = useState([]) // New state for group members
+  const [isChatEnded, setIsChatEnded] = useState(false)
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -229,7 +230,7 @@ const GroupChat = () => {
         const callTo = member?.phoneNumber
         console.log("all detail =", room, callFrom, callTo)
         // window.location.href = `tel:${cleanedNumber}`;
-        const res = await axios.post(`${ENDPOINT}api/v1/create_call_for_free`, { roomId:room, callFrom, callTo });
+        const res = await axios.post(`${ENDPOINT}api/v1/create_call_for_free`, { roomId: room, callFrom, callTo });
         toast.success(`Calling ${member.name}...`);
       } else {
         toast.error("Invalid phone number");
@@ -266,6 +267,7 @@ const GroupChat = () => {
         setIsChatStarted(true)
         setIsChatOnGoing(true)
         setGroupMembers(getGroupMembers(chatData)) // Set group members
+        setIsChatEnded(chatData?.isGroupChatEnded)
 
         // Auto-join the room
         if (userData?.role === "provider") {
@@ -311,6 +313,34 @@ const GroupChat = () => {
       console.error("Error ending group chat:", error)
     }
   }, [socket, selectedUserId, selectedProviderIds, userData, currentRoomId, fetchGroupChatHistory])
+
+  // Enhanced version that includes role information
+  const getSenderInfo = useCallback((senderId) => {
+    if (senderId === userData?._id) {
+      return { name: "You", role: userData?.role, isCurrentUser: true };
+    }
+
+    // Check if sender is the user in the chat
+    if (selectedChat?.userId?._id === senderId) {
+      return {
+        name: selectedChat.userId.name,
+        role: "user",
+        isCurrentUser: false
+      };
+    }
+
+    // Check if sender is one of the providers
+    const provider = selectedChat?.providerIds?.find(p => p._id === senderId);
+    if (provider) {
+      return {
+        name: provider.name,
+        role: "provider",
+        isCurrentUser: false
+      };
+    }
+
+    return { name: "Unknown User", role: "unknown", isCurrentUser: false };
+  }, [userData, selectedChat]);
 
   // Navigation handling
   useEffect(() => {
@@ -375,17 +405,27 @@ const GroupChat = () => {
       })
     })
 
-    // Handle messages from others
+    // Enhanced message handler to properly handle files
     socket.on("return_message", (data) => {
       console.log("Received message from others:", data)
-      setMessages((prev) => [
-        ...prev,
-        {
-          ...data,
-          senderId: data.sender || data.senderId,
-          sender: data.sender || data.senderId,
-        },
-      ])
+
+      // Create message object with proper structure
+      const messageObj = {
+        ...data,
+        senderId: data.sender || data.senderId,
+        sender: data.sender || data.senderId,
+      }
+
+      // If it's a file message, ensure file structure is correct
+      if (data.file) {
+        messageObj.file = {
+          name: data.file.name,
+          type: data.file.type,
+          content: data.file.content
+        }
+      }
+
+      setMessages((prev) => [...prev, messageObj])
     })
 
     // Rest of your socket listeners...
@@ -421,13 +461,13 @@ const GroupChat = () => {
       console.log("Message sent confirmation:", data)
     })
 
-    socket.on("file_upload_success", (data) => {
-      toast.success("File uploaded successfully")
-    })
+    // socket.on("file_upload_success", (data) => {
+    //   toast.success("File uploaded successfully")
+    // })
 
-    socket.on("file_upload_error", (data) => {
-      toast.error(data.error)
-    })
+    // socket.on("file_upload_error", (data) => {
+    //   toast.error(data.error)
+    // })
 
     socket.on("chat_ended", (data) => {
       if (data.success) {
@@ -473,7 +513,7 @@ const GroupChat = () => {
     return !prohibitedPatterns.some((pattern) => pattern.test(messageText))
   }, [])
 
-  // Handle file upload for group chat
+  // Enhanced file upload handler in your React component
   const handleFileChange = useCallback(
     (event) => {
       const file = event.target.files[0]
@@ -491,6 +531,9 @@ const GroupChat = () => {
         return
       }
 
+      // Show uploading toast
+      const uploadingToast = toast.loading("Uploading file...")
+
       const reader = new FileReader()
       reader.onload = () => {
         try {
@@ -506,12 +549,18 @@ const GroupChat = () => {
             senderId: userData._id,
             timestamp: new Date().toISOString(),
           })
+
+          // Clear the uploading toast - success/error will be handled by socket events
+          toast.dismiss(uploadingToast)
+
         } catch (error) {
+          toast.dismiss(uploadingToast)
           toast.error("Failed to process file")
         }
       }
 
       reader.onerror = () => {
+        toast.dismiss(uploadingToast)
         toast.error("Failed to read file")
       }
 
@@ -731,20 +780,31 @@ const GroupChat = () => {
                     ) : (
                       messages.map((msg, idx) => (
                         <div key={idx} className={`message-wrapper ${msg.sender === id ? "outgoing" : "incoming"}`}>
+                          {/* Add sender name for incoming messages */}
+                          {msg.sender !== id && (
+                            <div className={`sender-name ${getSenderInfo(msg.sender || msg.senderId).role}`}>
+                              {getSenderInfo(msg.sender || msg.senderId).name}
+                            </div>
+                          )}
+
                           {msg.file ? (
                             <div
                               onClick={() => handleImageClick(msg.file)}
                               style={{ cursor: "pointer" }}
                               className="message-bubble file-message"
                             >
-                              <a>
-                                <img
-                                  src={msg.file.content || "/placeholder.svg"}
-                                  alt={msg.file.name}
-                                  className="message-image img-thumbnail"
-                                  style={{ maxWidth: "200px", maxHeight: "150px" }}
-                                />
-                              </a>
+                              <img
+                                src={msg.file.content}
+                                alt={msg.file.name}
+                                className="message-image img-thumbnail"
+                                style={{ maxWidth: "200px", maxHeight: "150px" }}
+                                onError={(e) => {
+                                  e.target.src = "/placeholder.svg" // Fallback image
+                                }}
+                              />
+                              {/* <div className="file-info">
+                                <small>{msg.file.name}</small>
+                              </div> */}
                               <div className="message-time">
                                 {new Date(msg.timestamp).toLocaleTimeString("en-US", {
                                   hour: "2-digit",
@@ -767,6 +827,7 @@ const GroupChat = () => {
                       ))
                     )}
                   </ScrollToBottom>
+
 
                   <Modal show={showModal} onHide={handleCloseModal} centered size="lg" className="image-preview-modal">
                     <Modal.Header closeButton>
@@ -798,9 +859,10 @@ const GroupChat = () => {
                       id="fileUpload"
                       onChange={handleFileChange}
                       style={{ display: "none" }}
+                      disabled={isChatEnded}
                       accept="image/*"
                     />
-                    <label htmlFor="fileUpload" className="attachment-button">
+                    <label htmlFor="fileUpload" className={`attachment-button ${isChatEnded ? "disabled" : ""}`}>
                       <MdAttachment />
                     </label>
                     <input
@@ -808,9 +870,10 @@ const GroupChat = () => {
                       className="form-control message-input"
                       placeholder="Type your message..."
                       value={message}
+                      disabled={isChatEnded}
                       onChange={(e) => setMessage(e.target.value)}
                     />
-                    <button type="submit" className="send-button">
+                    <button type="submit" className={`send-button ${isChatEnded ? "disabled" : ""}`}>
                       <MdSend />
                     </button>
                   </form>
@@ -845,7 +908,7 @@ const GroupChat = () => {
       </div>
 
       {/* Navigation Confirmation Modal */}
-      {showPrompt && (
+      {/* {showPrompt && (
         <div className="navigation-modal">
           <div className="navigation-modal-content">
             <h4>Leave Group Chat?</h4>
@@ -860,7 +923,7 @@ const GroupChat = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   )
 }
