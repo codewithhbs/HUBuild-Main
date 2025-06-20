@@ -28,6 +28,9 @@ import EditExpertise from './views/Expertise/EditExpertise'
 import EditCommission from './views/Commission/EditCommission'
 import EditTerm from './views/Term/EditTerm'
 import AllCallHistory from './views/CallHistory/AllCallHistory'
+import AllCustomChat from './views/CustomChat/AllCustomChat'
+import AddCustomChat from './views/CustomChat/AddCustomChat'
+import EditCustomChat from './views/CustomChat/EditCustomChat'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
@@ -224,7 +227,11 @@ const routes = [
   // term and condition routes here
   { path: '/term/edit_term', name: 'Edit Term', element: EditTerm },
 
-  { path: '/call/all_call', name: 'All Expertise', element: AllCallHistory },
+  { path: '/call/all_call', name: 'All Call', element: AllCallHistory },
+
+  { path: '/project/all_project', name: 'All Project', element: AllCustomChat },
+  { path: '/project/add_project', name: 'Add Project', element: AddCustomChat },
+  { path: '/project/edit_project/:id', name: 'Edit Project', element: EditCustomChat },
 
 ]
 

@@ -73,8 +73,8 @@ const Header = () => {
 
     try {
       const url = UserData?.role === "provider"
-        ? `https://api.helpubuild.in/api/v1/get-chat-by-providerId/${UserData._id}`
-        : `https://api.helpubuild.in/api/v1/get-chat-by-userId/${UserData._id}`;
+        ? `http://localhost:5000/api/v1/get-chat-by-providerId/${UserData._id}`
+        : `http://localhost:5000/api/v1/get-chat-by-userId/${UserData._id}`;
 
       const { data } = await axios.get(url);
       const fullData = data.data
@@ -106,7 +106,7 @@ const Header = () => {
     // Check if the user role is 'user' or 'provider' and call the corresponding API route
     try {
       let response;
-      const url = `https://api.helpubuild.in/api/v1/mark-${UserData.role}-chats-as-read/${UserData._id}`;
+      const url = `http://localhost:5000/api/v1/mark-${UserData.role}-chats-as-read/${UserData._id}`;
 
       // Use axios to make the request
       response = await axios.put(url);
@@ -167,7 +167,7 @@ const Header = () => {
             toast.error("Failed to load Razorpay SDK. Please check your connection.");
             return;
           }
-          const res = await axios.post(`https://api.helpubuild.in/api/v1/buy_membership/${providerId}`);
+          const res = await axios.post(`http://localhost:5000/api/v1/buy_membership/${providerId}`);
           const order = res.data.data.razorpayOrder;
           const amount = res.data.data.discountAmount;
           const providerData = res.data.data.provider;
@@ -179,7 +179,7 @@ const Header = () => {
               name: "Help U Build",
               description: "Buying Membership",
               order_id: order.id,
-              callback_url: "https://api.helpubuild.in/api/v1/membership_payment_verify",
+              callback_url: "http://localhost:5000/api/v1/membership_payment_verify",
               prefill: {
                 name: providerData.name,
                 email: providerData.email,
@@ -290,7 +290,8 @@ const Header = () => {
                                         <span className="badge-chat">
                                           {allChat}
 
-                                        </span></>
+                                        </span>
+                                      </>
                                     ) :
                                       (
                                         <>

@@ -25,7 +25,7 @@ const AddExpertise = () => {
 
     setLoading(true);
     try {
-      const res = await axios.post('https://api.helpubuild.in/api/v1/create_expertise', expertiseData);
+      const res = await axios.post('http://localhost:5000/api/v1/create_expertise', expertiseData);
       toast.success(res.data.message);
       setExpertiseData({ expertise: '' });
     } catch (error) {

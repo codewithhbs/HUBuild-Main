@@ -5,6 +5,7 @@ import {
     CSpinner,
     CPagination,
     CPaginationItem,
+    CNavLink,
 } from '@coreui/react';
 import Table from '../../components/Table/Table';
 import axios from 'axios';
@@ -12,7 +13,7 @@ import toast from 'react-hot-toast';
 import Swal from 'sweetalert2';
 import './AllChatRoom.css';
 
-function AllChatRoom() {
+const AllCustomChat = () => {
     const [banners, setBanners] = useState([]);
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -25,8 +26,9 @@ function AllChatRoom() {
         setLoading(true);
         try {
             const { data } = await axios.get('http://localhost:5000/api/v1/get-all-chat-record');
-            // console.log("all data", data.data)
-            setBanners(data.data.reverse() || []);
+            const filterData = data.data.filter((item) => item.isManualChat === true);
+            // console.log("all data", filterData)
+            setBanners(filterData.reverse() || []);
         } catch (error) {
             console.log('Error fetching chat records:');
             toast.error('Failed to load chat records. Please try again.');
@@ -115,7 +117,7 @@ function AllChatRoom() {
         return message.text;
     };
 
-    const heading = ['S.No', 'Chat room', 'User Name', 'Provider Name', 'Action'];
+    const heading = ['S.No', 'Group Name', 'Chat Room', 'User Name', 'Provider Name', 'Action'];
 
     return (
         <>
@@ -131,25 +133,30 @@ function AllChatRoom() {
                 <>
                     <Table
                         heading="All Chat"
-                        btnText=""
-                        btnURL=""
+                        btnText="Create Chat Room"
+                        btnURL="/project/add_project"
                         tableHeading={heading}
                         tableContent={
                             currentData.map((item, index) => (
                                 <CTableRow key={item._id}>
                                     <CTableDataCell>{startIndex + index + 1}</CTableDataCell>
+                                        <CTableDataCell>{item?.groupName || 'N/A'}</CTableDataCell>
                                     <CTableDataCell>
                                         <button
                                             className="btn btn-link text-primary"
                                             onClick={() => handleFetchChat(item?.room)}
                                         >
-                                            {item?.room}
+                                            {item?._id}
                                         </button>
                                     </CTableDataCell>
                                     <CTableDataCell>{item?.userId?.name}</CTableDataCell>
-                                    <CTableDataCell>{item?.providerId?.name}</CTableDataCell>
+                                    <CTableDataCell>{item?.providerIds && item?.providerIds.map((provider) => provider.name).join(', ')}</CTableDataCell>
+                                    {/* {console.log("item?.providerIds",item?.providerIds)} */}
                                     <CTableDataCell>
                                         <div className="action-parent">
+                                            <CNavLink href={`#/project/edit_project/${item._id}`} className='edit'>
+                                                <i class="ri-pencil-fill"></i>
+                                            </CNavLink>
                                             <div
                                                 className="delete"
                                                 onClick={() => confirmDelete(item._id)}
@@ -246,4 +253,4 @@ function AllChatRoom() {
     );
 }
 
-export default AllChatRoom;
+export default AllCustomChat

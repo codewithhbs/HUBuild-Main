@@ -1,5 +1,5 @@
 const express = require('express');
-const { registeruser, getAllUsers, getSingleUserById, updateProfile, login, logout, deleteAccount, banUserToggle, verifyEmail, resendOtp, forgotPassword, getUserById, createPayment, PaymentVerify, getSingleUser, updateUserPassword, getTotalRechargeAmount, Changepassword, getDetailForVerification, updateUserProfileImage } = require('../controllers/user.Controller');
+const { registeruser, getAllUsers, getSingleUserById, updateProfile, login, logout, deleteAccount, banUserToggle, verifyEmail, resendOtp, forgotPassword, getUserById, createPayment, PaymentVerify, getSingleUser, updateUserPassword, getTotalRechargeAmount, Changepassword, getDetailForVerification, updateUserProfileImage, getAllUser } = require('../controllers/user.Controller');
 const { protect } = require('../middlewares/Protect');
 const { CreateProvider, GetMyProfile, addPortfolio, getAllProvider, getSingleProvider, updateProvider, updateDocuments, updatePassword, updateAvailable, updateBankDetail, updateIsBanned, deleteprovider, accountVerification, getProviderStatus, sendOtpForUpdateDetail, verifyOtpForUpdateDetail, changeProviderNumber, verifyOtpForChangeNumber, updateProfileImage, changeProviderDeactiveStatus } = require('../controllers/provider.controller');
 const multer = require('multer');
@@ -12,11 +12,11 @@ const { createAboutImage, getAllAboutImage, deleteAboutImage, updateAboutActiveS
 const { createTestimonial, getAllTestimonial, getsingleTestimonial, deleteTestimonial, updateTestimonial, updateTestimonialActiveStatus } = require('../controllers/testimonial.controller');
 const { createBlog, getAllBlog, getSingleBlog, updateBlog, deleteBlog } = require('../controllers/blog.controller');
 const { createBlogComment, getAllComments, getBlogCommentByBlogId, deleteBlogComment } = require('../controllers/blogCommont.controller');
-const { createChatWithNew, getAllChatRecord, getChatByProviderid, getChatByUserid, getChatById, markAllChatsAsRead, markUserChatsAsRead, markProviderChatsAsRead, deleteChatRoom, getchatByRoom, deleteChatByRoom, deleteMessageFromRoom, createManualChatRoom, addProvidersToChat } = require('../controllers/chatAndPayment.Controller');
+const { createChatWithNew, getAllChatRecord, getChatByProviderid, getChatByUserid, getChatById, markAllChatsAsRead, markUserChatsAsRead, markProviderChatsAsRead, deleteChatRoom, getchatByRoom, deleteChatByRoom, deleteMessageFromRoom, createManualChatRoom, addOrUpdateProvidersInChat, getCustomChatById, getManualChatByProviderId, getManualChatBuUserId } = require('../controllers/chatAndPayment.Controller');
 const { createWithdrawal, updateWithdrawStatus, deleteWithdrawRequest, getWithdrawalsByProviderId, getAllWithdrawals, getTotalWithdrawAndCommission } = require('../controllers/withdraw.controller');
 const { createCommission, updateCommission, getSingleCommission, getAllCommissions, deleteCommission } = require('../controllers/commission.controller');
 const { createProviderService, getAllProviderService, getProviderServiceById, updateProviderService, deleteProviderService, findbyProvider } = require('../controllers/providerService.controller');
-const { createCall, call_status, get_call_history_by_provider, get_call_history_by_user, delete_call_history, getAllCallHistory } = require('../controllers/call.controller');
+const { createCall, call_status, get_call_history_by_provider, get_call_history_by_user, delete_call_history, getAllCallHistory, createCallFreeModule } = require('../controllers/call.controller');
 const { createMemberShip, getAllMemberShip, getSingleMemberShip, updateMemberShip, deleteMemberShip, checkCouponCode, buyMemberShip, membershipPaymentVerify } = require('../controllers/memberShip.controller');
 const { createGlobelUserRefDis, getAllGlobelUserRefDis, updateGlobelUserRef, deleteGlobelUserRef, getSingleGlobelUserRef } = require('../controllers/globelUserRefDis.controller');
 const { createAdminCoupon, getAllAdminCoupon, getSingleAdminCoupon, updateAdminCoupon, deleteAdminCoupon } = require('../controllers/adminCoupon.controller');
@@ -109,6 +109,7 @@ router.get('/users', getAllUsers);
 router.get('/get-single-user/:id', getSingleUser)
 router.delete('/user-delete/:userId', deleteAccount);
 router.put('/user-ban/:userId', banUserToggle);
+router.get('/get-all-user', getAllUser)
 
 // provider rating router here 
 
@@ -283,9 +284,12 @@ router.put('/update_term/:id', updateTerm)
 // create manual chat room with multiple vendor and user 
 
 router.post('/create_manual_chat_room', createManualChatRoom)
-// router.get('/get_all_manual_chat_room', getAllManualChatRoom)
-// router.get('/get_single_manual_chat_room/:id', getSingleManualChatRoom)
-router.put('/add_members_to_manual_chat_room/:id', addProvidersToChat)
-// router.delete('/delete_manual_chat_room/:id', deleteManualChatRoom)
+router.put('/add_members_to_manual_chat_room/:id', addOrUpdateProvidersInChat)
+router.get('/get_manual_chat_by_userId/:userId', getManualChatBuUserId)
+router.get('/get_manual_chat_by_providerId/:providerId', getManualChatByProviderId)
+
+// call for free module 
+
+router.post('/create_call_for_free', createCallFreeModule)
 
 module.exports = router;

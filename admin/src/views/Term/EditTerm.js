@@ -21,7 +21,7 @@ const EditTerm = () => {
     // Fetch Term & Condition data
     const fetchTerm = async () => {
         try {
-            const { data } = await axios.get(`https://api.helpubuild.in/api/v1/single_term/${id}`);
+            const { data } = await axios.get(`http://localhost:5000/api/v1/single_term/${id}`);
             setText(data.data.text || '');
         } catch (error) {
             console.error('Error fetching term:', error);
@@ -49,7 +49,7 @@ const EditTerm = () => {
 
         setLoading(true);
         try {
-            const res = await axios.put(`https://api.helpubuild.in/api/v1/update_term/${id}`, { text });
+            const res = await axios.put(`http://localhost:5000/api/v1/update_term/${id}`, { text });
             toast.success(res.data.message);
         } catch (error) {
             console.error('Error updating term:', error);

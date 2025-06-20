@@ -14,7 +14,7 @@ const Enquiry = () => {
   // Fetch Enquiry Data
   const fetchEnquiryData = async () => {
     try {
-      const { data } = await axios.get(`https://api.helpubuild.in/api/v1/get-chat-by-providerId/${UserId}`);
+      const { data } = await axios.get(`http://localhost:5000/api/v1/get-chat-by-providerId/${UserId}`);
       setEnquiries(data.data);
     } catch (error) {
       console.log('Error fetching enquiry data:', error);

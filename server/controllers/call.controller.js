@@ -403,3 +403,46 @@ exports.delete_call_history = async (req, res) => {
         })
     }
 }
+
+exports.createCallFreeModule = async (req, res) => {
+    try {
+        const { callFrom, callTo, roomId } = req.body;
+        if (!callFrom || !callTo || !roomId) {
+            return res.status(400).json({
+                success: false,
+                message: "All fields are required"
+            })
+        }
+
+        const response = await axios.post(
+            'https://apiv1.cloudshope.com/api/sendClickToCall',
+            {
+                from_number: callFrom,
+                to_number: callTo,
+                // callback_url: "https://www.api.helpubuild.in/api/v1/call_status-call",
+                // callback_method: "POST",
+                // max_duration: max_duration_allowed
+            },
+            {
+                headers: {
+                    'Authorization': `Bearer ${process.env.CLOUDSHOPE_API_KEY}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Call created successfully",
+            data: response.data
+        })
+
+    } catch (error) {
+        console.log("Internal server error", error)
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message
+        })
+    }
+}

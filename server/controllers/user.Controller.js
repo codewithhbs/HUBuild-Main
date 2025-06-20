@@ -1495,3 +1495,28 @@ exports.changeAvailableStatus = async (id, status) => {
         };
     }
 }
+
+exports.getAllUser = async (req, res) => {
+    try {
+        const users = await User.find({});
+        if(!users){
+            return res.status(500).json({
+                success: false,
+                message: "User not found",
+                error: "User not found",
+            })
+        }
+        res.status(200).json({
+            success: true,
+            message: "User found",
+            data: users
+        });
+    } catch (error) {
+        console.log("Internal server error",error)
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message
+        })
+    }
+}

@@ -269,6 +269,59 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Handle room joining for group chat
+    socket.on("join_manual_room", async ({ userId, astrologerId, role, room }, callback) => {
+        try {
+            if (!userId || !astrologerId || !role || !room) {
+                throw new Error("Missing required parameters")
+            }
+
+            console.log("Joining group room:", { userId, astrologerId, role, room })
+
+            socket.join(room)
+
+            // Store room membership
+            roomMemberships.set(socket.id, {
+                userId,
+                astrologerId,
+                role,
+                room,
+                providerConnected: role === "provider",
+            })
+
+            // Mark provider online if provider joins
+            if (role === "provider") {
+                await update_profile_status(astrologerId, true)
+            }
+
+            // Emit user status to other members in the room
+            socket.to(room).emit("user_status", {
+                userId,
+                astrologerId,
+                status: "online",
+                role,
+            })
+
+            // Notify joining client
+            socket.emit("room_joined", {
+                message: "Joined group room successfully.",
+                room,
+            })
+
+            if (callback) {
+                callback({ success: true, message: "Joined group room successfully." })
+            }
+        } catch (error) {
+            console.error("Join group room error:", error.message)
+            socket.emit("error_message", { message: error.message })
+
+            if (callback) {
+                callback({ success: false, message: error.message })
+            }
+        }
+    })
+
+
     // Function to setup or reset the inactivity timer
     function setupInactivityTimer(room) {
         // Clear any existing inactivity timer for this room
@@ -289,6 +342,67 @@ io.on('connection', (socket) => {
 
         inactivityTimers.set(room, inactivityTimer);
     }
+
+    // Handle group chat messages
+    // Fixed backend socket event
+socket.on("manual_message", async ({ room, message, senderId, timestamp, role }) => {
+    try {
+        if (!room || !message || !senderId || !role) {
+            throw new Error("Missing required parameters")
+        }
+
+        console.log(`Group message received in room ${room} from ${senderId}:`, message)
+
+        // Check for prohibited content
+        const PROHIBITED_PATTERNS = [
+            /\b\d{10}\b/,
+            /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/,
+            /18\+|\bsex\b|\bxxx\b|\bcall\b|\bphone\b|\bmobile|\bteliphone\b|\bnudes\b|\bporn\b|\bsex\scall\b|\btext\b|\bwhatsapp\b|\bskype\b|\btelegram\b|\bfacetime\b|\bvideo\schat\b|\bdial\snumber\b|\bmessage\b/i,
+        ]
+
+        if (PROHIBITED_PATTERNS.some((pattern) => pattern.test(message))) {
+            socket.emit("wrong_message", {
+                message: "Your message contains prohibited content.",
+            })
+            return
+        }
+
+        // Save message to GroupChat DB
+        await Chat.findOneAndUpdate(
+            { _id: room },
+            {
+                $push: {
+                    messages: {
+                        sender: senderId,
+                        text: message,
+                        timestamp: timestamp || new Date().toISOString(),
+                    },
+                },
+            },
+            { upsert: true, new: true },
+        )
+
+        // FIXED: Emit message to ENTIRE room (including sender)
+        // Use io.to(room) instead of socket.to(room) to include sender
+        io.to(room).emit("return_message", {
+            text: message,
+            sender: senderId,
+            senderId: senderId, // Add both for consistency
+            timestamp: timestamp || new Date().toISOString(),
+        })
+
+        // Optional: Still emit confirmation to sender
+        socket.emit("message_sent", {
+            success: true,
+            text: message,
+            timestamp: timestamp || new Date().toISOString(),
+        })
+
+    } catch (error) {
+        console.error("Group message error:", error.message)
+        socket.emit("error_message", { message: `Message failed: ${error.message}` })
+    }
+})
 
     // Handle chat messages
     socket.on('message', async ({ room, message, senderId, timestamp, role }) => {
@@ -358,6 +472,7 @@ io.on('connection', (socket) => {
         }
     });
 
+
     // Handle file uploads
     socket.on('file_upload', async ({ room, fileData, senderId, timestamp }) => {
         try {
@@ -397,6 +512,64 @@ io.on('connection', (socket) => {
             socket.emit('file_upload_error', { error: error.message });
         }
     });
+
+    // Handle file uploads in group chat
+    socket.on("manual_file_upload", async ({ room, fileData, senderId, timestamp }) => {
+        try {
+            if (!room || !fileData || !senderId) {
+                throw new Error("Missing required parameters")
+            }
+
+            // Validate file type and size
+            const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"]
+            const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+
+            const isAllowedType = ALLOWED_FILE_TYPES.includes(fileData.type)
+            if (!isAllowedType) {
+                throw new Error("Invalid file type")
+            }
+
+            const fileSize = Buffer.byteLength(fileData.content, "base64")
+            if (fileSize > MAX_FILE_SIZE) {
+                throw new Error("File size exceeds the maximum allowed")
+            }
+
+            // Save to GroupChat DB
+            await Chat.findOneAndUpdate(
+                { _id: room },
+                {
+                    $push: {
+                        messages: {
+                            sender: senderId,
+                            file: fileData,
+                            text: "",
+                            timestamp: timestamp || new Date().toISOString(),
+                        },
+                    },
+                },
+                { upsert: true, new: true },
+            )
+
+            // Notify other users in room
+            socket.to(room).emit("return_message", {
+                text: "Attachment received",
+                file: fileData,
+                sender: senderId,
+                timestamp: timestamp || new Date().toISOString(),
+            })
+
+            // Confirm back to sender
+            socket.emit("file_upload_success", {
+                message: "File uploaded successfully",
+                file: fileData,
+                timestamp: timestamp || new Date().toISOString(),
+            })
+        } catch (error) {
+            console.error("Group file upload error:", error.message)
+            socket.emit("file_upload_error", { error: error.message })
+        }
+    })
+
 
     // Add event handler for when provider connects later
     socket.on('provider_connected', ({ room }) => {
@@ -547,6 +720,57 @@ io.on('connection', (socket) => {
             socket.emit('chat_ended', { success: false, message: 'Error ending chat' });
         }
     });
+
+    // Handle chat end
+    socket.on("manual_end_chat", async ({ userId, astrologerId, role, room }) => {
+        try {
+            if (!userId || !astrologerId || !role || !room) {
+                throw new Error("Missing required parameters")
+            }
+
+            console.log("Ending group chat for:", { userId, astrologerId, role, room })
+
+            // Clear any active timer
+            const timer = activeTimers.get(room)
+            if (timer) {
+                clearTimeout(timer)
+                activeTimers.delete(room)
+            }
+
+            // Notify other participants in room
+            socket.to(room).emit("user_status", {
+                userId,
+                astrologerId,
+                status: "offline",
+                role,
+            })
+
+            if (role === "provider") {
+                // Inform group that provider left
+                socket.to(room).emit("provider_disconnected", {
+                    message: `Provider ${astrologerId} has left the group chat.`,
+                    providerId: astrologerId,
+                })
+            } else if (role === "user") {
+                // Inform providers that user left
+                socket.to(room).emit("user_left_chat", {
+                    userId,
+                    message: "The user has ended the group chat.",
+                    status: false,
+                })
+            }
+
+            // Leave and clean up
+            socket.leave(room)
+            roomMemberships.delete(socket.id)
+
+            socket.emit("chat_ended", { success: true })
+        } catch (error) {
+            console.error("Error ending group chat:", error.message)
+            socket.emit("chat_ended", { success: false, message: error.message })
+        }
+    })
+
 
     // Handle disconnections
     socket.on('disconnect', async () => {

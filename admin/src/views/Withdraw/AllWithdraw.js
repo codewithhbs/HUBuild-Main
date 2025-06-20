@@ -29,7 +29,7 @@ function AllWithdraw() {
     const handleFetchBanner = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('https://api.helpubuild.in/api/v1/get-all-withdrawals');
+            const { data } = await axios.get('http://localhost:5000/api/v1/get-all-withdrawals');
             setBanners(data.data.reverse() || []); // Ensure default empty array
         } catch (error) {
             console.error('Error fetching banners:', error);
@@ -42,7 +42,7 @@ function AllWithdraw() {
     const handleStatusChange = async (id, newStatus, providerId) => {
         setLoading(true);
         try {
-            const res = await axios.put(`https://api.helpubuild.in/api/v1/update-withdraw-status/${id}`, { status: newStatus, providerId: providerId });
+            const res = await axios.put(`http://localhost:5000/api/v1/update-withdraw-status/${id}`, { status: newStatus, providerId: providerId });
             // toast.success('Status updated successfully!');
             toast.success(res?.data?.message);
             handleFetchBanner(); // Refresh the provider list to reflect changes
@@ -67,7 +67,7 @@ function AllWithdraw() {
     const handleDeleteBanner = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`https://api.helpubuild.in/api/v1/delete-withdraw-request/${id}`);
+            await axios.delete(`http://localhost:5000/api/v1/delete-withdraw-request/${id}`);
             // setBanners((prevBanners) => prevBanners.filter((banner) => banner._id !== id));
             handleFetchBanner();
             toast.success('Withdraw request deleted successfully!');

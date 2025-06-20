@@ -86,6 +86,12 @@ const _nav = [
   },
   {
     component: CNavItem,
+    name: 'All Projects',
+    to: '/project/all_project',
+    icon: <CIcon icon={cilChatBubble} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
     name: 'Withdraw Request',
     to: '/withdraw/all_withdraw',
     icon: <CIcon icon={cilWallet} customClassName="nav-icon" />,

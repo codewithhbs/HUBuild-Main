@@ -37,6 +37,7 @@ import Disclaimer from "./pages/Policies/Disclaimer";
 import TermCondition from "./pages/Policies/Term&Condition";
 import PartnerLogin from "./pages/auth/PartnerLogin";
 import MobileCard from "./pages/Services/MobileCard";
+import ManualChat from "./pages/ManualChat/ManualChat";
 // Scroll to top component
 function ScrollToTop() {
   const location = useLocation();
@@ -97,6 +98,7 @@ function App() {
         <Route path="/cancellation-refund-policy" element={<Cancellation />} />
         <Route path="/disclaimer" element={<Disclaimer />} />
         <Route path="/terms-and-conditions" element={<TermCondition />} />
+        <Route path="/manual-chat" element={<ManualChat />} />
       </Routes>
       <Toaster />
       <Footer />
