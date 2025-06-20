@@ -4,7 +4,7 @@ import './Chat.css';
 import { MdAttachment } from "react-icons/md";
 import ScrollToBottom from 'react-scroll-to-bottom';
 
-const ENDPOINT = 'https://api.helpubuild.in/';
+const ENDPOINT = 'http://localhost:5000/';
 
 const Chat = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);

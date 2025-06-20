@@ -4,15 +4,19 @@ const ChatAndPaymentSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        // required: true
     },
     providerId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Provider',
-        required: true
+        // required: true
     },
     providerIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Provider' }],
-    room: { type: String, required: true, index: true },
+    room: { 
+        type: String, 
+        // required: true, 
+        index: true 
+    },
     amount: {
         type: Number
     },
@@ -65,6 +69,13 @@ const ChatAndPaymentSchema = new mongoose.Schema({
     },
     deletedDateByProvider: {
         type: Date
+    },
+    isManualChat: {
+        type: Boolean,
+        default: false
+    },
+    groupName: {
+        type: String
     }
 }, { timestamps: true })
 

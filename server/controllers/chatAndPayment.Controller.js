@@ -64,7 +64,7 @@ Go ahead and wait for the user's message. ⏳`;
 
 exports.getAllChatRecord = async (req, res) => {
     try {
-        const allChat = await ChatAndPayment.find().populate('userId').populate('providerId')
+        const allChat = await ChatAndPayment.find().populate('userId').populate('providerId').populate('providerIds');
         return res.status(200).json({
             success: true,
             message: 'All chat records fetched successfully',
@@ -85,9 +85,9 @@ exports.getChatById = async (req, res) => {
         const { id } = req.params;
         const { role } = req.query; // role should be passed as a query param
 
-        let chat = await ChatAndPayment.findOne({ room: id }).populate('userId').populate('providerId');
+        let chat = await ChatAndPayment.findOne({ room: id }).populate('userId').populate('providerId').populate('providerIds');
         if (!chat) {
-            chat = await ChatAndPayment.findById(id).populate('userId').populate('providerId');
+            chat = await ChatAndPayment.findById(id).populate('userId').populate('providerId').populate('providerIds');
         }
 
         if (!chat) {
@@ -159,7 +159,7 @@ exports.getChatByProviderid = async (req, res) => {
 
 exports.getChatByUserid = async (req, res) => {
     try {
-        const { userId } = req.params;
+        const { userId } = req.params; 
         const chat = await ChatAndPayment.find({ userId: userId }).populate('userId').populate('providerId')
         if (!chat) {
             return res.status(404).json({
@@ -401,12 +401,14 @@ exports.deleteMessageFromRoom = async (req, res) => {
 
 exports.createManualChatRoom = async (req, res) => {
     try {
-        const { userId, providerIds } = req.body;
+        const { userId, providerIds, groupName } = req.body;
 
         // 1. Create chat room
         const newChatRoom = new ChatAndPayment({
             userId,
-            providerIds
+            providerIds,
+            isManualChat: true,
+            groupName
         });
         const savedChatRoom = await newChatRoom.save();
 
@@ -434,79 +436,166 @@ exports.createManualChatRoom = async (req, res) => {
     }
 };
 
-exports.addProvidersToChat = async (req, res) => {
+exports.addOrUpdateProvidersInChat = async (req, res) => {
     try {
         const { chatRoomId, providerIds } = req.body;
 
         // Validate input
         if (!chatRoomId) {
-            return res.status(400).json({
-                message: 'Chat room ID is required.'
-            });
+            return res.status(400).json({ message: 'Chat room ID is required.' });
         }
 
         if (!providerIds || (Array.isArray(providerIds) && providerIds.length === 0)) {
-            return res.status(400).json({
-                message: 'At least one provider ID is required.'
-            });
+            return res.status(400).json({ message: 'At least one provider ID is required.' });
         }
 
-        // Ensure providerIds is an array (handle single provider case)
         const providerIdsArray = Array.isArray(providerIds) ? providerIds : [providerIds];
 
         // 1. Check if chat room exists
         const chatRoom = await ChatAndPayment.findById(chatRoomId);
         if (!chatRoom) {
-            return res.status(404).json({
-                message: 'Chat room not found.'
-            });
+            return res.status(404).json({ message: 'Chat room not found.' });
         }
 
-        // 2. Check if providers exist
+        // 2. Validate new providers exist
         const existingProviders = await Provider.find({ _id: { $in: providerIdsArray } });
         if (existingProviders.length !== providerIdsArray.length) {
-            return res.status(404).json({
-                message: 'One or more providers not found.'
-            });
+            return res.status(404).json({ message: 'One or more providers not found.' });
         }
 
-        // 3. Filter out providers that are already in the chat room
-        const newProviderIds = providerIdsArray.filter(
-            providerId => !chatRoom.providerIds.includes(providerId)
-        );
+        const currentProviders = chatRoom.providerIds.map(id => id.toString());
+        const newProviders = providerIdsArray.map(id => id.toString());
 
-        if (newProviderIds.length === 0) {
-            return res.status(400).json({
-                message: 'All specified providers are already in the chat room.'
-            });
+        // 3. Determine which providers to add and remove
+        const providersToAdd = newProviders.filter(id => !currentProviders.includes(id));
+        const providersToRemove = currentProviders.filter(id => !newProviders.includes(id));
+
+        // 4. Update chat room's providerIds field
+        chatRoom.providerIds = providerIdsArray;
+        const updatedChatRoom = await chatRoom.save();
+
+        // 5. Add chatRoomId to new providers
+        if (providersToAdd.length > 0) {
+            await Provider.updateMany(
+                { _id: { $in: providersToAdd } },
+                { $addToSet: { chatRoomIds: chatRoomId } }
+            );
         }
 
-        // 4. Update chat room with new providers
-        const updatedChatRoom = await ChatAndPayment.findByIdAndUpdate(
-            chatRoomId,
-            { $addToSet: { providerIds: { $each: newProviderIds } } },
-            { new: true }
-        );
-
-        // 5. Add chatRoom ID to each new provider
-        await Provider.updateMany(
-            { _id: { $in: newProviderIds } },
-            { $addToSet: { chatRoomIds: chatRoomId } }
-        );
+        // 6. Remove chatRoomId from removed providers
+        if (providersToRemove.length > 0) {
+            await Provider.updateMany(
+                { _id: { $in: providersToRemove } },
+                { $pull: { chatRoomIds: chatRoomId } }
+            );
+        }
 
         return res.status(200).json({
-            message: `Successfully added ${newProviderIds.length} provider(s) to the chat room.`,
+            message: 'Chat room providers updated successfully.',
             data: {
                 chatRoom: updatedChatRoom,
-                addedProviders: newProviderIds
+                addedProviders: providersToAdd,
+                removedProviders: providersToRemove
             }
         });
 
     } catch (error) {
-        console.error("Error adding providers to chat room:", error);
+        console.error("Error updating providers in chat room:", error);
         return res.status(500).json({
-            message: 'An error occurred while adding providers to the chat room.',
+            message: 'An error occurred while updating providers in the chat room.',
             error: error.message
+        });
+    }
+};
+
+exports.getCustomChatById = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        console.log("userId",userId)
+        const chat = await ChatAndPayment.findById(userId).populate('userId').populate('providerIds');
+        if (!chat) {
+            return res.status(404).json({
+                success: false,
+                message: 'Chat not found',
+            })
+        }
+        const filteredMessages = chat.messages || [];
+        res.status(200).json({
+            success: true,
+            message: 'Chat fetched successfully',
+            data: filteredMessages
+        })
+    } catch (error) {
+        console.log("Internal Server error", error)
+        res.status(500).json({
+            success: false,
+            message: "Internal Server error",
+            error: error.message
+        })
+    }
+}
+
+exports.getManualChatBuUserId = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const chat = await ChatAndPayment.find({ userId: userId }).populate('userId').populate('providerId').populate('providerIds')
+        // console.log("chat",chat)
+        if (!chat) {
+            return res.status(404).json({
+                success: false,
+                message: 'Chat not found',
+            })
+        }
+        const filterChat = chat.filter(chat => chat.isManualChat === true);
+        res.status(200).json({
+            success: true,
+            message: 'Chat fetched successfully',
+            data: filterChat
+        })
+    } catch (error) {
+        console.log("Internal Server error", error)
+        res.status(500).json({
+            success: false,
+            message: "Internal Server error",
+            error: error.message
+        })
+    }
+}
+
+exports.getManualChatByProviderId = async (req, res) => {
+    try {
+        const { providerId } = req.params;
+
+        if (!providerId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Provider ID is required',
+            });
+        }
+
+        const chats = await ChatAndPayment.find({ providerIds: { $in: [providerId] } })
+            .populate('userId')
+            .populate('providerId')
+            .populate('providerIds');
+
+        if (!chats || chats.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'No chats found for this provider',
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Chats fetched successfully',
+            data: chats,
+        });
+    } catch (error) {
+        console.error("Internal Server Error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+            error: error.message,
         });
     }
 };
