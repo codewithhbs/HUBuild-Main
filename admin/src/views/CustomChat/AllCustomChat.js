@@ -125,10 +125,6 @@ const AllCustomChat = () => {
                 <div className="spin-style">
                     <CSpinner color="primary" variant="grow" />
                 </div>
-            ) : banners.length === 0 ? (
-                <div className="no-data">
-                    <p>No data available</p>
-                </div>
             ) : (
                 <>
                     <Table
