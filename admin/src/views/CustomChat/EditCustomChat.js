@@ -29,7 +29,7 @@ const EditCustomChat = () => {
 
     const handleFetchSingleCustomChat = async () => {
         try {
-            const { data } = await axios.get(`http://localhost:5000/api/v1/get-chat-by-id/${id}`);
+            const { data } = await axios.get(`https://api.helpubuild.in/api/v1/get-chat-by-id/${id}`);
             const chatData = data.data;
             setChatRoomData(chatData);
             
@@ -77,7 +77,7 @@ const EditCustomChat = () => {
 
     const handleFetchProvider = async () => {
         try {
-            const { data } = await axios.get("http://localhost:5000/api/v1/get-all-provider");
+            const { data } = await axios.get("https://api.helpubuild.in/api/v1/get-all-provider");
             const allData = data.data;
             const architects = allData.filter((item) => item.type === "Architect");
             const interiors = allData.filter((item) => item.type === "Interior");
@@ -139,7 +139,7 @@ const EditCustomChat = () => {
 
         setLoading(true);
         try {
-            const res = await axios.put("http://localhost:5000/api/v1/update-chat-providers", {
+            const res = await axios.put("https://api.helpubuild.in/api/v1/update-chat-providers", {
                 chatRoomId: id,
                 providerIds: formData.providerIds
             });
