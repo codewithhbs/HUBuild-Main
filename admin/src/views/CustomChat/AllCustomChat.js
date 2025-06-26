@@ -27,7 +27,6 @@ const AllCustomChat = () => {
         try {
             const { data } = await axios.get('https://api.helpubuild.in/api/v1/get-all-chat-record');
             const filterData = data.data.filter((item) => item.isManualChat === true);
-            // console.log("all data", filterData)
             setBanners(filterData.reverse() || []);
         } catch (error) {
             console.log('Error fetching chat records:');
@@ -39,7 +38,7 @@ const AllCustomChat = () => {
 
     const handleFetchChat = async (chatRoomId) => {
         try {
-            const { data } = await axios.get(`https://api.helpubuild.in/api/v1/get-chat-by-room/${chatRoomId}`);
+            const { data } = await axios.get(`https://api.helpubuild.in/api/v1/get-group-chat-by-id/${chatRoomId}`);
             setSelectedChat(data.data[0]);
             setShowChatModal(true);
         } catch (error) {
@@ -55,12 +54,12 @@ const AllCustomChat = () => {
                 `https://api.helpubuild.in/api/v1/update_manual_chat_ended/${id}`,
                 { isGroupChatEnded: updatedField }
             );
-            handleFetchBanner()
+            handleFetchBanner();
             toast.success(data.message);
         } catch (error) {
             console.log("Internal server error", error);
         }
-    }
+    };
 
     const handleDeleteBanner = async (id) => {
         setLoading(true);
@@ -116,7 +115,7 @@ const AllCustomChat = () => {
 
     const renderMessageContent = (message) => {
         if (message.file) {
-            if (message.file.type.startsWith('image/')) {
+            if (message.file.type && message.file.type.startsWith('image/')) {
                 return (
                     <img
                         src={message.file.content}
@@ -129,6 +128,22 @@ const AllCustomChat = () => {
             return <a href={message.file.content} download={message.file.name}>{message.file.name}</a>;
         }
         return message.text;
+    };
+
+    // Helper function to get sender name
+    const getSenderName = (senderId, selectedChat) => {
+        if (senderId === selectedChat.userId._id) {
+            return selectedChat.userId.name;
+        }
+        
+        // Find the provider who sent this message
+        const provider = selectedChat.providerIds.find(provider => provider._id === senderId);
+        return provider ? provider.name : 'Unknown';
+    };
+
+    // Helper function to determine if sender is user
+    const isMessageFromUser = (senderId, selectedChat) => {
+        return senderId === selectedChat.userId._id;
     };
 
     const heading = ['S.No', 'Group Name', 'Chat Room', 'User Name', 'Providers Name', 'isChatEnded', 'Action'];
@@ -154,13 +169,15 @@ const AllCustomChat = () => {
                                     <CTableDataCell>
                                         <button
                                             className="btn btn-link text-primary"
-                                            onClick={() => handleFetchChat(item?.room)}
+                                            onClick={() => handleFetchChat(item?._id)}
                                         >
                                             {item?._id}
                                         </button>
                                     </CTableDataCell>
                                     <CTableDataCell>{item?.userId?.name}</CTableDataCell>
-                                    <CTableDataCell>{item?.providerIds && item?.providerIds.map((provider) => provider.name).join(', ')}</CTableDataCell>
+                                    <CTableDataCell>
+                                        {item?.providerIds && item?.providerIds.map((provider) => provider.name).join(', ')}
+                                    </CTableDataCell>
                                     <CTableDataCell>
                                         <button
                                             className={`btn btn-sm ${item.isGroupChatEnded ? 'btn-danger' : 'btn-success'}`}
@@ -169,12 +186,10 @@ const AllCustomChat = () => {
                                             {item.isGroupChatEnded ? 'Reopen Chat' : 'End Chat'}
                                         </button>
                                     </CTableDataCell>
-
-                                    {/* {console.log("item?.providerIds",item?.providerIds)} */}
                                     <CTableDataCell>
                                         <div className="action-parent">
                                             <CNavLink href={`#/project/edit_project/${item._id}`} className='edit'>
-                                                <i class="ri-pencil-fill"></i>
+                                                <i className="ri-pencil-fill"></i>
                                             </CNavLink>
                                             <div
                                                 className="delete"
@@ -214,15 +229,18 @@ const AllCustomChat = () => {
                         }
                     />
 
-                    {/* Chat Modal */}
+                    {/* Chat Modal - Updated for Group Chat */}
                     {showChatModal && selectedChat && (
                         <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
-                            {console.log("object", selectedChat?.messages)}
                             <div className="modal-dialog modal-dialog-centered modal-lg">
                                 <div className="modal-content">
                                     <div className="modal-header bg-primary text-white">
                                         <h5 className="modal-title">
-                                            Chat between {selectedChat.userId?.name} and {selectedChat.providerId?.name}
+                                            Group Chat: {selectedChat.groupName} 
+                                            <small className="d-block">
+                                                User: {selectedChat.userId?.name} | 
+                                                Providers: {selectedChat.providerIds?.map(p => p.name).join(', ')}
+                                            </small>
                                         </h5>
                                         <button
                                             type="button"
@@ -234,7 +252,9 @@ const AllCustomChat = () => {
                                         <div className="chat-container" ref={chatContainerRef}>
                                             {selectedChat.messages && selectedChat.messages.length > 0 ? (
                                                 selectedChat.messages.map((message, index) => {
-                                                    const isUser = message.sender === selectedChat.userId._id;
+                                                    const isUser = isMessageFromUser(message.sender, selectedChat);
+                                                    const senderName = getSenderName(message.sender, selectedChat);
+                                                    
                                                     return (
                                                         <div
                                                             key={index}
@@ -242,7 +262,7 @@ const AllCustomChat = () => {
                                                         >
                                                             <div className="message-content">
                                                                 <div className="message-sender">
-                                                                    {isUser ? selectedChat.userId.name : selectedChat.providerId.name}
+                                                                    {senderName}
                                                                 </div>
                                                                 <div className="message-bubble">
                                                                     {renderMessageContent(message)}
@@ -261,7 +281,6 @@ const AllCustomChat = () => {
                                             )}
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
@@ -270,6 +289,6 @@ const AllCustomChat = () => {
             )}
         </>
     );
-}
+};
 
-export default AllCustomChat
+export default AllCustomChat;
