@@ -646,3 +646,36 @@ exports.updateGroupChatISEnded = async (req, res) => {
         });
     }
 };
+
+exports.getGroupChatById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // Populate both userId and providerIds with their details
+        const chat = await ChatAndPayment.findById(id)
+            .populate('userId')
+            .populate('providerIds');
+            
+        if (!chat) {
+            return res.status(404).json({
+                success: false,
+                message: 'Chat not found',
+            });
+        }
+
+        // Return the complete chat object instead of just messages
+        res.status(200).json({
+            success: true,
+            message: 'Chat fetched successfully',
+            data: [chat] // Wrapping in array to match frontend expectation
+        });
+        
+    } catch (error) {
+        console.log("Internal server error", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message
+        });
+    }
+}

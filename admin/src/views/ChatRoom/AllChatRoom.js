@@ -26,7 +26,8 @@ function AllChatRoom() {
         try {
             const { data } = await axios.get('https://api.helpubuild.in/api/v1/get-all-chat-record');
             // console.log("all data", data.data)
-            setBanners(data.data.reverse() || []);
+            const filterData = data.data.filter((item) => item.isManualChat === false);
+            setBanners(filterData.reverse() || []);
         } catch (error) {
             console.log('Error fetching chat records:');
             toast.error('Failed to load chat records. Please try again.');

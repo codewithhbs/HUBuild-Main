@@ -12,7 +12,7 @@ const { createAboutImage, getAllAboutImage, deleteAboutImage, updateAboutActiveS
 const { createTestimonial, getAllTestimonial, getsingleTestimonial, deleteTestimonial, updateTestimonial, updateTestimonialActiveStatus } = require('../controllers/testimonial.controller');
 const { createBlog, getAllBlog, getSingleBlog, updateBlog, deleteBlog } = require('../controllers/blog.controller');
 const { createBlogComment, getAllComments, getBlogCommentByBlogId, deleteBlogComment } = require('../controllers/blogCommont.controller');
-const { createChatWithNew, getAllChatRecord, getChatByProviderid, getChatByUserid, getChatById, markAllChatsAsRead, markUserChatsAsRead, markProviderChatsAsRead, deleteChatRoom, getchatByRoom, deleteChatByRoom, deleteMessageFromRoom, createManualChatRoom, addOrUpdateProvidersInChat, getCustomChatById, getManualChatByProviderId, getManualChatBuUserId, updateGroupChatISEnded } = require('../controllers/chatAndPayment.Controller');
+const { createChatWithNew, getAllChatRecord, getChatByProviderid, getChatByUserid, getChatById, markAllChatsAsRead, markUserChatsAsRead, markProviderChatsAsRead, deleteChatRoom, getchatByRoom, deleteChatByRoom, deleteMessageFromRoom, createManualChatRoom, addOrUpdateProvidersInChat, getCustomChatById, getManualChatByProviderId, getManualChatBuUserId, updateGroupChatISEnded, getGroupChatById } = require('../controllers/chatAndPayment.Controller');
 const { createWithdrawal, updateWithdrawStatus, deleteWithdrawRequest, getWithdrawalsByProviderId, getAllWithdrawals, getTotalWithdrawAndCommission } = require('../controllers/withdraw.controller');
 const { createCommission, updateCommission, getSingleCommission, getAllCommissions, deleteCommission } = require('../controllers/commission.controller');
 const { createProviderService, getAllProviderService, getProviderServiceById, updateProviderService, deleteProviderService, findbyProvider } = require('../controllers/providerService.controller');
@@ -187,6 +187,7 @@ router.put('/mark-user-chats-as-read/:userId', markUserChatsAsRead);
 router.put('/mark-provider-chats-as-read/:providerId', markProviderChatsAsRead);
 router.delete('/delete-chat-room/:chatRoomId', deleteChatRoom)
 router.get('/get-chat-by-room/:chatRoomId', getchatByRoom)
+router.get('/get-group-chat-by-id/:id', getGroupChatById)
 router.get('/get-all-chat', getAllChat)
 router.delete('/delete_chat_bt_room/:chatRoomId', deleteChatByRoom)
 router.patch('/update-provider-deactive-status/:id', changeProviderDeactiveStatus)

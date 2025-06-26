@@ -19,46 +19,52 @@ const _nav = [
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
   },
   {
-    component: CNavItem,
-    name: 'Banner',
-    to: '/banner/all-banner',
-    icon: <CIcon icon={cilImage} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Work Description Image',
-    to: '/work_description_image/all_work_description_image',
-    icon: <CIcon icon={cilImage} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Plan Journey Image',
-    to: '/plan_journey_image/all_plan_journey_image',
-    icon: <CIcon icon={cilImage} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'About Image',
-    to: '/about_image/all_about_image',
-    icon: <CIcon icon={cilImage} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Testimonial',
-    to: '/testimonial/all_testimonial',
+    component: CNavGroup,
+    name: 'Home Layout',
+    to: '#',
     icon: <CIcon icon={cilText} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Blogs',
-    to: '/blogs/all_blogs',
-    icon: <CIcon icon={cilText} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'All Expertise',
-    to: '/expertise/all_expertise',
-    icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Banner',
+        to: '/banner/all-banner',
+      },
+      {
+        component: CNavItem,
+        name: 'Work Description Image',
+        to: '/work_description_image/all_work_description_image',
+      },
+      {
+        component: CNavItem,
+        name: 'Plan Journey Image',
+        to: '/plan_journey_image/all_plan_journey_image',
+      },
+      {
+        component: CNavItem,
+        name: 'About Image',
+        to: '/about_image/all_about_image',
+      },
+      {
+        component: CNavItem,
+        name: 'Testimonial',
+        to: '/testimonial/all_testimonial',
+      },
+      {
+        component: CNavItem,
+        name: 'Blogs',
+        to: '/blogs/all_blogs',
+      },
+      {
+        component: CNavItem,
+        name: 'Term & Condition',
+        to: '/term/edit_term',
+      },
+      {
+        component: CNavItem,
+        name: 'All Expertise',
+        to: '/expertise/all_expertise',
+      },
+    ],
   },
   {
     component: CNavItem,
@@ -84,12 +90,12 @@ const _nav = [
     to: '/call/all_call',
     icon: <CIcon icon={cilChatBubble} customClassName="nav-icon" />,
   },
-  // {
-  //   component: CNavItem,
-  //   name: 'All Projects',
-  //   to: '/project/all_project',
-  //   icon: <CIcon icon={cilChatBubble} customClassName="nav-icon" />,
-  // },
+  {
+    component: CNavItem,
+    name: 'All Projects',
+    to: '/project/all_project',
+    icon: <CIcon icon={cilChatBubble} customClassName="nav-icon" />,
+  },
   {
     component: CNavItem,
     name: 'Withdraw Request',
@@ -112,12 +118,6 @@ const _nav = [
     component: CNavItem,
     name: 'Commission',
     to: '/commission/edit_commission',
-    icon: <CIcon icon={cilWallet} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Term & Condition',
-    to: '/term/edit_term',
     icon: <CIcon icon={cilWallet} customClassName="nav-icon" />,
   },
   {

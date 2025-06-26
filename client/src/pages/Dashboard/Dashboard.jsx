@@ -347,6 +347,24 @@ function Dashboard() {
                       {/* <span className="ms-3 me-4">|</span> */}
                     </p>
 
+                    <p
+                      style={{ fontWeight: '700' }}
+                      className="formarginbottommore text-uppercase marginrightmore"
+                    >
+                      <i className="fas fa-cog me-2" />{' '}
+                      <a
+                        href='manual-chat'
+                        style={{ cursor: 'pointer' }}
+                        className={`cursor-pointer ${activeTab === 'settings'
+                          ? 'text-danger fw-bold text-decoration-underline'
+                          : ''
+                          }`}
+                      >
+                        Manual Chat
+                      </a>
+                      {/* <span className="ms-3 me-4">|</span> */}
+                    </p>
+
                     <button
                       type="button"
                       className="formarginbottommore btn logout_btn mx-2 btn-sm btn-floating"
