@@ -31,6 +31,9 @@ import AllCallHistory from './views/CallHistory/AllCallHistory'
 import AllCustomChat from './views/CustomChat/AllCustomChat'
 import AddCustomChat from './views/CustomChat/AddCustomChat'
 import EditCustomChat from './views/CustomChat/EditCustomChat'
+import Eprivacy from './views/Term/Eprivacy'
+import EDisc from './views/Term/EDisc'
+import ERefund from './views/Term/ERefund'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
@@ -142,90 +145,93 @@ const routes = [
 
 
 
-  // custom code 
+  // custom code
 
-  // banner routes here 
+  // banner routes here
   { path: '/banner', name: 'Banner', element: Cards, exact: true },
   { path: '/banner/add-banner', name: 'Add Banner', element: AddBanner },
   { path: '/banner/all-banner', name: 'All Banner', element: ALLBanner },
 
-  // work description routes here 
+  // work description routes here
   { path: '/work_description_image', name: 'Work Description Image', element: Cards, exact: true },
   { path: '/work_description_image/add_work_description_image', name: 'Add Work Description Image', element: AddWorkDescriptionImage },
   { path: '/work_description_image/all_work_description_image', name: 'All Banner', element: AllWorkDescriptionImage },
 
-  // plan journey routes here 
+  // plan journey routes here
   { path: '/plan_journey_image', name: 'Plan Journey Image', element: Cards, exact: true },
   { path: '/plan_journey_image/add_plan_journey_image', name: 'Add Plan Journey Image', element: AddPlanJourneyImage },
   { path: '/plan_journey_image/all_plan_journey_image', name: 'All Plan Journey Image', element: AllPlanJourneyImage },
 
-  // about image routes here 
+  // about image routes here
   { path: '/about_image', name: 'Plan Journey Image', element: Cards, exact: true },
   { path: '/about_image/add_about_image', name: 'Add About Image', element: AddAboutImage },
   { path: '/about_image/all_about_image', name: 'All About Image', element: AllAboutImage },
 
-  // testimonial routes here 
+  // testimonial routes here
   { path: '/testimonial', name: 'Testimonial', element: Cards, exact: true },
   { path: '/testimonial/add_testimonial', name: 'Add Testimonial', element: AddTestimonial },
   { path: '/testimonial/all_testimonial', name: 'All Testimonial', element: AllTestimonial },
   { path: '/testimonial/edit_testimonial/:id', name: 'Edit Testimonial', element: EditTestimonial },
 
-  // blogs routes here 
+  // blogs routes here
   { path: '/blogs', name: 'Blogs', element: Cards, exact: true },
   { path: '/blogs/add_blogs', name: 'Add Blogs', element: AddBlogs },
   { path: '/blogs/all_blogs', name: 'All Blogs', element: AllBlogs },
   { path: '/blogs/edit_blogs/:id', name: 'Edit Blogs', element: EditBlogs },
 
-  // blogs routes here 
+  // blogs routes here
   { path: '/user', name: 'Blogs', element: Cards, exact: true },
   { path: '/user/all_user', name: 'All Users', element: AllUser },
 
-  // chat routes here 
+  // chat routes here
   { path: '/chats', name: 'Chats', element: Cards, exact: true },
   { path: '/chats/all_chat', name: 'All Chats', element: AllChatRoom },
 
-  // provider routes here 
+  // provider routes here
   { path: '/provider', name: 'Consultant', element: Cards, exact: true },
   { path: '/provider/all_provider', name: 'All Consultant', element: AllProvider },
 
-  // withdraw routes here 
+  // withdraw routes here
   { path: '/withdraw', name: 'Withdraw Request', element: Cards, exact: true },
   { path: '/withdraw/all_withdraw', name: 'All Withdraw Request', element: AllWithdraw },
 
-  // membership routes here 
+  // membership routes here
   { path: '/membership', name: 'Membership', element: Cards, exact: true },
   { path: '/membership/all_membership', name: 'All Membership', element: AllMembership },
   { path: '/membership/add_membership', name: 'Add Membership', element: AddMembership },
   { path: '/membership/edit_membership/:id', name: 'Edit Membership', element: EditMembership },
-  
-  // globel dis route here 
-  
+
+  // globel dis route here
+
   { path: '/globel-ref-dis', name: 'Globel Referal Discount', element: Cards, exact: true },
   { path: '/globel-ref-dis/update-globel-ref-dis', name: 'Edit Globel Referal Discount', element: EditGlobelDisPer },
-  
-  // globel dis route here 
-  
+
+  // globel dis route here
+
   { path: '/admin-coupon', name: 'Admin Coupon', element: Cards, exact: true },
   { path: '/admin-coupon/all_admin_coupon', name: 'All Admin Coupon', element: AllAdminCoupon },
   { path: '/admin-coupon/add_admin_coupon', name: 'Add Admin Coupon', element: AddAdminCoupon },
   { path: '/admin-coupon/edit_admin_coupon/:id', name: 'Edit Admin Coupon', element: EditAdminCoupon },
-  
-  // newsletter routes here 
+
+  // newsletter routes here
   { path: '/newsletter', name: 'Newsletter', element: Cards, exact: true },
   { path: '/newsletter/all_newsletter', name: 'All Newsletter', element: AllNewsLetter},
 
-  // expertise routes here 
-  
+  // expertise routes here
+
   { path: '/expertise', name: 'Expertise', element: Cards, exact: true },
   { path: '/expertise/all_expertise', name: 'All Expertise', element: AllExpertise },
   { path: '/expertise/add_expertise', name: 'Add Expertise', element: AddExpertise },
   { path: '/expertise/edit_expertise/:id', name: 'Edit Expertise', element: EditExpertise },
-  
+
   // commission routes here
   { path: '/commission/edit_commission', name: 'Edit Commission', element: EditCommission },
-  
+
   // term and condition routes here
   { path: '/term/edit_term', name: 'Edit Term', element: EditTerm },
+  { path: '/term/edit_privacy', name: 'Edit Privacy Policy', element: Eprivacy },
+  { path: '/term/edit_disclamier', name: 'Edit Disclaimer', element: EDisc },
+  { path: '/term/edit_refund', name: 'Edit Cancellation and refund', element: ERefund },
 
   { path: '/call/all_call', name: 'All Call', element: AllCallHistory },
 

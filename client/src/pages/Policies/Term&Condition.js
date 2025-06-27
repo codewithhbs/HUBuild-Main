@@ -1,29 +1,38 @@
-import React from 'react';
-import { useEffect } from 'react';
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 const TermCondition = () => {
-  const [term, setTerm] = useState({})
-  const id = '67f8bb6f160226ea5b6a957f'
+  const location = useLocation();
+  const [term, setTerm] = useState(null);
+
+  const searchParams = new URLSearchParams(location.search);
+  const termType = searchParams.get('type');
+
   useEffect(() => {
     const fetchTerm = async () => {
       try {
-        const { data } = await axios.get(`https://api.helpubuild.in/api/v1/single_term/${id}`)
-        setTerm(data.data)
+        const { data } = await axios.get(`https://api.helpubuild.in/api/v1/single_term/${termType}`);
+        setTerm(data?.data);
+        window.scrollTo(0, 0); // Scroll to top when termType changes
       } catch (error) {
-        console.log("Internal server error", error)
+        console.error('Error fetching term:', error.message);
       }
-    }
-    fetchTerm();
-  }, [])
-  return (
-    <>
+    };
 
-      <div className="container mt-5 mb-5">
-        <div dangerouslySetInnerHTML={{ __html: term?.text }}></div>
-      </div>
-    </>
+    if (termType) {
+      fetchTerm();
+    }
+  }, [termType]);
+
+  return (
+    <div className="container mt-5 mb-5">
+      {term ? (
+        <div dangerouslySetInnerHTML={{ __html: term.text }}></div>
+      ) : (
+        <p>Loading...</p>
+      )}
+    </div>
   );
 };
 

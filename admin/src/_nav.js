@@ -57,7 +57,22 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Term & Condition',
-        to: '/term/edit_term',
+        to: '/term/edit_term?type=term',
+      },
+      {
+        component: CNavItem,
+        name: 'Privacy & Policy',
+        to: '/term/edit_privacy?type=privacy',
+      },
+      {
+        component: CNavItem,
+        name: 'Disclaimer',
+        to: '/term/edit_disclamier?type=disclamier',
+      },
+      {
+        component: CNavItem,
+        name: 'Cancel & Refund',
+        to: '/term/edit_refund?type=refund',
       },
       {
         component: CNavItem,

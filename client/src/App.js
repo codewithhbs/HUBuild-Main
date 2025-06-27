@@ -97,7 +97,7 @@ function App() {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/cancellation-refund-policy" element={<Cancellation />} />
         <Route path="/disclaimer" element={<Disclaimer />} />
-        <Route path="/terms-and-conditions" element={<TermCondition />} />
+        <Route path="/Pages" element={<TermCondition />} />
         <Route path="/manual-chat" element={<ManualChat />} />
       </Routes>
       <Toaster />

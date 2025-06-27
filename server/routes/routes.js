@@ -279,7 +279,7 @@ router.delete('/delete_expertise/:id', deleteExpertise)
 
 router.post('/create_term', createTerm)
 router.get('/all_term', getTerm)
-router.get('/single_term/:id', singleTerm)
+router.get('/single_term/:type', singleTerm)
 router.put('/update_term/:id', updateTerm)
 
 // create manual chat room with multiple vendor and user 

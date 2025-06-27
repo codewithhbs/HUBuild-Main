@@ -12,7 +12,6 @@ const quickLinks = [
   { to: '/about', text: 'About Us' },
   { to: '/blog', text: 'Blog' },
   { to: '/contact', text: 'Contact Us' },
-  // { to: '/mobile_card', text: 'Mobile Card' },
 ];
 
 const serviceLinks = [
@@ -20,27 +19,47 @@ const serviceLinks = [
   { to: '/talk-to-interior', text: 'Talk to Interior Designer' },
   { to: '/vastu', text: 'Talk to Vastu Experts' },
 ];
-const legalLinks = [
-  { to: '/privacy-policy', text: 'Privacy Policy' },
-  { to: '/cancellation-refund-policy', text: 'Cancellation & Refund Policy' },
-  { to: '/disclaimer', text: 'Disclaimer' },
-  { to: '/terms-and-conditions', text: 'Terms & Conditions' },
-];
-
 
 const Footer = () => {
   const [email, setEmail] = useState('');
-  const [token, setToken] = useState(null)
+  const [token, setToken] = useState(null);
+  const [legalLinks, setLegalLinks] = useState([]);
 
   useEffect(() => {
-    // const GetToken = () => {
     const data = GetData('token');
     if (data) {
       setToken(data);
     }
-    // };
+  }, []);
 
-  }, [])
+  const getAllTermForFooter = async () => {
+    try {
+      const { data } = await axios.get('https://api.helpubuild.in/api/v1/all_term');
+      console.log('All Terms for Footer:', data);
+      if (data?.data?.length > 0) {
+        const terms = data.data.map((item) => ({
+          to: `/Pages?type=${item.type}`,
+          text:
+            item.type === 'privacy'
+              ? 'Privacy Policy'
+              : item.type === 'disclamier'
+              ? 'Disclaimer'
+              : item.type === 'refund'
+              ? 'Cancellation & Refund Policy'
+              : item.type === 'term'
+              ? 'Terms & Conditions'
+              : item.type.charAt(0).toUpperCase() + item.type.slice(1),
+        }));
+        setLegalLinks(terms);
+      }
+    } catch (error) {
+      console.error('Error fetching terms for footer:', error.message);
+    }
+  };
+
+  useEffect(() => {
+    getAllTermForFooter();
+  }, []);
 
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
@@ -49,7 +68,8 @@ const Footer = () => {
       toast.success(res.data.message);
       setEmail('');
     } catch (error) {
-      console.log("Internal sever error",error)
+      console.log("Internal server error", error);
+      toast.error('Something went wrong');
     }
   };
 
@@ -63,15 +83,21 @@ const Footer = () => {
             <ul className="footer-contact-list">
               <li className="footer-contact-item">
                 <MapPin className="footer-contact-icon" />
-                <p style={{color:'white'}}>E-520A, 3rd Floor, Sector 7, Dwarka, New Delhi- 110075</p>
+                <p style={{ color: 'white' }}>
+                  E-520A, 3rd Floor, Sector 7, Dwarka, New Delhi- 110075
+                </p>
               </li>
               <li className="footer-contact-item">
                 <Phone className="footer-contact-icon" />
-                <a style={{color:'white'}} href="tel:+919220441214">+91 9220441214</a>
+                <a style={{ color: 'white' }} href="tel:+919220441214">
+                  +91 9220441214
+                </a>
               </li>
               <li className="footer-contact-item">
                 <Mail className="footer-contact-icon" />
-                <a style={{color:'white'}} href="mailto:info@helpubuild.in">info@helpubuild.in</a>
+                <a style={{ color: 'white' }} href="mailto:info@helpubuild.in">
+                  info@helpubuild.in
+                </a>
               </li>
             </ul>
           </div>
@@ -81,7 +107,7 @@ const Footer = () => {
             <h3>Quick Links</h3>
             <ul className="footer-links">
               {quickLinks
-                .filter((link) => !(token && link.key === 'partner')) // Remove "Become A Partner" if token exists
+                .filter((link) => !(token && link.key === 'partner'))
                 .map((link) => (
                   <li key={link.to}>
                     <Link to={link.to}>{link.text}</Link>
@@ -89,9 +115,6 @@ const Footer = () => {
                 ))}
             </ul>
           </div>
-
-          {/* Legal Links */}
-
 
           {/* Services */}
           <div className="footer-widget">
@@ -104,6 +127,8 @@ const Footer = () => {
               ))}
             </ul>
           </div>
+
+          {/* Legal Links */}
           <div className="footer-widget">
             <h3>Legal</h3>
             <ul className="footer-links">
@@ -114,10 +139,14 @@ const Footer = () => {
               ))}
             </ul>
           </div>
+
           {/* Newsletter */}
           <div className="footer-widget">
             <h3>Newsletter</h3>
-            <p>Subscribe for insights on architecture, interior design, Vastu tips, and exclusive offers.</p>
+            <p>
+              Subscribe for insights on architecture, interior design, Vastu tips, and exclusive
+              offers.
+            </p>
             <form onSubmit={handleNewsletterSubmit} className="newsletter-form">
               <div className="newsletter-input-group">
                 <input

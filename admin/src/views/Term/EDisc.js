@@ -3,7 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import JoditEditor from 'jodit-react';
 
-const EditTerm = () => {
+const EDisc = () => {
   const [text, setText] = useState('');
   const [typse, setType] = useState('');
   const [id, setId] = useState(null);
@@ -120,7 +120,7 @@ const EditTerm = () => {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">
-        Edit Term: <span className="text-blue-600">Term & Conditions</span>
+        Edit Term: <span className="text-blue-600">Disclamier</span>
       </h1>
 
       <form onSubmit={handleSubmit}>
@@ -150,4 +150,4 @@ const EditTerm = () => {
   );
 };
 
-export default EditTerm;
+export default EDisc;
