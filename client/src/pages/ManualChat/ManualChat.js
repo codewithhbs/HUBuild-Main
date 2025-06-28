@@ -1,8 +1,6 @@
-"use client"
-
 import { useEffect, useMemo, useState, useCallback } from "react"
 import "./chat.css"
-import { MdAttachment, MdSend, MdArrowBack, MdSearch, MdPhone, MdExpandMore } from "react-icons/md"
+import { MdAttachment, MdSend, MdArrowBack, MdSearch, MdPhone, MdExpandMore, MdUndo, MdClear, MdBrush } from "react-icons/md"
 import ScrollToBottom from "react-scroll-to-bottom"
 import axios from "axios"
 import { GetData } from "../../utils/sessionStoreage"
@@ -10,17 +8,20 @@ import toast from "react-hot-toast"
 import AccessDenied from "../../components/AccessDenied/AccessDenied"
 import { useSocket } from "../../context/SocketContext"
 import { useNavigate, useLocation } from "react-router-dom"
-import { Modal, Button, Dropdown } from "react-bootstrap"
+import { Modal, Button, Dropdown, ButtonGroup } from "react-bootstrap"
 import "bootstrap/dist/css/bootstrap.min.css"
+import CanvasDraw from "react-canvas-draw"
+import { useRef } from "react"
 
 const ENDPOINT = "https://api.helpubuild.in/"
-const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB file size limit
+const MAX_FILE_SIZE = 5 * 1024 * 1024
 
 const GroupChat = () => {
   // State Management
   const [showModal, setShowModal] = useState(false)
   const [selectedImage, setSelectedImage] = useState(null)
   const [isFetchingChatStatus, setIsFetchingChatStatus] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
   const [socketId, setSocketId] = useState("")
@@ -42,9 +43,15 @@ const GroupChat = () => {
   const [isUserConfirming, setIsUserConfirming] = useState(false)
   const [selectedChat, setSelectedChat] = useState(null)
   const [connectedProviders, setConnectedProviders] = useState(new Set())
-  const [groupMembers, setGroupMembers] = useState([]) // New state for group members
+  const [groupMembers, setGroupMembers] = useState([])
   const [isChatEnded, setIsChatEnded] = useState(false)
+  const [downloadUrl, setDownloadUrl] = useState(null);
+  // Canvas annotation states
+  const [brushColor, setBrushColor] = useState("#ff0000")
+  const [brushRadius, setBrushRadius] = useState(2)
+  const [isAnnotating, setIsAnnotating] = useState(false)
 
+  const canvasRef = useRef()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -59,6 +66,155 @@ const GroupChat = () => {
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
+  // Handle canvas actions
+  const handleUndo = () => {
+    if (canvasRef.current) {
+      canvasRef.current.undo()
+    }
+  }
+  useEffect(() => {
+    if (!selectedImage?.content) return;
+
+    let url;
+
+    // CASE 1: Already a base64 data URL
+    if (typeof selectedImage.content === "string" && selectedImage.content.startsWith("data:image")) {
+      url = selectedImage.content;
+    }
+
+    // CASE 2: Buffer content (Array of numbers)
+    else if (Array.isArray(selectedImage.content)) {
+      const byteArray = new Uint8Array(selectedImage.content);
+      const blob = new Blob([byteArray], { type: selectedImage.type || "image/jpeg" });
+      url = URL.createObjectURL(blob);
+    }
+
+    setDownloadUrl(url);
+
+    // Cleanup Blob URL when component unmounts or changes
+    return () => {
+      if (url?.startsWith("blob:")) URL.revokeObjectURL(url);
+    };
+  }, [selectedImage]);
+
+  const handleBase64Download = () => {
+    try {
+      const base64Data = downloadUrl;
+      console.log("Step 1: Received base64Data", base64Data);
+
+      if (!base64Data || typeof base64Data !== "string" || !base64Data.startsWith("data:")) {
+        console.error("❌ Step 2: Invalid base64 data");
+        return;
+      }
+
+      const parts = base64Data.split(',');
+      const byteString = atob(parts[1]);
+      const mimeString = parts[0].split(':')[1].split(';')[0];
+      console.log("✅ Step 3: Decoded base64 to byte string");
+      console.log("MIME Type:", mimeString);
+
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      console.log("✅ Step 4: Converted to Uint8Array");
+
+      const blob = new Blob([ia], { type: mimeString });
+      const blobUrl = URL.createObjectURL(blob);
+      console.log("✅ Step 5: Created Blob URL", blobUrl);
+
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = 'annotated-image.png';
+      link.target = '_blank'; // Important for some browsers
+
+      document.body.appendChild(link);
+
+      // Use requestAnimationFrame for natural user-triggered behavior
+      requestAnimationFrame(() => {
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+        console.log("✅ Step 7: Cleanup complete");
+      });
+
+      console.log("✅ Step 6: Download triggered");
+    } catch (error) {
+      console.error("❌ Error during base64 download:", error);
+    }
+  };
+
+  const handleClear = () => {
+    if (canvasRef.current) {
+      canvasRef.current.clear()
+    }
+  }
+
+  const handleSendAnnotation = async () => {
+    setLoading(true)
+    if (!canvasRef.current || !selectedImage?.content) return;
+
+    try {
+      // Access both canvas layers
+      const drawingCanvas = canvasRef.current.canvas.drawing; // user drawing
+      const width = drawingCanvas.width;
+      const height = drawingCanvas.height;
+
+      // Create an off-screen canvas to merge background and drawing
+      const mergedCanvas = document.createElement("canvas");
+      mergedCanvas.width = width;
+      mergedCanvas.height = height;
+      const ctx = mergedCanvas.getContext("2d");
+
+      // Load the background image
+      const backgroundImg = new Image();
+      backgroundImg.src = selectedImage.content;
+
+      backgroundImg.onload = () => {
+        // Draw background image
+        ctx.drawImage(backgroundImg, 0, 0, width, height);
+
+        // Draw the drawing canvas on top
+        ctx.drawImage(drawingCanvas, 0, 0, width, height);
+
+        // Export the merged result
+        const mergedDataUrl = mergedCanvas.toDataURL("image/png");
+
+        const annotatedFile = {
+          name: `annotated_${selectedImage?.name || "image.png"}`,
+          type: "image/png",
+          content: mergedDataUrl,
+        };
+
+        console.log("Sending merged image", annotatedFile?.content);
+
+        socket.emit("manual_file_upload", {
+          room: currentRoomId,
+          fileData: annotatedFile,
+          senderId: userData._id,
+          timestamp: new Date().toISOString(),
+        });
+
+        toast.success("Annotated image sent to chat!");
+        setShowModal(false);
+        setIsAnnotating(false);
+      };
+
+      backgroundImg.onerror = () => {
+        toast.error("Failed to load background image");
+      };
+    } catch (error) {
+      toast.error("Failed to send annotated image");
+      console.error("Error sending annotation:", error);
+    } finally {
+      setLoading(false)
+
+    }
+  };
+
+
+
   // User data from session storage
   const userData = useMemo(() => {
     const data = GetData("user")
@@ -68,10 +224,15 @@ const GroupChat = () => {
   const handleImageClick = (image) => {
     setSelectedImage(image)
     setShowModal(true)
+    setIsAnnotating(false)
   }
 
   const handleCloseModal = () => {
     setShowModal(false)
+    setIsAnnotating(false)
+    if (canvasRef.current) {
+      canvasRef.current.clear()
+    }
   }
 
   const id = userData?._id || ""
@@ -107,6 +268,8 @@ const GroupChat = () => {
   // Fetch group chat status
   useEffect(() => {
     const fetchGroupChatStatus = async () => {
+      setLoading(true)
+
       if (!currentRoomId) return
 
       setIsFetchingChatStatus(true)
@@ -121,6 +284,8 @@ const GroupChat = () => {
         toast.error("Failed to fetch chat status")
         setIsAbleToJoinChat(false)
       } finally {
+        setLoading(false)
+
         setIsFetchingChatStatus(false)
       }
     }
@@ -132,6 +297,8 @@ const GroupChat = () => {
 
   // Fetch group chat history
   const fetchGroupChatHistory = useCallback(async () => {
+        setLoading(true)
+
     if (!userData) {
       toast.error("Please login first")
       return
@@ -147,6 +314,9 @@ const GroupChat = () => {
       setAllGroupChats(data.data.reverse())
     } catch (error) {
       toast.error("Failed to load group chat history")
+    }finally{
+          setLoading(false)
+
     }
   }, [userData])
 
@@ -204,12 +374,12 @@ const GroupChat = () => {
   )
 
   const handleCallMember = useCallback(async (member, selectedChat) => {
-    console.log("member", member)
+    setLoading(true)
+
     if (!userData) {
       toast.error("Please login first")
       return
     }
-    // console.log("selectedChat",selectedChat)
 
     let phoneNumber = member?.phoneNumber;
 
@@ -218,9 +388,6 @@ const GroupChat = () => {
       return;
     }
 
-    // console.log("PhoneNumber:", phoneNumber);
-
-    // Clean the number: remove all characters except digits and leading +
     const cleanedNumber = phoneNumber.replace(/[^+\d]/g, '');
 
     try {
@@ -229,7 +396,6 @@ const GroupChat = () => {
         const callFrom = userData.mobileNumber || userData.PhoneNumber
         const callTo = member?.phoneNumber
         console.log("all detail =", room, callFrom, callTo)
-        // window.location.href = `tel:${cleanedNumber}`;
         const res = await axios.post(`${ENDPOINT}api/v1/create_call_for_free`, { roomId: room, callFrom, callTo });
         toast.success(`Calling ${member.name}...`);
       } else {
@@ -237,9 +403,11 @@ const GroupChat = () => {
       }
     } catch (error) {
       console.log("Internal server error", error)
+    }finally{
+          setLoading(false)
+
     }
   }, []);
-
 
   // Handle selecting a group chat from the sidebar
   const handleChatStart = useCallback(
@@ -266,7 +434,7 @@ const GroupChat = () => {
         setCurrentRoomId(chatId)
         setIsChatStarted(true)
         setIsChatOnGoing(true)
-        setGroupMembers(getGroupMembers(chatData)) // Set group members
+        setGroupMembers(getGroupMembers(chatData))
         setIsChatEnded(chatData?.isGroupChatEnded)
 
         // Auto-join the room
@@ -280,7 +448,7 @@ const GroupChat = () => {
         } else {
           socket.emit("join_manual_room", {
             userId: userId,
-            astrologerId: providerIds[0], // Use first provider for compatibility
+            astrologerId: providerIds[0],
             role: userData.role,
             room: chatId,
           })
@@ -306,7 +474,7 @@ const GroupChat = () => {
       setIsActive(false)
       setIsChatOnGoing(false)
       setConnectedProviders(new Set())
-      setGroupMembers([]) // Clear group members
+      setGroupMembers([])
       fetchGroupChatHistory()
     } catch (error) {
       toast.error("Failed to end group chat properly")
@@ -428,7 +596,6 @@ const GroupChat = () => {
       setMessages((prev) => [...prev, messageObj])
     })
 
-    // Rest of your socket listeners...
     socket.on("user_status", ({ userId, astrologerId, status, role }) => {
       if (role === "provider") {
         setConnectedProviders((prev) => {
@@ -460,14 +627,6 @@ const GroupChat = () => {
     socket.on("message_sent", (data) => {
       console.log("Message sent confirmation:", data)
     })
-
-    // socket.on("file_upload_success", (data) => {
-    //   toast.success("File uploaded successfully")
-    // })
-
-    // socket.on("file_upload_error", (data) => {
-    //   toast.error(data.error)
-    // })
 
     socket.on("chat_ended", (data) => {
       if (data.success) {
@@ -513,7 +672,7 @@ const GroupChat = () => {
     return !prohibitedPatterns.some((pattern) => pattern.test(messageText))
   }, [])
 
-  // Enhanced file upload handler in your React component
+  // Enhanced file upload handler
   const handleFileChange = useCallback(
     (event) => {
       const file = event.target.files[0]
@@ -531,7 +690,6 @@ const GroupChat = () => {
         return
       }
 
-      // Show uploading toast
       const uploadingToast = toast.loading("Uploading file...")
 
       const reader = new FileReader()
@@ -550,7 +708,6 @@ const GroupChat = () => {
             timestamp: new Date().toISOString(),
           })
 
-          // Clear the uploading toast - success/error will be handled by socket events
           toast.dismiss(uploadingToast)
 
         } catch (error) {
@@ -573,6 +730,7 @@ const GroupChat = () => {
   // Handle message submission
   const handleSubmit = useCallback(
     (e) => {
+      
       e.preventDefault()
 
       const trimmedMessage = message && typeof message === "string" ? message.trim() : ""
@@ -622,10 +780,39 @@ const GroupChat = () => {
       return providerNames
     }
   }
+  const isMobile = window.innerWidth <= 710;
 
   if (!userData) {
     return <AccessDenied />
   }
+if (loading) {
+  return (
+    <div
+      className="d-flex flex-column justify-content-center align-items-center bg-light"
+      style={{ height: '100dvh', textAlign: 'center' }}
+    >
+      <div
+        className="spinner-border"
+        role="status"
+        style={{
+          width: '3rem',
+          height: '3rem',
+          borderColor: '#eab936',
+          borderRightColor: 'transparent',
+        }}
+      >
+        <span className="visually-hidden">Loading...</span>
+      </div>
+
+      <h5 className="fw-semibold mb-1 mt-4" style={{ color: '#eab936' }}>
+        Fetching Live Projects...
+      </h5>
+      <small className="text-muted">Please wait while we prepare your workspace.</small>
+    </div>
+  );
+}
+
+
 
   return (
     <div className="modern-chat-container">
@@ -707,25 +894,27 @@ const GroupChat = () => {
             <div className="col-md-8 chat-window-container">
               {isChatBoxActive ? (
                 <>
-                  <div className="chat-header">
+                  <div className="chatn-header">
                     {isMobileView && (
-                      <button className="back-button" onClick={handleBackToList}>
-                        <MdArrowBack />
+                      <button className="chatn-back-button" onClick={handleBackToList}>
+                        <MdArrowBack size={20} />
                       </button>
                     )}
 
-                    <div className="chat-user-info">
-                      <div className="avatar">
+                    <div className="chatn-user-info">
+                      <div className="chatn-avatar">
                         {selectedChat && (
                           <img
-                            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(selectedChat?.groupName || "Group")}&background=random`}
+                            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                              selectedChat?.groupName || "Group"
+                            )}&background=random`}
                             alt={selectedChat?.groupName || "Group Chat"}
                           />
                         )}
                       </div>
-                      <div className="user-details">
-                        <div className="user-name">{selectedChat?.groupName || "Group Chat"}</div>
-                        <div className="user-status">
+                      <div className="chatn-user-details">
+                        <div className="chatn-user-name">{selectedChat?.groupName || "Group Chat"}</div>
+                        <div className="chatn-user-status">
                           {userData?.role === "user"
                             ? `${connectedProviders.size}/${selectedProviderIds.length} providers online`
                             : `Group Chat`}
@@ -733,17 +922,15 @@ const GroupChat = () => {
                       </div>
                     </div>
 
-                    {/* Call Members Dropdown */}
-                    <div className="chat-actions">
+                    <div className="chatn-actions">
                       {groupMembers.length > 0 && (
                         <Dropdown>
                           <Dropdown.Toggle
                             variant="outline-primary"
                             id="call-members-dropdown"
-                            style={{ fontSize: '17px' }}
-                            className="d-flex align-items-center"
+                            className="chatn-call-dropdown"
                           >
-                            <MdPhone className="me-2" />
+                            <MdPhone className="me-1" />
                             Call Member
                             <MdExpandMore className="ms-1" />
                           </Dropdown.Toggle>
@@ -754,7 +941,7 @@ const GroupChat = () => {
                               <Dropdown.Item
                                 key={member.id}
                                 onClick={() => handleCallMember(member, selectedChat)}
-                                className="d-flex align-items-center justify-content-between"
+                                className="d-flex justify-content-between align-items-center"
                               >
                                 <div>
                                   <div className="fw-semibold">{member.name}</div>
@@ -763,14 +950,12 @@ const GroupChat = () => {
                                 <MdPhone className="text-success" />
                               </Dropdown.Item>
                             ))}
-                            {groupMembers.length === 0 && (
-                              <Dropdown.Item disabled>No other members in this group</Dropdown.Item>
-                            )}
                           </Dropdown.Menu>
                         </Dropdown>
                       )}
                     </div>
                   </div>
+
 
                   <ScrollToBottom className="messages-container" initialScrollBehavior="smooth">
                     {messages.length === 0 ? (
@@ -794,17 +979,14 @@ const GroupChat = () => {
                               className="message-bubble file-message"
                             >
                               <img
-                                src={msg.file.content}
+                                src={msg.file.content || "/placeholder.svg"}
                                 alt={msg.file.name}
                                 className="message-image img-thumbnail"
                                 style={{ maxWidth: "200px", maxHeight: "150px" }}
                                 onError={(e) => {
-                                  e.target.src = "/placeholder.svg" // Fallback image
+                                  e.target.src = "/placeholder.svg"
                                 }}
                               />
-                              {/* <div className="file-info">
-                                <small>{msg.file.name}</small>
-                              </div> */}
                               <div className="message-time">
                                 {new Date(msg.timestamp).toLocaleTimeString("en-US", {
                                   hour: "2-digit",
@@ -828,31 +1010,146 @@ const GroupChat = () => {
                     )}
                   </ScrollToBottom>
 
-
-                  <Modal show={showModal} onHide={handleCloseModal} centered size="lg" className="image-preview-modal">
-                    <Modal.Header closeButton>
-                      <Modal.Title>{selectedImage?.name}</Modal.Title>
+                  {/* Enhanced Image Annotation Modal */}
+                  <Modal
+                    show={showModal}
+                    onHide={handleCloseModal}
+                    centered
+                    size="xl"
+                    className="chat-screen-image-annotation-modal"
+                  >
+                    <Modal.Header closeButton className="chat-screen-modal-header">
+                      <Modal.Title className="chat-screen-modal-title">
+                        <MdBrush className="chat-screen-title-icon" />
+                        {isAnnotating ? 'Annotate Image' : 'View Image'} - {selectedImage?.name}
+                      </Modal.Title>
                     </Modal.Header>
-                    <Modal.Body className="text-center p-0">
+
+                    <Modal.Body className="chat-screen-modal-body">
                       {selectedImage && (
-                        <img
-                          src={selectedImage.content || "/placeholder.svg"}
-                          alt={selectedImage.name}
-                          className="img-fluid"
-                          style={{ maxHeight: "70vh" }}
-                        />
+                        <div className="chat-screen-annotation-container">
+                          {/* Annotation Controls */}
+                          {isAnnotating && (
+                            <div className="chat-screen-annotation-controls">
+                              <div className="chat-screen-controls-row">
+                                <div className="chat-screen-controls-left">
+                                  <div className="chat-screen-control-group">
+                                    <label className="chat-screen-label">Color:</label>
+                                    <input
+                                      type="color"
+                                      value={brushColor}
+                                      onChange={(e) => setBrushColor(e.target.value)}
+                                      className="chat-screen-color-input"
+                                    />
+                                  </div>
+                                  <div className="chat-screen-control-group">
+                                    <label className="chat-screen-label">Size:</label>
+                                    <input
+                                      type="range"
+                                      min="1"
+                                      max="10"
+                                      value={brushRadius}
+                                      onChange={(e) => setBrushRadius(parseInt(e.target.value))}
+                                      className="chat-screen-range-input"
+                                    />
+                                    <span className="chat-screen-size-badge">{brushRadius}px</span>
+                                  </div>
+                                </div>
+                                <div className="chat-screen-controls-right">
+                                  <button className="chat-screen-button chat-screen-button-warning" onClick={handleUndo}>
+                                    <MdUndo className="chat-screen-icon" />
+                                    <span className="chat-screen-button-text">Undo</span>
+                                  </button>
+                                  <button className="chat-screen-button chat-screen-button-danger" onClick={handleClear}>
+                                    <MdClear className="chat-screen-icon" />
+                                    <span className="chat-screen-button-text">Clear</span>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Canvas Container */}
+                          <div className="chat-screen-canvas-wrapper">
+                            {isAnnotating ? (
+                              <div className="chat-screen-canvas-container">
+                                <CanvasDraw
+                                  ref={canvasRef}
+                                  imgSrc={selectedImage?.content}
+                                  canvasWidth={Math.min(800, window.innerWidth - 50)}
+                                  canvasHeight={isMobile ? 170 : Math.min(600, window.innerHeight - 100)}
+                                  loadTimeOffset={10}
+                                  brushRadius={brushRadius}
+                                  brushColor={brushColor}
+                                  lazyRadius={0}
+                                  className="chat-screen-canvas"
+                                />
+                              </div>
+                            ) : (
+                              <div className="chat-screen-image-container">
+                                <img
+                                  src={selectedImage?.content || "/placeholder.svg"}
+                                  alt={selectedImage?.name}
+                                  className="chat-screen-preview-image"
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       )}
                     </Modal.Body>
-                    <Modal.Footer>
-                      <Button variant="secondary" onClick={handleCloseModal}>
-                        Close
-                      </Button>
-                      <a href={selectedImage?.content} download={selectedImage?.name} className="btn btn-primary">
-                        Download
-                      </a>
-                    </Modal.Footer>
-                  </Modal>
 
+                    <Modal.Footer className="chatn-footer">
+                      <div className="chatn-footer-container">
+                        <div>
+                          {!isAnnotating ? (
+                            <button
+                              onClick={() => setIsAnnotating(true)}
+                              className="chatn-button chatn-button-primary"
+                            >
+                              <MdBrush className="chatn-icon" />
+                              Start Annotating
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => setIsAnnotating(false)}
+                              className="chatn-button chatn-button-secondary-outline"
+                            >
+                              View Only
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="chatn-footer-actions">
+                          {isAnnotating && (
+                            <button
+                              onClick={handleSendAnnotation}
+                              className="chatn-button chatn-button-success"
+                            >
+                              <MdSend className="chatn-icon" />
+                              Send to Chat
+                            </button>
+                          )}
+
+                          <button
+                            className="chatn-button chatn-button-outline"
+                            onClick={handleBase64Download}
+                          >
+                            <MdAttachment className="chatn-icon" />
+                            Download Annotated Image
+                          </button>
+
+                          <button
+                            onClick={handleCloseModal}
+                            className="chatn-button chatn-button-secondary"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    </Modal.Footer>
+
+                  </Modal>
                   <form className="message-input-container" onSubmit={handleSubmit}>
                     <input
                       type="file"
@@ -906,24 +1203,6 @@ const GroupChat = () => {
           )}
         </div>
       </div>
-
-      {/* Navigation Confirmation Modal */}
-      {/* {showPrompt && (
-        <div className="navigation-modal">
-          <div className="navigation-modal-content">
-            <h4>Leave Group Chat?</h4>
-            <p>Are you sure you want to leave the group chat?</p>
-            <div className="navigation-modal-actions">
-              <button className="btn btn-secondary" onClick={cancelNavigation}>
-                Cancel
-              </button>
-              <button className="btn btn-danger" onClick={confirmNavigation}>
-                Leave
-              </button>
-            </div>
-          </div>
-        </div>
-      )} */}
     </div>
   )
 }

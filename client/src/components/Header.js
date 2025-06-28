@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import { isTokenValid } from "./isTokenValid/isTokenValid";
 
 const Header = () => {
-  const [allChat, setAllChat] = useState(0)
+  const [allChat, setAllChat] = useState(0);
   const [sessionData, setSessionData] = useState({
     isAuthenticated: false,
     user: null,
@@ -16,15 +16,18 @@ const Header = () => {
     isProfileComplete: false,
     dashboard: ''
   });
+  const [checkUserData, setCheckUserData] = useState(null);
+  const [findToken, setFindToken] = useState(null);
+  const [scrollValue, setScrollValue] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  
+  const location = useLocation();
+  const [active, setActive] = useState(location.pathname);
 
-  const [checkUserData, setCheckUserData] = useState(null)
-
-  // const findToken = GetData('token')
-  const [findToken, setFindToken] = useState(null)
-
+  // Token validation effect
   useEffect(() => {
     console.log("Validating user on mount...");
-
     const validateUser = async () => {
       const valid = await isTokenValid();
       if (!valid) {
@@ -35,24 +38,11 @@ const Header = () => {
     };
 
     if (findToken) {
-      validateUser()
+      validateUser();
     }
+  }, [findToken]);
 
-    // validateUser();
-  }, []);
-
-
-
-
-  const [scrollValue, setScrollValue] = useState(0);
-  const [isOpen, setIsOpen] = useState(false);
-  const handleOpen = () => {
-    setIsOpen(!isOpen);
-  };
-  const handleLinkClick = () => {
-    setIsOpen(false);
-  };
-
+  // Scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setScrollValue(window.scrollY);
@@ -64,9 +54,41 @@ const Header = () => {
     };
   }, []);
 
+  // Active route effect
+  useEffect(() => {
+    setActive(location.pathname);
+  }, [location]);
+
+  // Session data effect
+  useEffect(() => {
+    const isAuthenticatedValue = GetData('islogin');
+    const convertToBoolean = Boolean(isAuthenticatedValue);
+    setFindToken(GetData('token'));
+    
+    setSessionData(prevState => ({
+      ...prevState,
+      isAuthenticated: convertToBoolean
+    }));
+
+    const Data = GetData('user');
+    const UserData = JSON.parse(Data);
+
+    if (UserData && UserData.role === 'provider') {
+      setSessionData(prevState => ({
+        ...prevState,
+        user: UserData,
+        role: UserData.role,
+        isProfileComplete: UserData.isProfileComplete || false,
+      }));
+      setCheckUserData(UserData);
+    }
+  }, []);
+
+  // Chat data fetching
   const fetchChatProverId = async () => {
-    const Data = GetData('user')
-    const UserData = JSON.parse(Data)
+    const Data = GetData('user');
+    const UserData = JSON.parse(Data);
+
     if (!UserData) {
       return toast.error("Please Login First");
     }
@@ -77,9 +99,8 @@ const Header = () => {
         : `https://api.helpubuild.in/api/v1/get-chat-by-userId/${UserData._id}`;
 
       const { data } = await axios.get(url);
-      const fullData = data.data
-      const filter = fullData.filter(item => item.newChat === true)
-      // console.log('allData', filter)
+      const fullData = data.data;
+      const filter = fullData.filter(item => item.newChat === true);
       const allData = filter.length;
       setAllChat(allData);
     } catch (error) {
@@ -89,65 +110,35 @@ const Header = () => {
 
   useEffect(() => {
     fetchChatProverId();
-  }, [])
+  }, []);
+
+  // Handle functions
+  const handleOpen = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleLinkClick = () => {
+    setIsOpen(false);
+    setIsDropdownOpen(false);
+  };
 
   const handleChatRead = async () => {
-    // Get user data from local storage or other storage mechanism
     const Data = GetData('user');
     const UserData = JSON.parse(Data);
-    if (!UserData) {
+
+    if (!UserData || UserData.role !== 'provider') {
       return;
     }
 
-    if (UserData.role !== 'provider') {
-      return;
-    }
-
-    // Check if the user role is 'user' or 'provider' and call the corresponding API route
     try {
-      let response;
       const url = `https://api.helpubuild.in/api/v1/mark-${UserData.role}-chats-as-read/${UserData._id}`;
-
-      // Use axios to make the request
-      response = await axios.put(url);
-
-      // Handle successful response
-      // console.log(`${UserData.role} chats marked as read:`, response.data);
-
+      await axios.put(url);
     } catch (error) {
-      // Handle error
-      console.log("Internal server error", error)
-      console.error(`Error marking ${UserData.role} chats as read:`, error.response ? error.response.data.message : error.message);
+      console.log("Internal server error", error);
     }
   };
 
-  useEffect(() => {
-    const isAuthenticatedValue = GetData('islogin')
-    // console.log('islogin', isAuthenticatedValue)
-    const convertToBoolean = Boolean(isAuthenticatedValue);
-
-    setFindToken(GetData('token'))
-
-    setSessionData(prevState => ({
-      ...prevState,
-      isAuthenticated: convertToBoolean
-    }));
-
-    const Data = GetData('user')
-    const UserData = JSON.parse(Data)
-
-    // Check if UserData exists and has a role
-    if (UserData && UserData.role === 'provider') {
-      setSessionData(prevState => ({
-        ...prevState,
-        user: UserData,
-        role: UserData.role,
-        isProfileComplete: UserData.isProfileComplete || false,
-      }));
-      setCheckUserData(UserData)
-    }
-  }, []);
-
+  // Payment logic
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
       const script = document.createElement("script");
@@ -167,10 +158,12 @@ const Header = () => {
             toast.error("Failed to load Razorpay SDK. Please check your connection.");
             return;
           }
+
           const res = await axios.post(`https://api.helpubuild.in/api/v1/buy_membership/${providerId}`);
           const order = res.data.data.razorpayOrder;
           const amount = res.data.data.discountAmount;
           const providerData = res.data.data.provider;
+
           if (order) {
             const options = {
               key: "rzp_live_bmq7YMRTuGvvfu",
@@ -198,165 +191,146 @@ const Header = () => {
           toast.error("Payment failed. Please try again.");
         }
       };
+
       handlePayment(checkUserData?._id);
-      // localStorage.clear();
-      // window.location.href = '/';
     }
-  }, [checkUserData])
-  // console.log(sessionData)
-  const location = useLocation();
-  const [active, setActive] = useState(location.pathname);
+  }, [checkUserData]);
 
-  // console.log("sessionData",sessionData)
-
-  useEffect(() => {
-    setActive(location.pathname);
-  }, [location]);
-
-  // console.log("i am sss", findToken);
+  const navigationItems = [
+    { path: "/", label: "Home" },
+    { path: "/talk-to-architect", label: "Talk to Architect" },
+    { path: "/talk-to-interior", label: "Talk to Interior Designer" },
+    { path: "/Vastu", label: "Talk to Vastu Expert" },
+    { path: "/contact", label: "Contact" }
+  ];
 
   return (
-    <div>
-      <section className={`as_header_wrapper ${scrollValue > 200 ? "fixed-header" : ""}`}>
+    <header className={`hub-header ${scrollValue > 200 ? "hub-header--fixed" : ""}`}>
+      <nav className="navbar navbar-expand-lg hub-header__navbar">
         <div className="container-fluid">
-          <div className="row py-2">
-            <div className="col-lg-2 col-md-2 col-sm-2 col-xs-6 forlogoresponsive">
-              <div className="as_logo d-none d-md-block">
-                <Link onClick={handleLinkClick} to={"/"}>
-                  <img src={logo} className="img-responsive sm-screen-logo" alt="" />
-                </Link>
-              </div>
-            </div>
-            <div className="col-lg-10 col-md-10 col-sm-10 col-xs-6">
-              <div className="as_right_info">
-                <div className={`as_menu_wrapper ${isOpen ? "menu_open" : ""}`}>
-                  <div className="showsmall">
-                    <div className="as_logo">
-                      <Link onClick={handleLinkClick} to={"/"}>
-                        <img src={logo} className="img-responsive ws" alt="" />
-                      </Link>
-                    </div>
-                    <div>
-                      <span onClick={handleOpen} className="as_toggle">
-                        <img src="assets/images/svg/menu.svg" alt="" />
-                      </span>
-                    </div>
-                  </div>
+          {/* Logo */}
+          <Link className="navbar-brand hub-header__brand" to="/" onClick={handleLinkClick}>
+            <img 
+              src={logo || "/placeholder.svg"} 
+              alt="Help U Build" 
+              className="hub-header__logo"
+            />
+          </Link>
 
-                  <div className="as_menu">
-                    <ul>
-                      <li>
-                        <Link style={{ color: 'black' }} onClick={handleLinkClick} to="/" className={active === "/" ? "active" : ""}>
-                          home
-                        </Link>
-                      </li>
-                      <li>
-                        <Link style={{ color: 'black' }} onClick={handleLinkClick} to="/talk-to-architect" className={active === "/talk-to-architect" ? "active" : ""}>
-                          Talk to Architect
-                        </Link>
-                      </li>
-                      <li>
-                        <Link style={{ color: 'black' }} onClick={handleLinkClick} to="/talk-to-interior" className={active === "/talk-to-interior" ? "active" : ""}>
-                          Talk to Interior Designer
-                        </Link>
-                      </li>
-                      <li>
-                        <Link style={{ color: 'black' }} onClick={handleLinkClick} to="/Vastu" className={active === "/Vastu" ? "active" : ""}>
-                          Talk to Vastu Expert
-                        </Link>
-                      </li>
-                      <li>
-                        <Link style={{ color: 'black' }} onClick={handleLinkClick} to="/contact" className={active === "/contact" ? "active" : ""}>
-                          Contact
-                        </Link>
-                      </li>
-                      {
-                        findToken && (
-                          <>
-                            {sessionData?.user?.role === 'provider' ? (
-                              <li>
-                                <Link
-                                  onClick={() => {
-                                    handleChatRead(); // Call handleChatRead after clicking the link
-                                    handleLinkClick();
-                                  }}
-                                  to="/chat"
-                                  className={active === "/chat" ? "active" : ""}
-                                >
-                                  {
-                                    allChat > 0 ? (
-                                      <>
-                                        Chat
-                                        <span className="badge-chat">
-                                          {allChat}
+          {/* Mobile Toggle Button */}
+          <button
+            className="navbar-toggler hub-header__toggle"
+            type="button"
+            onClick={handleOpen}
+            aria-controls="navbarNav"
+            aria-expanded={isOpen}
+            aria-label="Toggle navigation"
+          >
+            <span className="hub-header__toggle-icon">
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
+          </button>
 
-                                        </span>
-                                      </>
-                                    ) :
-                                      (
-                                        <>
-                                          Chat
-                                        </>
-                                      )
-                                  }
-                                </Link>
-                              </li>
-                            ) : (
-                              <li>
-                                <Link
-                                  onClick={() => {
-                                    // handleChatRead(); 
-                                    handleLinkClick();
-                                  }}
-                                  to="/chat"
-                                  className={active === "/chat" ? "active" : ""}
-                                >
-                                  Chat
-                                </Link>
-                              </li>
-                            )
-                            }
-                          </>
-                        )
+          {/* Navigation Menu */}
+          <div className={`collapse navbar-collapse hub-header__collapse ${isOpen ? 'show' : ''}`}>
+            <ul className="navbar-nav ms-auto hub-header__nav">
+              {navigationItems.map((item) => (
+                <li key={item.path} className="nav-item hub-header__nav-item">
+                  <Link
+                    to={item.path}
+                    className={`nav-link hub-header__nav-link ${active === item.path ? 'hub-header__nav-link--active' : ''}`}
+                    onClick={handleLinkClick}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+
+              {/* Chat Link */}
+              {findToken && (
+                <li className="nav-item hub-header__nav-item">
+                  <Link
+                    to="/chat"
+                    className={`nav-link hub-header__nav-link hub-header__chat-link ${active === "/chat" ? 'hub-header__nav-link--active' : ''}`}
+                    onClick={() => {
+                      if (sessionData?.user?.role === 'provider') {
+                        handleChatRead();
                       }
+                      handleLinkClick();
+                    }}
+                  >
+                    Chat
+                    {sessionData?.user?.role === 'provider' && allChat > 0 && (
+                      <span className="hub-header__badge">{allChat}</span>
+                    )}
+                  </Link>
+                </li>
+              )}
 
+              {/* Live Projects Link */}
+              {findToken && (
+                <li className="nav-item hub-header__nav-item">
+                  <Link
+                    to="/manual-chat"
+                    className={`nav-link hub-header__nav-link ${active === "/manual-chat" ? 'hub-header__nav-link--active' : ''}`}
+                    onClick={handleLinkClick}
+                  >
+                    Live Projects
+                  </Link>
+                </li>
+              )}
+
+              {/* Auth Section */}
+              <li className="nav-item hub-header__nav-item hub-header__auth-item">
+                {findToken ? (
+                  <Link
+                    to={sessionData?.user?.role === 'provider' 
+                      ? `/profile?role=${sessionData.role}` 
+                      : `/user-profile`}
+                    className="btn hub-header__profile-btn"
+                    onClick={handleLinkClick}
+                  >
+                    <i className="fas fa-user me-2"></i>
+                    Profile
+                  </Link>
+                ) : (
+                  <div className="dropdown hub-header__dropdown">
+                    <button
+                      className="btn hub-header__login-btn dropdown-toggle"
+                      type="button"
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                      aria-expanded={isDropdownOpen}
+                    >
+                      <i className="fas fa-sign-in-alt me-2"></i>
+                      Login
+                    </button>
+                    <ul className={`dropdown-menu hub-header__dropdown-menu ${isDropdownOpen ? 'show' : ''}`}>
                       <li>
-                        {findToken ? (
-
-                          <Link onClick={handleLinkClick}
-                            className={`as_btn ${active === "/Profile" ? "active" : ""}`}
-                            to={`${sessionData?.user?.role === 'provider' ? `/profile?role=${sessionData.role}` : `/user-profile`
-                              }`}
-                          >
-                            Profile
-                          </Link>
-                        ) : (
-                          // <Link onClick={handleLinkClick}
-                          //   className={`as_btn ${active === "/Login" ? "active" : ""}`}
-                          //   to="/login"
-                          // >
-                          //   Login
-                          // </Link>
-                          <div class="dropdown">
-                            <button class="btn dropdown-toggle" style={{ backgroundColor: '#EAB936', color: 'white', fontSize: '20px', padding: '5px 20px' }} type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              Login
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                              <a class="dropdown-item" href="/login">Login as User</a>
-                              <a class="dropdown-item" href="/partner-login">Login as Partner</a>
-                            </div>
-                          </div>
-                        )}
+                        <Link className="dropdown-item hub-header__dropdown-item" to="/login" onClick={handleLinkClick}>
+                          <i className="fas fa-user me-2"></i>
+                          Login as User
+                        </Link>
+                      </li>
+                      <li>
+                        <Link className="dropdown-item hub-header__dropdown-item" to="/partner-login" onClick={handleLinkClick}>
+                          <i className="fas fa-handshake me-2"></i>
+                          Login as Partner
+                        </Link>
                       </li>
                     </ul>
                   </div>
-                </div>
-              </div>
-            </div>
+                )}
+              </li>
+            </ul>
           </div>
         </div>
-      </section>
-    </div>
+      </nav>
+
+      {/* Mobile Overlay */}
+      {isOpen && <div className="hub-header__overlay" onClick={handleOpen}></div>}
+    </header>
   );
 };
 

@@ -679,3 +679,65 @@ exports.getGroupChatById = async (req, res) => {
         });
     }
 }
+
+
+exports.updateManualChatRoom = async (req, res) => {
+  try {
+    const { chatRoomId } = req.params;
+    const { groupName, providerIds, userId } = req.body;
+
+    const chatRoom = await ChatAndPayment.findById(chatRoomId);
+    if (!chatRoom) {
+      return res.status(404).json({ message: 'Chat room not found.' });
+    }
+
+    // 1. Remove chatRoomId from old providers
+    await Provider.updateMany(
+      { _id: { $in: chatRoom.providerIds } },
+      { $pull: { chatRoomIds: chatRoom._id } }
+    );
+
+    // 2. Add chatRoomId to new providers
+    if (providerIds && providerIds.length > 0) {
+      await Provider.updateMany(
+        { _id: { $in: providerIds } },
+        { $addToSet: { chatRoomIds: chatRoom._id } }
+      );
+      chatRoom.providerIds = providerIds;
+    }
+
+    // 3. If userId changed, update user reference
+    if (userId && userId.toString() !== chatRoom.userId.toString()) {
+      // Remove from old user
+      await User.findByIdAndUpdate(chatRoom.userId, {
+        $pull: { chatRoomIds: chatRoom._id }
+      });
+
+      // Add to new user
+      await User.findByIdAndUpdate(userId, {
+        $addToSet: { chatRoomIds: chatRoom._id }
+      });
+
+      chatRoom.userId = userId;
+    }
+
+    // 4. Update group name
+    if (groupName) {
+      chatRoom.groupName = groupName;
+    }
+
+    const updatedChatRoom = await chatRoom.save();
+
+    return res.status(200).json({
+      message: 'Chat room updated successfully.',
+      data: updatedChatRoom
+    });
+
+  } catch (error) {
+    console.error('Error updating chat room:', error);
+    return res.status(500).json({
+      message: 'An error occurred while updating the chat room.',
+      error: error.message
+    });
+  }
+};

@@ -12,7 +12,7 @@ const { createAboutImage, getAllAboutImage, deleteAboutImage, updateAboutActiveS
 const { createTestimonial, getAllTestimonial, getsingleTestimonial, deleteTestimonial, updateTestimonial, updateTestimonialActiveStatus } = require('../controllers/testimonial.controller');
 const { createBlog, getAllBlog, getSingleBlog, updateBlog, deleteBlog } = require('../controllers/blog.controller');
 const { createBlogComment, getAllComments, getBlogCommentByBlogId, deleteBlogComment } = require('../controllers/blogCommont.controller');
-const { createChatWithNew, getAllChatRecord, getChatByProviderid, getChatByUserid, getChatById, markAllChatsAsRead, markUserChatsAsRead, markProviderChatsAsRead, deleteChatRoom, getchatByRoom, deleteChatByRoom, deleteMessageFromRoom, createManualChatRoom, addOrUpdateProvidersInChat, getCustomChatById, getManualChatByProviderId, getManualChatBuUserId, updateGroupChatISEnded, getGroupChatById } = require('../controllers/chatAndPayment.Controller');
+const { createChatWithNew, getAllChatRecord, getChatByProviderid, getChatByUserid, getChatById, markAllChatsAsRead, markUserChatsAsRead, markProviderChatsAsRead, deleteChatRoom, getchatByRoom, deleteChatByRoom, deleteMessageFromRoom, createManualChatRoom, addOrUpdateProvidersInChat, getCustomChatById, getManualChatByProviderId, getManualChatBuUserId, updateGroupChatISEnded, getGroupChatById, updateManualChatRoom } = require('../controllers/chatAndPayment.Controller');
 const { createWithdrawal, updateWithdrawStatus, deleteWithdrawRequest, getWithdrawalsByProviderId, getAllWithdrawals, getTotalWithdrawAndCommission } = require('../controllers/withdraw.controller');
 const { createCommission, updateCommission, getSingleCommission, getAllCommissions, deleteCommission } = require('../controllers/commission.controller');
 const { createProviderService, getAllProviderService, getProviderServiceById, updateProviderService, deleteProviderService, findbyProvider } = require('../controllers/providerService.controller');
@@ -285,6 +285,8 @@ router.put('/update_term/:id', updateTerm)
 // create manual chat room with multiple vendor and user 
 
 router.post('/create_manual_chat_room', createManualChatRoom)
+router.put('/manual-chat-room/:chatRoomId', updateManualChatRoom);
+
 router.put('/add_members_to_manual_chat_room/:id', addOrUpdateProvidersInChat)
 router.get('/get_manual_chat_by_userId/:userId', getManualChatBuUserId)
 router.get('/get_manual_chat_by_providerId/:providerId', getManualChatByProviderId)
