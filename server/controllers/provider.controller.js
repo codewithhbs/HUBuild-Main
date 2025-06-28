@@ -110,9 +110,7 @@ exports.CreateProvider = async (req, res) => {
         // await sendEmail(emailOptions);
         const providerNumber = newProvider.mobileNumber
         const message = `Hello,  
-
-Welcome to HelpUBuild! 🎉 We're excited to have you on board.`
-
+        Welcome to HelpUBuild! 🎉 We're excited to have you on board.`
         await SendWhatsapp(providerNumber, message)
         // Send token for authentication
         sendToken(newProvider, res, 201, "Account Created successfully");

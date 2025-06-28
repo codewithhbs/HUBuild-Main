@@ -1,15 +1,40 @@
 import React, { useEffect, useState } from 'react';
-import { CCol, CFormLabel, CButton, CCard, CCardBody, CCardHeader, CAlert, CFormInput } from '@coreui/react';
+import {
+    CCol,
+    CFormLabel,
+    CFormSelect,
+    CButton,
+    CCard,
+    CCardBody,
+    CCardHeader,
+    CFormInput,
+    CTable,
+    CTableHead,
+    CTableRow,
+    CTableHeaderCell,
+    CTableBody,
+    CTableDataCell,
+    CPagination,
+    CPaginationItem,
+    CInputGroup,
+    CInputGroupText,
+    CFormCheck,
+    CRow,
+    CAlert,
+    CSpinner
+} from '@coreui/react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import Form from '../../components/Form/Form';
 import { useParams, useNavigate } from 'react-router-dom';
 import './EditCustomChat.css';
+import { cilSearch, cilUser, cilMoney } from '@coreui/icons';
+import CIcon from '@coreui/icons-react';
 
 const EditCustomChat = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    
+
     const [allProviders, setAllProviders] = useState({
         architects: [],
         interiors: [],
@@ -20,7 +45,12 @@ const EditCustomChat = () => {
         chatRoomId: id,
         providerIds: [],
         groupName: '',
-        userId: ''
+        userId: '',
+        amount: '',
+        service: '',
+        razorpayOrderId: '',
+        transactionId: '',
+        PaymentStatus: 'pending'
     });
     const [loading, setLoading] = useState(false);
     const [fetchingData, setFetchingData] = useState(true);
@@ -34,7 +64,7 @@ const EditCustomChat = () => {
         interiors: '',
         vastu: ''
     });
-    
+
     // Pagination states
     const [pagination, setPagination] = useState({
         architects: { currentPage: 1, itemsPerPage: 5 },
@@ -47,7 +77,7 @@ const EditCustomChat = () => {
             const { data } = await axios.get(`https://api.helpubuild.in/api/v1/get-chat-by-id/${id}`);
             const chatData = data.data;
             setChatRoomData(chatData);
-            
+
             // Handle both array of IDs and array of objects
             let providerIds = [];
             if (chatData.providerIds) {
@@ -55,17 +85,22 @@ const EditCustomChat = () => {
                     return typeof provider === 'object' ? provider._id : provider;
                 });
             }
-            
+
             setFormData(prev => ({
                 ...prev,
                 providerIds: providerIds,
                 groupName: chatData.groupName || '',
-                userId: typeof chatData.userId === 'object' ? chatData.userId._id : chatData.userId
+                userId: typeof chatData.userId === 'object' ? chatData.userId._id : chatData.userId,
+                amount: chatData?.amount,
+                service: chatData?.service,
+                razorpayOrderId: chatData?.razorpayOrderId,
+                transactionId: chatData?.transactionId,
+                PaymentStatus: chatData?.PaymentStatus
             }));
-            
+
             // Categorize existing providers for checkbox state
             categorizeExistingProviders(providerIds);
-            
+
         } catch (error) {
             console.log("Internal server error", error);
             toast.error("Failed to fetch chat room data");
@@ -98,7 +133,12 @@ const EditCustomChat = () => {
 
         setSelectedProviders(categorized);
     };
-
+    const handleInputChange = (field, value) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
     const handleFetchProvider = async () => {
         try {
             const { data } = await axios.get("https://api.helpubuild.in/api/v1/get-all-provider");
@@ -134,7 +174,7 @@ const EditCustomChat = () => {
             const updatedCategory = prev[category].includes(providerId)
                 ? prev[category].filter(id => id !== providerId)
                 : [...prev[category], providerId];
-            
+
             const newSelectedProviders = {
                 ...prev,
                 [category]: updatedCategory
@@ -180,10 +220,11 @@ const EditCustomChat = () => {
     // Filter and sort providers (selected first)
     const filterAndSortProviders = (providers, searchTerm, selectedIds) => {
         let filtered = providers;
-        
+
         if (searchTerm) {
-            filtered = providers.filter(provider => 
+            filtered = providers.filter(provider =>
                 (provider.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (provider?.unique_id || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                 (provider.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                 (provider.mobileNumber || '').toLowerCase().includes(searchTerm.toLowerCase())
             );
@@ -193,7 +234,7 @@ const EditCustomChat = () => {
         return filtered.sort((a, b) => {
             const aSelected = selectedIds.includes(a._id);
             const bSelected = selectedIds.includes(b._id);
-            
+
             if (aSelected && !bSelected) return -1;
             if (!aSelected && bSelected) return 1;
             return 0;
@@ -205,11 +246,11 @@ const EditCustomChat = () => {
         const { currentPage, itemsPerPage } = pagination[category];
         const selectedIds = selectedProviders[category];
         const searchTerm = searchTerms[category];
-        
+
         const sortedProviders = filterAndSortProviders(providers, searchTerm, selectedIds);
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
-        
+
         return {
             providers: sortedProviders.slice(startIndex, endIndex),
             totalProviders: sortedProviders.length,
@@ -219,7 +260,7 @@ const EditCustomChat = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (formData.providerIds.length === 0) {
             toast.error("Please select at least one provider");
             return;
@@ -231,14 +272,19 @@ const EditCustomChat = () => {
             const res = await axios.put(`https://api.helpubuild.in/api/v1/manual-chat-room/${id}`, {
                 providerIds: formData.providerIds,
                 groupName: formData.groupName,
-                userId: formData.userId
+                userId: formData.userId,
+                amount: formData.amount,
+                service: formData.service,
+                razorpayOrderId: formData.razorpayOrderId,
+                transactionId: formData.transactionId,
+                PaymentStatus: formData.PaymentStatus
             });
-            
+
             toast.success("Chat room updated successfully!");
-            
+
             // Refresh data
             handleFetchSingleCustomChat();
-            
+
         } catch (error) {
             console.log("Internal server error", error);
             toast.error(error.response?.data?.message || "Failed to update chat room");
@@ -252,7 +298,7 @@ const EditCustomChat = () => {
         if (typeof provider === 'object') {
             return provider.name || provider.email || provider._id || 'Unknown Provider';
         }
-        
+
         const allProvidersFlat = [
             ...allProviders.architects,
             ...allProviders.interiors,
@@ -275,7 +321,7 @@ const EditCustomChat = () => {
         if (!chatRoomData || !chatRoomData.providerIds || chatRoomData.providerIds.length === 0) {
             return 'No providers assigned';
         }
-        
+
         return chatRoomData.providerIds.map(provider => getProviderName(provider)).join(', ');
     };
 
@@ -305,7 +351,7 @@ const EditCustomChat = () => {
                                 <i className="fas fa-chevron-left"></i>
                             </button>
                         </li>
-                        
+
                         {startPage > 1 && (
                             <>
                                 <li className="page-item">
@@ -436,6 +482,7 @@ const EditCustomChat = () => {
                                         <tr>
                                             <th className="select-column">Select</th>
                                             <th>Name</th>
+                                            <th>Id</th>
                                             <th>Email</th>
                                             <th>Phone</th>
                                             <th>Location</th>
@@ -445,7 +492,7 @@ const EditCustomChat = () => {
                                         {providers.map((provider, index) => {
                                             const isSelected = selectedProviders[category].includes(provider._id);
                                             return (
-                                                <tr 
+                                                <tr
                                                     key={provider._id}
                                                     className={`provider-row ${isSelected ? 'selected' : ''}`}
                                                     onClick={() => handleProviderChange(category, provider._id)}
@@ -466,6 +513,7 @@ const EditCustomChat = () => {
                                                             <div className="provider-avatar">
                                                                 {(provider.name || 'U').charAt(0).toUpperCase()}
                                                             </div>
+
                                                             <div>
                                                                 <div className="provider-name">
                                                                     {provider.name || 'Unknown Name'}
@@ -475,7 +523,13 @@ const EditCustomChat = () => {
                                                                     {categoryDisplayNames[category]}
                                                                 </small>
                                                             </div>
+
                                                         </div>
+                                                    </td>
+                                                    <td>
+                                                        <p className="rovider-name">
+                                                            {(provider.unique_id || 'U')}
+                                                        </p>
                                                     </td>
                                                     <td>
                                                         <span className="provider-detail">
@@ -508,7 +562,7 @@ const EditCustomChat = () => {
                                     </tbody>
                                 </table>
                             </div>
-                            
+
                             {/* Pagination */}
                             {renderPagination(category, totalPages, currentPage)}
                         </>
@@ -539,7 +593,7 @@ const EditCustomChat = () => {
                         <div className="alert alert-danger text-center">
                             <i className="fas fa-exclamation-triangle fa-2x mb-3"></i>
                             <h5>Chat room not found or failed to load.</h5>
-                            <button 
+                            <button
                                 className="btn btn-primary mt-3"
                                 onClick={() => navigate('/project/all_project')}
                             >
@@ -618,11 +672,10 @@ const EditCustomChat = () => {
                                                 <i className="fas fa-credit-card info-icon"></i>
                                                 <div>
                                                     <small className="info-label">Payment Status</small>
-                                                    <span 
-                                                        className={`badge payment-badge ${
-                                                            chatRoomData.PaymentStatus === 'paid' ? 'bg-success' : 
+                                                    <span
+                                                        className={`badge payment-badge ${chatRoomData.PaymentStatus === 'paid' ? 'bg-success' :
                                                             chatRoomData.PaymentStatus === 'pending' ? 'bg-warning' : 'bg-secondary'
-                                                        }`}
+                                                            }`}
                                                     >
                                                         {chatRoomData.PaymentStatus || 'Unknown'}
                                                     </span>
@@ -644,6 +697,81 @@ const EditCustomChat = () => {
                                 </div>
                             </div>
                         </CCol>
+                        <CCard className="mb-4">
+                            <CCardHeader>
+                                <h6 className="mb-0">
+                                    <CIcon icon={cilMoney} className="me-2" />
+                                    Payment Information
+                                </h6>
+                            </CCardHeader>
+                            <CCardBody>
+                                <CRow>
+                                    <CCol md={6}>
+                                        <CFormLabel htmlFor="paymentStatus">Payment Status</CFormLabel>
+                                        <CFormSelect
+                                            id="paymentStatus"
+                                            value={formData.PaymentStatus}
+                                            onChange={(e) => handleInputChange('PaymentStatus', e.target.value)}
+                                        >
+                                            <option value="pending">Pending</option>
+                                            <option value="paid">Paid</option>
+                                            <option value="failed">Failed</option>
+                                        </CFormSelect>
+                                    </CCol>
+                                    <CCol md={6}>
+                                        <CFormLabel htmlFor="service">Service</CFormLabel>
+                                        <CFormInput
+                                            id="service"
+                                            placeholder="Enter service type"
+                                            value={formData.service}
+                                            onChange={(e) => handleInputChange('service', e.target.value)}
+                                            required={formData.PaymentStatus === 'paid'}
+                                        />
+                                    </CCol>
+                                </CRow>
+
+                                {formData.PaymentStatus === 'paid' && (
+                                    <>
+                                        <CRow className="mt-3">
+                                            <CCol md={12}>
+                                                <CFormLabel htmlFor="amount">Amount *</CFormLabel>
+                                                <CFormInput
+                                                    id="amount"
+                                                    type="number"
+                                                    placeholder="Enter amount"
+                                                    value={formData.amount}
+                                                    onChange={(e) => handleInputChange('amount', e.target.value)}
+                                                    required
+                                                />
+                                            </CCol>
+
+                                        </CRow>
+                                        <CRow className="mt-3">
+                                            <CCol md={6}>
+                                                <CFormLabel htmlFor="razorpayOrderId">Razorpay Order ID *</CFormLabel>
+                                                <CFormInput
+                                                    id="razorpayOrderId"
+                                                    placeholder="Enter Razorpay order ID"
+                                                    value={formData.razorpayOrderId}
+                                                    onChange={(e) => handleInputChange('razorpayOrderId', e.target.value)}
+                                                    required
+                                                />
+                                            </CCol>
+                                            <CCol md={6}>
+                                                <CFormLabel htmlFor="transactionId">Transaction ID *</CFormLabel>
+                                                <CFormInput
+                                                    id="transactionId"
+                                                    placeholder="Enter transaction ID"
+                                                    value={formData.transactionId}
+                                                    onChange={(e) => handleInputChange('transactionId', e.target.value)}
+                                                    required
+                                                />
+                                            </CCol>
+                                        </CRow>
+                                    </>
+                                )}
+                            </CCardBody>
+                        </CCard>
 
                         <CCol md={12}>
                             <div className="section-header">
@@ -652,11 +780,11 @@ const EditCustomChat = () => {
                                     Update Providers
                                 </h5>
                                 <p className="section-description">
-                                    Select or deselect providers to add or remove them from this chat room. 
+                                    Select or deselect providers to add or remove them from this chat room.
                                     Selected providers appear first in each category.
                                 </p>
                             </div>
-                            
+
                             {renderProviderTable('architects', allProviders.architects)}
                             {renderProviderTable('interiors', allProviders.interiors)}
                             {renderProviderTable('vastu', allProviders.vastu)}
@@ -674,8 +802,8 @@ const EditCustomChat = () => {
 
                         <CCol xs={12} className="mt-4">
                             <div className="action-buttons">
-                                <button 
-                                    type="submit" 
+                                <button
+                                    type="submit"
                                     disabled={loading || formData.providerIds.length === 0}
                                     className="btn-primary-custom"
                                 >
@@ -691,7 +819,7 @@ const EditCustomChat = () => {
                                         </>
                                     )}
                                 </button>
-                                <button 
+                                <button
                                     type="button"
                                     className="btn-secondary-custom"
                                     onClick={() => navigate('/project/all_project')}

@@ -1168,3 +1168,153 @@
   font-size: 0.95rem;
   padding: 0.4rem 0.75rem;
 }
+.chatn-payment-warning {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fffbe6;
+  padding: 2rem;
+  text-align: center;
+}
+
+.chatn-payment-box {
+  max-width: 400px;
+}
+
+.chatn-warning-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #eab936;
+}
+
+.chatn-warning-text {
+  font-size: 1rem;
+  margin-top: 1rem;
+  color: #333;
+}
+
+.chatn-warning-text-muted {
+  font-size: 0.9rem;
+  color: #777;
+  margin-top: 0.5rem;
+}
+/* Chat layout */
+.chatn-messages-container {
+  padding: 1rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.chatn-no-messages {
+  text-align: center;
+  margin-top: 2rem;
+  color: #999;
+}
+
+.chatn-message {
+  margin-bottom: 1rem;
+ max-width: max-content;
+  max-width: fit-content;
+}
+
+.chatn-incoming {
+  align-self: flex-start;
+}
+
+.chatn-outgoing {
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+.chatn-sender-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.2rem;
+  color: #003873;
+}
+
+.chatn-message-bubble {
+  background-color: #f0f0f0;
+  border-radius: 12px;
+  width: auto;
+  padding: 0.6rem 1rem;
+  position: relative;
+}
+
+.chatn-message-text {
+  font-size: 0.95rem;
+}
+
+.chatn-message-time {
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: 0.25rem;
+  text-align: right;
+}
+
+.chatn-file-message img {
+  max-width: 200px;
+  max-height: 150px;
+  border-radius: 8px;
+}
+
+.chatn-input-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #e0e0e0;
+  background-color: #fff;
+  gap: 0.5rem;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+
+.chatn-attachment-button {
+  font-size: 1.4rem;
+  color: #003873;
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 50%;
+  transition: background 0.3s;
+}
+
+.chatn-attachment-button:hover {
+  background-color: #f0f0f0;
+}
+
+.chatn-text-input {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.chatn-text-input:focus {
+  border-color: #eab936;
+}
+
+.chatn-send-button {
+  background-color: #eab936;
+  border: none;
+  border-radius: 50%;
+  /* padding: 0.5rem 0.6rem; */
+  font-size: 1.4rem;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.chatn-send-button:hover {
+  background-color: #d4a728;
+}
+
+.chatn-send-button:disabled,
+.chatn-attachment-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

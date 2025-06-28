@@ -25,6 +25,7 @@ const ProviderProfileSchema = new mongoose.Schema({
         },
         public_id: String
     },
+
     age: {
         type: Number,
         min: 0
@@ -92,6 +93,10 @@ const ProviderProfileSchema = new mongoose.Schema({
         type: String,
         enum: ["Architect", "Interior", "Vastu"],
         required: true
+    },
+    unique_id: {
+        type: String,
+        unique: true
     },
     isBanned: {
         type: Boolean,
@@ -285,6 +290,36 @@ ProviderProfileSchema.pre('save', async function (next) {
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
     }
+    next();
+});
+ProviderProfileSchema.pre("save", async function (next) {
+    if (this.unique_id) return next();
+
+    let prefix = "";
+
+    switch (this.type) {
+        case "Architect":
+            prefix = "HUBA";
+            break;
+        case "Interior":
+            prefix = "HUBI";
+            break;
+        case "Vastu":
+            prefix = "HUBV";
+            break;
+        default:
+            return next(new Error("Invalid type for ID prefix."));
+    }
+
+
+    const count = await mongoose.model("YourModel").countDocuments({
+        unique_id: new RegExp(`^${prefix}`)
+    });
+
+
+    const paddedNumber = String(count + 1).padStart(4, "0");
+    this.unique_id = `${prefix}${paddedNumber}`;
+
     next();
 });
 

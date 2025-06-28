@@ -24,6 +24,7 @@ const GroupChat = () => {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
+  const [chatData, setChatData] = useState([])
   const [socketId, setSocketId] = useState("")
   const [isChatBoxActive, setIsChatBoxActive] = useState(false)
   const [isActive, setIsActive] = useState(false)
@@ -297,7 +298,7 @@ const GroupChat = () => {
 
   // Fetch group chat history
   const fetchGroupChatHistory = useCallback(async () => {
-        setLoading(true)
+    setLoading(true)
 
     if (!userData) {
       toast.error("Please login first")
@@ -314,8 +315,8 @@ const GroupChat = () => {
       setAllGroupChats(data.data.reverse())
     } catch (error) {
       toast.error("Failed to load group chat history")
-    }finally{
-          setLoading(false)
+    } finally {
+      setLoading(false)
 
     }
   }, [userData])
@@ -403,8 +404,8 @@ const GroupChat = () => {
       }
     } catch (error) {
       console.log("Internal server error", error)
-    }finally{
-          setLoading(false)
+    } finally {
+      setLoading(false)
 
     }
   }, []);
@@ -426,7 +427,7 @@ const GroupChat = () => {
 
         const userId = chatData?.userId?._id
         const providerIds = chatData?.providerIds?.map((provider) => provider._id) || []
-
+        setChatData(chatData || {})
         setMessages(chatData.messages || [])
         setSelectedUserId(userId)
         setSelectedProviderIds(providerIds)
@@ -730,7 +731,7 @@ const GroupChat = () => {
   // Handle message submission
   const handleSubmit = useCallback(
     (e) => {
-      
+
       e.preventDefault()
 
       const trimmedMessage = message && typeof message === "string" ? message.trim() : ""
@@ -785,32 +786,32 @@ const GroupChat = () => {
   if (!userData) {
     return <AccessDenied />
   }
-if (loading) {
-  return (
-    <div
-      className="d-flex flex-column justify-content-center align-items-center bg-light"
-      style={{ height: '100dvh', textAlign: 'center' }}
-    >
+  if (loading) {
+    return (
       <div
-        className="spinner-border"
-        role="status"
-        style={{
-          width: '3rem',
-          height: '3rem',
-          borderColor: '#eab936',
-          borderRightColor: 'transparent',
-        }}
+        className="d-flex flex-column justify-content-center align-items-center bg-light"
+        style={{ height: '100dvh', textAlign: 'center' }}
       >
-        <span className="visually-hidden">Loading...</span>
-      </div>
+        <div
+          className="spinner-border"
+          role="status"
+          style={{
+            width: '3rem',
+            height: '3rem',
+            borderColor: '#eab936',
+            borderRightColor: 'transparent',
+          }}
+        >
+          <span className="visually-hidden">Loading...</span>
+        </div>
 
-      <h5 className="fw-semibold mb-1 mt-4" style={{ color: '#eab936' }}>
-        Fetching Live Projects...
-      </h5>
-      <small className="text-muted">Please wait while we prepare your workspace.</small>
-    </div>
-  );
-}
+        <h5 className="fw-semibold mb-1 mt-4" style={{ color: '#eab936' }}>
+          Fetching Live Projects...
+        </h5>
+        <small className="text-muted">Please wait while we prepare your workspace.</small>
+      </div>
+    );
+  }
 
 
 
@@ -957,58 +958,75 @@ if (loading) {
                   </div>
 
 
-                  <ScrollToBottom className="messages-container" initialScrollBehavior="smooth">
-                    {messages.length === 0 ? (
-                      <div className="no-messages">
-                        <p>Send a message to start the group conversation</p>
+                  {chatData?.PaymentStatus?.toLowerCase() !== "paid" ? (
+                    <div className="chatn-payment-warning">
+                      <div className="chatn-payment-box">
+                        <h2 className="chatn-warning-title">Access Restricted</h2>
+                        <p className="chatn-warning-text">
+                          To join this group conversation, please complete your payment.
+                        </p>
+                        <p className="chatn-warning-text-muted">
+                          Contact our <strong>support team</strong> for assistance.
+                        </p>
                       </div>
-                    ) : (
-                      messages.map((msg, idx) => (
-                        <div key={idx} className={`message-wrapper ${msg.sender === id ? "outgoing" : "incoming"}`}>
-                          {/* Add sender name for incoming messages */}
-                          {msg.sender !== id && (
-                            <div className={`sender-name ${getSenderInfo(msg.sender || msg.senderId).role}`}>
-                              {getSenderInfo(msg.sender || msg.senderId).name}
-                            </div>
-                          )}
-
-                          {msg.file ? (
-                            <div
-                              onClick={() => handleImageClick(msg.file)}
-                              style={{ cursor: "pointer" }}
-                              className="message-bubble file-message"
-                            >
-                              <img
-                                src={msg.file.content || "/placeholder.svg"}
-                                alt={msg.file.name}
-                                className="message-image img-thumbnail"
-                                style={{ maxWidth: "200px", maxHeight: "150px" }}
-                                onError={(e) => {
-                                  e.target.src = "/placeholder.svg"
-                                }}
-                              />
-                              <div className="message-time">
-                                {new Date(msg.timestamp).toLocaleTimeString("en-US", {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="message-bubble">
-                              <div className="message-text">{msg.text}</div>
-                              <div className="message-time">
-                                {new Date(msg.timestamp).toLocaleTimeString("en-US", {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
-                              </div>
-                            </div>
-                          )}
+                    </div>
+                  ) : (
+                    <ScrollToBottom className="chatn-messages-container" initialScrollBehavior="smooth">
+                      {messages.length === 0 ? (
+                        <div className="chatn-no-messages">
+                          <p className="chatn-no-messages-text">Send a message to start the group conversation.</p>
                         </div>
-                      ))
-                    )}
-                  </ScrollToBottom>
+                      ) : (
+                        messages.map((msg, idx) => {
+                          const isOwn = msg.sender === id;
+                          const senderInfo = getSenderInfo(msg.sender || msg.senderId);
+
+                          return (
+                            <div key={idx} className={`chatn-message ${isOwn ? "chatn-outgoing" : "chatn-incoming"}`}>
+                              {!isOwn && (
+                                <div className={`chatn-sender-name ${senderInfo.role}`}>
+                                  {senderInfo.name}
+                                </div>
+                              )}
+
+                              {msg.file ? (
+                                <div
+                                  className="chatn-message-bubble chatn-file-message"
+                                  onClick={() => handleImageClick(msg.file)}
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  <img
+                                    src={msg.file.content || "/placeholder.svg"}
+                                    alt={msg.file.name}
+                                    className="chatn-message-image"
+                                    onError={(e) => (e.target.src = "/placeholder.svg")}
+                                  />
+                                  <div className="chatn-message-time">
+                                    {new Date(msg.timestamp).toLocaleTimeString("en-US", {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="chatn-message-bubble">
+                                  <div className="chatn-message-text">{msg.text}</div>
+                                  <div className="chatn-message-time">
+                                    {new Date(msg.timestamp).toLocaleTimeString("en-US", {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })
+                      )}
+                    </ScrollToBottom>
+                  )}
+
+
 
                   {/* Enhanced Image Annotation Modal */}
                   <Modal
@@ -1150,30 +1168,43 @@ if (loading) {
                     </Modal.Footer>
 
                   </Modal>
-                  <form className="message-input-container" onSubmit={handleSubmit}>
-                    <input
-                      type="file"
-                      id="fileUpload"
-                      onChange={handleFileChange}
-                      style={{ display: "none" }}
-                      disabled={isChatEnded}
-                      accept="image/*"
-                    />
-                    <label htmlFor="fileUpload" className={`attachment-button ${isChatEnded ? "disabled" : ""}`}>
-                      <MdAttachment />
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control message-input"
-                      placeholder="Type your message..."
-                      value={message}
-                      disabled={isChatEnded}
-                      onChange={(e) => setMessage(e.target.value)}
-                    />
-                    <button type="submit" className={`send-button ${isChatEnded ? "disabled" : ""}`}>
-                      <MdSend />
-                    </button>
-                  </form>
+                <form className="chatn-input-wrapper" onSubmit={handleSubmit}>
+  <input
+    type="file"
+    id="chatnFileUpload"
+    onChange={handleFileChange}
+    style={{ display: "none" }}
+    disabled={isChatEnded || chatData?.PaymentStatus?.toLowerCase() !== "paid"}
+    accept="image/*"
+  />
+
+  <label
+    htmlFor="chatnFileUpload"
+    className={`chatn-attachment-button ${
+      isChatEnded || chatData?.PaymentStatus?.toLowerCase() !== "paid" ? "disabled" : ""
+    }`}
+  >
+    <MdAttachment />
+  </label>
+
+  <input
+    type="text"
+    className="chatn-text-input"
+    placeholder="Type your message..."
+    value={message}
+    disabled={isChatEnded || chatData?.PaymentStatus?.toLowerCase() !== "paid"}
+    onChange={(e) => setMessage(e.target.value)}
+  />
+
+  <button
+    type="submit"
+    className="chatn-send-button"
+    disabled={isChatEnded || chatData?.PaymentStatus?.toLowerCase() !== "paid" || !message.trim()}
+  >
+    <MdSend />
+  </button>
+</form>
+
                 </>
               ) : (
                 <div className="empty-chat-container">
