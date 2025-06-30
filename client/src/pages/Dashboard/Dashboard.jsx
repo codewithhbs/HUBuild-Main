@@ -347,7 +347,7 @@ function Dashboard() {
                       {/* <span className="ms-3 me-4">|</span> */}
                     </p>
 
-                    <p
+                    {/* <p
                       style={{ fontWeight: '700' }}
                       className="formarginbottommore text-uppercase marginrightmore"
                     >
@@ -362,8 +362,8 @@ function Dashboard() {
                       >
                         Manual Chat
                       </a>
-                      {/* <span className="ms-3 me-4">|</span> */}
-                    </p>
+                      
+                    </p> */}
 
                     <button
                       type="button"

@@ -488,7 +488,7 @@ const handleChange = (e) => {
                             />
                             <label className="form-check-label text-black" htmlFor="termsCheck">
                                 I agree to the
-                                <a href="/terms-and-conditions" target="_blank" rel="noopener noreferrer" className="text-warning ms-1">
+                                <a href="/Pages?type=term" target="_blank" rel="noopener noreferrer" className="text-warning ms-1">
                                     Terms & Conditions
                                 </a>
                             </label>

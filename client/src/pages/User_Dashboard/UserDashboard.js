@@ -608,13 +608,13 @@ const UserDashboard = () => {
                     {/* <span className="ms-3 me-4">|</span> */}
                   </p>
 
-                  <p onClick={() => setActiveTab('Gallery')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab marginrightmore">
+                  {/* <p onClick={() => setActiveTab('Gallery')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab marginrightmore">
                     <i className="fas fa-link marginnone" />{" "}
                     <a href='manual-chat' style={{ cursor: 'pointer' }} className={`cursor-pointer ${activeTab === 'Gallery' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
                       Manual Chat
                     </a>
-                    {/* <span className="ms-3 me-4">|</span> */}
-                  </p>
+                    
+                  </p> */}
 
                   <button
                     type="button"

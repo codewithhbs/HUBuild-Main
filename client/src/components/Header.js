@@ -270,7 +270,7 @@ const Header = () => {
               )}
 
               {/* Live Projects Link */}
-              {findToken && (
+              {/* {findToken && (
                 <li className="nav-item hub-header__nav-item">
                   <Link
                     to="/manual-chat"
@@ -280,7 +280,7 @@ const Header = () => {
                     Live Projects
                   </Link>
                 </li>
-              )}
+              )} */}
 
               {/* Auth Section */}
               <li className="nav-item hub-header__nav-item hub-header__auth-item">
