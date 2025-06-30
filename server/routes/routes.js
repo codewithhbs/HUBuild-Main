@@ -23,6 +23,7 @@ const { createAdminCoupon, getAllAdminCoupon, getSingleAdminCoupon, updateAdminC
 const { createNewsLetter, getAllNewsLetter, deleteNewsLetter, getSingleNewsLetter, sendNewsLetterMessage } = require('../controllers/newsLetter.controller');
 const { createExpertise, getAllExpertise, getSingleExpertise, updateExpertise, deleteExpertise } = require('../controllers/expertise.controller');
 const { createTerm, getTerm, singleTerm, updateTerm } = require('../controllers/termAndCondition');
+const { createContact, getAllContacts, updateContact, deleteContact } = require('../controllers/contactController');
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 const router = express.Router();
@@ -293,6 +294,17 @@ router.get('/get_manual_chat_by_providerId/:providerId', getManualChatByProvider
 router.put('/update_manual_chat_ended/:id', updateGroupChatISEnded)
 
 // call for free module 
+
+
+
+
+router.post('/create-contact', createContact);
+router.get('/get-contact', getAllContacts);
+router.put('/update-contact/:id', updateContact);
+router.delete('/delete-contact/:id', deleteContact);
+
+
+
 
 router.post('/create_call_for_free', createCallFreeModule)
 

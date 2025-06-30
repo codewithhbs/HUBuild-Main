@@ -582,7 +582,7 @@ exports.getManualChatByProviderId = async (req, res) => {
         if (!chats || chats.length === 0) {
             return res.status(404).json({
                 success: false,
-                message: 'No chats found for this provider',
+                message: 'No chats Group found for You',
             });
         }
 

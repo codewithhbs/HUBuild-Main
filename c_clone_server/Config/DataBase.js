@@ -8,7 +8,7 @@ const connectDB = async (req, res) => {
         // Connect to MongoDB
         await mongoose.connect(MONOGO_LINK);
         console.log('MongoDB Connected...');
-
+        console.log("MongoDB URI:", process.env.MONGO_LINK);
         // ✅ Log the database name you're connected to
         const dbName = mongoose.connection.name;
         console.log('Connected to database:', dbName);

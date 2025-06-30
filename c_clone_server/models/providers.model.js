@@ -83,7 +83,18 @@ const ProviderProfileSchema = new mongoose.Schema({
         }
     ],
     location: {
-        type: String
+        state: {
+            type: String
+        },
+        city: {
+            type: String
+        },
+        pincode: {
+            type: String
+        },
+        formatted_address: {
+            type: String
+        }
     },
     role: {
         type: String,
@@ -312,7 +323,7 @@ ProviderProfileSchema.pre("save", async function (next) {
     }
 
 
-    const count = await mongoose.model("YourModel").countDocuments({
+    const count = await mongoose.model("Provider").countDocuments({
         unique_id: new RegExp(`^${prefix}`)
     });
 

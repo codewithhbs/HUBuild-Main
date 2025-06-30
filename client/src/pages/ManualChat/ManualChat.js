@@ -1,6 +1,22 @@
-import { useEffect, useMemo, useState, useCallback } from "react"
+
+
+import { useEffect, useMemo, useState, useCallback, useRef } from "react"
 import "./chat.css"
-import { MdAttachment, MdSend, MdArrowBack, MdSearch, MdPhone, MdExpandMore, MdUndo, MdClear, MdBrush } from "react-icons/md"
+import {
+  MdAttachment,
+  MdSend,
+  MdArrowBack,
+  MdSearch,
+  MdPhone,
+  MdExpandMore,
+  MdUndo,
+  MdClear,
+  MdBrush,
+  MdPinEnd,
+  MdFormatSize,
+  MdColorize,
+  MdDragIndicator,
+} from "react-icons/md"
 import ScrollToBottom from "react-scroll-to-bottom"
 import axios from "axios"
 import { GetData } from "../../utils/sessionStoreage"
@@ -8,16 +24,17 @@ import toast from "react-hot-toast"
 import AccessDenied from "../../components/AccessDenied/AccessDenied"
 import { useSocket } from "../../context/SocketContext"
 import { useNavigate, useLocation } from "react-router-dom"
-import { Modal, Button, Dropdown, ButtonGroup } from "react-bootstrap"
+import { Modal, Dropdown } from "react-bootstrap"
 import "bootstrap/dist/css/bootstrap.min.css"
 import CanvasDraw from "react-canvas-draw"
-import { useRef } from "react"
 
 const ENDPOINT = "https://api.helpubuild.in/"
 const MAX_FILE_SIZE = 5 * 1024 * 1024
 
+
+
 const GroupChat = () => {
-  // State Management
+  // Existing state management
   const [showModal, setShowModal] = useState(false)
   const [selectedImage, setSelectedImage] = useState(null)
   const [isFetchingChatStatus, setIsFetchingChatStatus] = useState(false)
@@ -46,175 +63,33 @@ const GroupChat = () => {
   const [connectedProviders, setConnectedProviders] = useState(new Set())
   const [groupMembers, setGroupMembers] = useState([])
   const [isChatEnded, setIsChatEnded] = useState(false)
-  const [downloadUrl, setDownloadUrl] = useState(null);
-  // Canvas annotation states
+  const [downloadUrl, setDownloadUrl] = useState(null)
+
+  // Enhanced Canvas annotation states
   const [brushColor, setBrushColor] = useState("#ff0000")
   const [brushRadius, setBrushRadius] = useState(2)
   const [isAnnotating, setIsAnnotating] = useState(false)
-
   const canvasRef = useRef()
+
+  // Enhanced Text Annotation States
+  const [textElements, setTextElements] = useState([])
+  const [isAddingText, setIsAddingText] = useState(false)
+  const [selectedTextId, setSelectedTextId] = useState(null)
+  const [textInput, setTextInput] = useState("")
+  const [textPosition, setTextPosition] = useState(null)
+  const [textSettings, setTextSettings] = useState({
+    fontSize: 18,
+    color: "#000000",
+    fontFamily: "Arial",
+  })
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [textHistory, setTextHistory] = useState([])
+  const [historyIndex, setHistoryIndex] = useState(-1)
+
   const navigate = useNavigate()
   const location = useLocation()
-
-  // Check for mobile view
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobileView(window.innerWidth < 768)
-    }
-
-    handleResize()
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
-
-  // Handle canvas actions
-  const handleUndo = () => {
-    if (canvasRef.current) {
-      canvasRef.current.undo()
-    }
-  }
-  useEffect(() => {
-    if (!selectedImage?.content) return;
-
-    let url;
-
-    // CASE 1: Already a base64 data URL
-    if (typeof selectedImage.content === "string" && selectedImage.content.startsWith("data:image")) {
-      url = selectedImage.content;
-    }
-
-    // CASE 2: Buffer content (Array of numbers)
-    else if (Array.isArray(selectedImage.content)) {
-      const byteArray = new Uint8Array(selectedImage.content);
-      const blob = new Blob([byteArray], { type: selectedImage.type || "image/jpeg" });
-      url = URL.createObjectURL(blob);
-    }
-
-    setDownloadUrl(url);
-
-    // Cleanup Blob URL when component unmounts or changes
-    return () => {
-      if (url?.startsWith("blob:")) URL.revokeObjectURL(url);
-    };
-  }, [selectedImage]);
-
-  const handleBase64Download = () => {
-    try {
-      const base64Data = downloadUrl;
-      console.log("Step 1: Received base64Data", base64Data);
-
-      if (!base64Data || typeof base64Data !== "string" || !base64Data.startsWith("data:")) {
-        console.error("❌ Step 2: Invalid base64 data");
-        return;
-      }
-
-      const parts = base64Data.split(',');
-      const byteString = atob(parts[1]);
-      const mimeString = parts[0].split(':')[1].split(';')[0];
-      console.log("✅ Step 3: Decoded base64 to byte string");
-      console.log("MIME Type:", mimeString);
-
-      const ab = new ArrayBuffer(byteString.length);
-      const ia = new Uint8Array(ab);
-      for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
-      }
-      console.log("✅ Step 4: Converted to Uint8Array");
-
-      const blob = new Blob([ia], { type: mimeString });
-      const blobUrl = URL.createObjectURL(blob);
-      console.log("✅ Step 5: Created Blob URL", blobUrl);
-
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = 'annotated-image.png';
-      link.target = '_blank'; // Important for some browsers
-
-      document.body.appendChild(link);
-
-      // Use requestAnimationFrame for natural user-triggered behavior
-      requestAnimationFrame(() => {
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(blobUrl);
-        console.log("✅ Step 7: Cleanup complete");
-      });
-
-      console.log("✅ Step 6: Download triggered");
-    } catch (error) {
-      console.error("❌ Error during base64 download:", error);
-    }
-  };
-
-  const handleClear = () => {
-    if (canvasRef.current) {
-      canvasRef.current.clear()
-    }
-  }
-
-  const handleSendAnnotation = async () => {
-    setLoading(true)
-    if (!canvasRef.current || !selectedImage?.content) return;
-
-    try {
-      // Access both canvas layers
-      const drawingCanvas = canvasRef.current.canvas.drawing; // user drawing
-      const width = drawingCanvas.width;
-      const height = drawingCanvas.height;
-
-      // Create an off-screen canvas to merge background and drawing
-      const mergedCanvas = document.createElement("canvas");
-      mergedCanvas.width = width;
-      mergedCanvas.height = height;
-      const ctx = mergedCanvas.getContext("2d");
-
-      // Load the background image
-      const backgroundImg = new Image();
-      backgroundImg.src = selectedImage.content;
-
-      backgroundImg.onload = () => {
-        // Draw background image
-        ctx.drawImage(backgroundImg, 0, 0, width, height);
-
-        // Draw the drawing canvas on top
-        ctx.drawImage(drawingCanvas, 0, 0, width, height);
-
-        // Export the merged result
-        const mergedDataUrl = mergedCanvas.toDataURL("image/png");
-
-        const annotatedFile = {
-          name: `annotated_${selectedImage?.name || "image.png"}`,
-          type: "image/png",
-          content: mergedDataUrl,
-        };
-
-        console.log("Sending merged image", annotatedFile?.content);
-
-        socket.emit("manual_file_upload", {
-          room: currentRoomId,
-          fileData: annotatedFile,
-          senderId: userData._id,
-          timestamp: new Date().toISOString(),
-        });
-
-        toast.success("Annotated image sent to chat!");
-        setShowModal(false);
-        setIsAnnotating(false);
-      };
-
-      backgroundImg.onerror = () => {
-        toast.error("Failed to load background image");
-      };
-    } catch (error) {
-      toast.error("Failed to send annotated image");
-      console.error("Error sending annotation:", error);
-    } finally {
-      setLoading(false)
-
-    }
-  };
-
-
+  const textCanvasRef = useRef(null)
+  const modalRef = useRef(null)
 
   // User data from session storage
   const userData = useMemo(() => {
@@ -222,23 +97,370 @@ const GroupChat = () => {
     return data ? JSON.parse(data) : null
   }, [])
 
+  const socket = useSocket()
+
+  // Enhanced Text Management Functions
+  const addTextToHistory = useCallback(
+    (elements) => {
+      const newHistory = textHistory.slice(0, historyIndex + 1)
+      newHistory.push([...elements])
+      setTextHistory(newHistory)
+      setHistoryIndex(newHistory.length - 1)
+    },
+    [textHistory, historyIndex],
+  )
+
+  const generateTextId = () => `text_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+
+  const addTextElement = useCallback(
+    (x, y, text) => {
+      if (!text.trim()) return
+
+      const newElement = {
+        id: generateTextId(),
+        text: text.trim(),
+        x,
+        y,
+        fontSize: textSettings.fontSize,
+        color: textSettings.color,
+        fontFamily: textSettings.fontFamily,
+        zIndex: textElements.length + 1,
+      }
+
+      const newElements = [...textElements, newElement]
+      setTextElements(newElements)
+      addTextToHistory(newElements)
+      setTextInput("")
+      setTextPosition(null)
+      setIsAddingText(false)
+    },
+    [textElements, textSettings, addTextToHistory],
+  )
+
+  const updateTextElement = useCallback(
+    (id, updates) => {
+      const newElements = textElements.map((el) => (el.id === id ? { ...el, ...updates } : el))
+      setTextElements(newElements)
+      addTextToHistory(newElements)
+    },
+    [textElements, addTextToHistory],
+  )
+
+  const deleteTextElement = useCallback(
+    (id) => {
+      const newElements = textElements.filter((el) => el.id !== id)
+      setTextElements(newElements)
+      addTextToHistory(newElements)
+    },
+    [textElements, addTextToHistory],
+  )
+
+  const undoTextAction = useCallback(() => {
+    if (historyIndex > 0) {
+      setHistoryIndex(historyIndex - 1)
+      setTextElements([...textHistory[historyIndex - 1]])
+    } else if (historyIndex === 0) {
+      setHistoryIndex(-1)
+      setTextElements([])
+    }
+  }, [historyIndex, textHistory])
+
+  const redoTextAction = useCallback(() => {
+    if (historyIndex < textHistory.length - 1) {
+      setHistoryIndex(historyIndex + 1)
+      setTextElements([...textHistory[historyIndex + 1]])
+    }
+  }, [historyIndex, textHistory])
+
+  // Enhanced Canvas Click Handler
+  const handleCanvasClick = useCallback(
+    (e) => {
+      if (!isAddingText) return
+
+      const canvas = e.currentTarget
+      const rect = canvas.getBoundingClientRect()
+      const scaleX = canvas.width / rect.width
+      const scaleY = canvas.height / rect.height
+
+      const x = (e.clientX - rect.left) * scaleX
+      const y = (e.clientY - rect.top) * scaleY
+
+      setTextPosition({ x, y })
+    },
+    [isAddingText],
+  )
+
+  // Enhanced Text Drag Handlers
+  const handleTextMouseDown = useCallback(
+    (e, textId) => {
+      e.preventDefault()
+      e.stopPropagation()
+
+      const textElement = textElements.find((el) => el.id === textId)
+      if (!textElement) return
+
+      const rect = e.currentTarget.getBoundingClientRect()
+      const offsetX = e.clientX - rect.left - textElement.x
+      const offsetY = e.clientY - rect.top - textElement.y
+
+      setDragOffset({ x: offsetX, y: offsetY })
+      setSelectedTextId(textId)
+      updateTextElement(textId, { isDragging: true })
+
+      const handleMouseMove = (moveEvent) => {
+        const canvas = textCanvasRef.current
+        if (!canvas) return
+
+        const canvasRect = canvas.getBoundingClientRect()
+        const scaleX = canvas.width / canvasRect.width
+        const scaleY = canvas.height / canvasRect.height
+
+        const newX = Math.max(0, Math.min(canvas.width, (moveEvent.clientX - canvasRect.left) * scaleX - dragOffset.x))
+        const newY = Math.max(
+          textSettings.fontSize,
+          Math.min(canvas.height, (moveEvent.clientY - canvasRect.top) * scaleY - dragOffset.y),
+        )
+
+        updateTextElement(textId, { x: newX, y: newY })
+      }
+
+      const handleMouseUp = () => {
+        updateTextElement(textId, { isDragging: false })
+        setSelectedTextId(null)
+        document.removeEventListener("mousemove", handleMouseMove)
+        document.removeEventListener("mouseup", handleMouseUp)
+      }
+
+      document.addEventListener("mousemove", handleMouseMove)
+      document.addEventListener("mouseup", handleMouseUp)
+    },
+    [textElements, dragOffset, textSettings.fontSize, updateTextElement],
+  )
+
+  // Enhanced Canvas Rendering
+  const renderTextOnCanvas = useCallback(() => {
+    const canvas = textCanvasRef.current
+    if (!canvas) return
+
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+    // Sort by zIndex for proper layering
+    const sortedElements = [...textElements].sort((a, b) => a.zIndex - b.zIndex)
+
+    sortedElements.forEach((element) => {
+      ctx.font = `${element.fontSize}px ${element.fontFamily}`
+      ctx.fillStyle = element.color
+      ctx.textBaseline = "top"
+
+      // Add text shadow for better visibility
+      ctx.shadowColor = "rgba(255, 255, 255, 0.8)"
+      ctx.shadowBlur = 2
+      ctx.shadowOffsetX = 1
+      ctx.shadowOffsetY = 1
+
+      ctx.fillText(element.text, element.x, element.y)
+
+      // Reset shadow
+      ctx.shadowColor = "transparent"
+      ctx.shadowBlur = 0
+      ctx.shadowOffsetX = 0
+      ctx.shadowOffsetY = 0
+
+      // Highlight selected text
+      if (element.id === selectedTextId) {
+        ctx.strokeStyle = "#007bff"
+        ctx.lineWidth = 2
+        ctx.setLineDash([5, 5])
+        const textMetrics = ctx.measureText(element.text)
+        ctx.strokeRect(element.x - 2, element.y - 2, textMetrics.width + 4, element.fontSize + 4)
+        ctx.setLineDash([])
+      }
+    })
+  }, [textElements, selectedTextId])
+
+  // Re-render text when elements change
+  useEffect(() => {
+    renderTextOnCanvas()
+  }, [renderTextOnCanvas])
+
+  // Enhanced Send Annotation Function
+  const handleSendAnnotation = async () => {
+    setLoading(true)
+    if (!canvasRef.current || !selectedImage?.content) return
+
+    try {
+      const drawingCanvas = canvasRef.current.canvas.drawing
+      const textCanvas = textCanvasRef.current
+      const width = drawingCanvas.width
+      const height = drawingCanvas.height
+
+      // Create merged canvas
+      const mergedCanvas = document.createElement("canvas")
+      mergedCanvas.width = width
+      mergedCanvas.height = height
+      const ctx = mergedCanvas.getContext("2d")
+
+      const backgroundImg = new Image()
+      backgroundImg.crossOrigin = "anonymous"
+      backgroundImg.src = selectedImage.content
+
+      backgroundImg.onload = () => {
+        // Draw background image
+        ctx.drawImage(backgroundImg, 0, 0, width, height)
+
+        // Draw drawing annotations
+        ctx.drawImage(drawingCanvas, 0, 0, width, height)
+
+        // Draw text annotations
+        if (textCanvas) {
+          ctx.drawImage(textCanvas, 0, 0, width, height)
+        }
+
+        const mergedDataUrl = mergedCanvas.toDataURL("image/png")
+        const annotatedFile = {
+          name: `annotated_${selectedImage?.name || "image.png"}`,
+          type: "image/png",
+          content: mergedDataUrl,
+        }
+
+        socket.emit("manual_file_upload", {
+          room: currentRoomId,
+          fileData: annotatedFile,
+          senderId: userData._id,
+          timestamp: new Date().toISOString(),
+        })
+
+        toast.success("Annotated image sent to chat!")
+        setShowModal(false)
+        setIsAnnotating(false)
+        setTextElements([])
+        setTextHistory([])
+        setHistoryIndex(-1)
+      }
+
+      backgroundImg.onerror = () => {
+        toast.error("Failed to load background image")
+      }
+    } catch (error) {
+      toast.error("Failed to send annotated image")
+      console.error("Error sending annotation:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Enhanced Clear Function
+  const handleClear = () => {
+    if (canvasRef.current) {
+      canvasRef.current.clear()
+    }
+    setTextElements([])
+    setTextHistory([])
+    setHistoryIndex(-1)
+  }
+
+  // Enhanced Undo Function
+  const handleUndo = () => {
+    if (canvasRef.current) {
+      canvasRef.current.undo()
+    }
+    undoTextAction()
+  }
+
+  // Check for mobile view
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth < 768)
+    }
+    handleResize()
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  // Handle image click
   const handleImageClick = (image) => {
     setSelectedImage(image)
     setShowModal(true)
     setIsAnnotating(false)
+    setTextElements([])
+    setTextHistory([])
+    setHistoryIndex(-1)
   }
 
+  // Handle modal close
   const handleCloseModal = () => {
     setShowModal(false)
     setIsAnnotating(false)
+    setTextElements([])
+    setTextHistory([])
+    setHistoryIndex(-1)
     if (canvasRef.current) {
       canvasRef.current.clear()
     }
   }
 
+  // Download URL effect
+  useEffect(() => {
+    if (!selectedImage?.content) return
+
+    let url
+    if (typeof selectedImage.content === "string" && selectedImage.content.startsWith("data:image")) {
+      url = selectedImage.content
+    } else if (Array.isArray(selectedImage.content)) {
+      const byteArray = new Uint8Array(selectedImage.content)
+      const blob = new Blob([byteArray], { type: selectedImage.type || "image/jpeg" })
+      url = URL.createObjectURL(blob)
+    }
+
+    setDownloadUrl(url)
+    return () => {
+      if (url?.startsWith("blob:")) URL.revokeObjectURL(url)
+    }
+  }, [selectedImage])
+
+  // Enhanced download function
+  const handleBase64Download = () => {
+    try {
+      const base64Data = downloadUrl
+      if (!base64Data || typeof base64Data !== "string" || !base64Data.startsWith("data:")) {
+        console.error("Invalid base64 data")
+        return
+      }
+
+      const parts = base64Data.split(",")
+      const byteString = atob(parts[1])
+      const mimeString = parts[0].split(":")[1].split(";")[0]
+
+      const ab = new ArrayBuffer(byteString.length)
+      const ia = new Uint8Array(ab)
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i)
+      }
+
+      const blob = new Blob([ia], { type: mimeString })
+      const blobUrl = URL.createObjectURL(blob)
+
+      const link = document.createElement("a")
+      link.href = blobUrl
+      link.download = "annotated-image.png"
+      link.target = "_blank"
+      document.body.appendChild(link)
+
+      requestAnimationFrame(() => {
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(blobUrl)
+      })
+    } catch (error) {
+      console.error("Error during base64 download:", error)
+    }
+  }
+
   const id = userData?._id || ""
   const role = userData?.role || ""
-  const socket = useSocket()
 
   // Handle mobile view chat selection
   const handleChatSelection = (chatId, chat) => {
@@ -270,7 +492,6 @@ const GroupChat = () => {
   useEffect(() => {
     const fetchGroupChatStatus = async () => {
       setLoading(true)
-
       if (!currentRoomId) return
 
       setIsFetchingChatStatus(true)
@@ -286,7 +507,6 @@ const GroupChat = () => {
         setIsAbleToJoinChat(false)
       } finally {
         setLoading(false)
-
         setIsFetchingChatStatus(false)
       }
     }
@@ -299,7 +519,6 @@ const GroupChat = () => {
   // Fetch group chat history
   const fetchGroupChatHistory = useCallback(async () => {
     setLoading(true)
-
     if (!userData) {
       toast.error("Please login first")
       return
@@ -314,10 +533,9 @@ const GroupChat = () => {
       const { data } = await axios.get(url)
       setAllGroupChats(data.data.reverse())
     } catch (error) {
-      toast.error("Failed to load group chat history")
+      toast.error(error?.response?.data?.message)
     } finally {
       setLoading(false)
-
     }
   }, [userData])
 
@@ -376,39 +594,37 @@ const GroupChat = () => {
 
   const handleCallMember = useCallback(async (member, selectedChat) => {
     setLoading(true)
-
     if (!userData) {
       toast.error("Please login first")
       return
     }
 
-    let phoneNumber = member?.phoneNumber;
-
+    const phoneNumber = member?.phoneNumber
     if (!phoneNumber) {
-      toast.error(`No phone number available for ${member?.name || 'this member'}`);
-      return;
+      toast.error(`No phone number available for ${member?.name || "this member"}`)
+      return
     }
 
-    const cleanedNumber = phoneNumber.replace(/[^+\d]/g, '');
+    const cleanedNumber = phoneNumber.replace(/[^+\d]/g, "")
 
     try {
       if (cleanedNumber) {
         const room = selectedChat?._id
         const callFrom = userData.mobileNumber || userData.PhoneNumber
         const callTo = member?.phoneNumber
+
         console.log("all detail =", room, callFrom, callTo)
-        const res = await axios.post(`${ENDPOINT}api/v1/create_call_for_free`, { roomId: room, callFrom, callTo });
-        toast.success(`Calling ${member.name}...`);
+        const res = await axios.post(`${ENDPOINT}api/v1/create_call_for_free`, { roomId: room, callFrom, callTo })
+        toast.success(`Calling ${member.name}...`)
       } else {
-        toast.error("Invalid phone number");
+        toast.error("Invalid phone number")
       }
     } catch (error) {
       console.log("Internal server error", error)
     } finally {
       setLoading(false)
-
     }
-  }, []);
+  }, [])
 
   // Handle selecting a group chat from the sidebar
   const handleChatStart = useCallback(
@@ -417,7 +633,6 @@ const GroupChat = () => {
 
       try {
         const { data } = await axios.get(`${ENDPOINT}api/v1/get-chat-by-id/${chatId}?role=${userData?.role}`)
-
         const chatData = data.data
 
         if (!chatData) {
@@ -427,6 +642,7 @@ const GroupChat = () => {
 
         const userId = chatData?.userId?._id
         const providerIds = chatData?.providerIds?.map((provider) => provider._id) || []
+
         setChatData(chatData || {})
         setMessages(chatData.messages || [])
         setSelectedUserId(userId)
@@ -484,32 +700,35 @@ const GroupChat = () => {
   }, [socket, selectedUserId, selectedProviderIds, userData, currentRoomId, fetchGroupChatHistory])
 
   // Enhanced version that includes role information
-  const getSenderInfo = useCallback((senderId) => {
-    if (senderId === userData?._id) {
-      return { name: "You", role: userData?.role, isCurrentUser: true };
-    }
+  const getSenderInfo = useCallback(
+    (senderId) => {
+      if (senderId === userData?._id) {
+        return { name: "You", role: userData?.role, isCurrentUser: true }
+      }
 
-    // Check if sender is the user in the chat
-    if (selectedChat?.userId?._id === senderId) {
-      return {
-        name: selectedChat.userId.name,
-        role: "user",
-        isCurrentUser: false
-      };
-    }
+      // Check if sender is the user in the chat
+      if (selectedChat?.userId?._id === senderId) {
+        return {
+          name: selectedChat.userId.name,
+          role: "user",
+          isCurrentUser: false,
+        }
+      }
 
-    // Check if sender is one of the providers
-    const provider = selectedChat?.providerIds?.find(p => p._id === senderId);
-    if (provider) {
-      return {
-        name: provider.name,
-        role: "provider",
-        isCurrentUser: false
-      };
-    }
+      // Check if sender is one of the providers
+      const provider = selectedChat?.providerIds?.find((p) => p._id === senderId)
+      if (provider) {
+        return {
+          name: provider.name,
+          role: "provider",
+          isCurrentUser: false,
+        }
+      }
 
-    return { name: "Unknown User", role: "unknown", isCurrentUser: false };
-  }, [userData, selectedChat]);
+      return { name: "Unknown User", role: "unknown", isCurrentUser: false }
+    },
+    [userData, selectedChat],
+  )
 
   // Navigation handling
   useEffect(() => {
@@ -549,7 +768,6 @@ const GroupChat = () => {
     setIsUserConfirming(true)
     await endGroupChat()
     setShowPrompt(false)
-
     if (nextPath) {
       navigate(nextPath, { replace: true })
       setNextPath(null)
@@ -577,7 +795,6 @@ const GroupChat = () => {
     // Enhanced message handler to properly handle files
     socket.on("return_message", (data) => {
       console.log("Received message from others:", data)
-
       // Create message object with proper structure
       const messageObj = {
         ...data,
@@ -590,7 +807,7 @@ const GroupChat = () => {
         messageObj.file = {
           name: data.file.name,
           type: data.file.type,
-          content: data.file.content
+          content: data.file.content,
         }
       }
 
@@ -663,13 +880,11 @@ const GroupChat = () => {
     if (!messageText || typeof messageText !== "string" || messageText.trim() === "") {
       return false
     }
-
     const prohibitedPatterns = [
       /\b\d{10}\b/,
       /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/,
       /18\+|\bsex\b|\bxxx\b|\bcall\b|\bphone\b|\bmobile|\bteliphone\b|\bnudes\b|\bporn\b|\bsex\scall\b|\btext\b|\bwhatsapp\b|\bskype\b|\btelegram\b|\bfacetime\b|\bvideo\schat\b|\bdial\snumber\b|\bmessage\b/i,
     ]
-
     return !prohibitedPatterns.some((pattern) => pattern.test(messageText))
   }, [])
 
@@ -692,8 +907,8 @@ const GroupChat = () => {
       }
 
       const uploadingToast = toast.loading("Uploading file...")
-
       const reader = new FileReader()
+
       reader.onload = () => {
         try {
           const fileData = {
@@ -710,7 +925,6 @@ const GroupChat = () => {
           })
 
           toast.dismiss(uploadingToast)
-
         } catch (error) {
           toast.dismiss(uploadingToast)
           toast.error("Failed to process file")
@@ -731,9 +945,7 @@ const GroupChat = () => {
   // Handle message submission
   const handleSubmit = useCallback(
     (e) => {
-
       e.preventDefault()
-
       const trimmedMessage = message && typeof message === "string" ? message.trim() : ""
 
       if (!trimmedMessage) {
@@ -781,39 +993,39 @@ const GroupChat = () => {
       return providerNames
     }
   }
-  const isMobile = window.innerWidth <= 710;
 
+  const isMobile = window.innerWidth <= 710
+  const canvasWidth = Math.min(800, window.innerWidth - 50);
+  const canvasHeight = isMobile ? 170 : Math.min(600, window.innerHeight - 100);
   if (!userData) {
     return <AccessDenied />
   }
+
   if (loading) {
     return (
       <div
         className="d-flex flex-column justify-content-center align-items-center bg-light"
-        style={{ height: '100dvh', textAlign: 'center' }}
+        style={{ height: "100dvh", textAlign: "center" }}
       >
         <div
           className="spinner-border"
           role="status"
           style={{
-            width: '3rem',
-            height: '3rem',
-            borderColor: '#eab936',
-            borderRightColor: 'transparent',
+            width: "3rem",
+            height: "3rem",
+            borderColor: "#eab936",
+            borderRightColor: "transparent",
           }}
         >
           <span className="visually-hidden">Loading...</span>
         </div>
-
-        <h5 className="fw-semibold mb-1 mt-4" style={{ color: '#eab936' }}>
+        <h5 className="fw-semibold mb-1 mt-4" style={{ color: "#eab936" }}>
           Fetching Live Projects...
         </h5>
         <small className="text-muted">Please wait while we prepare your workspace.</small>
       </div>
-    );
+    )
   }
-
-
 
   return (
     <div className="modern-chat-container">
@@ -901,13 +1113,12 @@ const GroupChat = () => {
                         <MdArrowBack size={20} />
                       </button>
                     )}
-
                     <div className="chatn-user-info">
                       <div className="chatn-avatar">
                         {selectedChat && (
                           <img
                             src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                              selectedChat?.groupName || "Group"
+                              selectedChat?.groupName || "Group",
                             )}&background=random`}
                             alt={selectedChat?.groupName || "Group Chat"}
                           />
@@ -935,7 +1146,6 @@ const GroupChat = () => {
                             Call Member
                             <MdExpandMore className="ms-1" />
                           </Dropdown.Toggle>
-
                           <Dropdown.Menu>
                             <Dropdown.Header>Group Members</Dropdown.Header>
                             {groupMembers.map((member) => (
@@ -957,7 +1167,6 @@ const GroupChat = () => {
                     </div>
                   </div>
 
-
                   {chatData?.PaymentStatus?.toLowerCase() !== "paid" ? (
                     <div className="chatn-payment-warning">
                       <div className="chatn-payment-box">
@@ -978,17 +1187,14 @@ const GroupChat = () => {
                         </div>
                       ) : (
                         messages.map((msg, idx) => {
-                          const isOwn = msg.sender === id;
-                          const senderInfo = getSenderInfo(msg.sender || msg.senderId);
+                          const isOwn = msg.sender === id
+                          const senderInfo = getSenderInfo(msg.sender || msg.senderId)
 
                           return (
                             <div key={idx} className={`chatn-message ${isOwn ? "chatn-outgoing" : "chatn-incoming"}`}>
                               {!isOwn && (
-                                <div className={`chatn-sender-name ${senderInfo.role}`}>
-                                  {senderInfo.name}
-                                </div>
+                                <div className={`chatn-sender-name ${senderInfo.role}`}>{senderInfo.name}</div>
                               )}
-
                               {msg.file ? (
                                 <div
                                   className="chatn-message-bubble chatn-file-message"
@@ -1020,13 +1226,11 @@ const GroupChat = () => {
                                 </div>
                               )}
                             </div>
-                          );
+                          )
                         })
                       )}
                     </ScrollToBottom>
                   )}
-
-
 
                   {/* Enhanced Image Annotation Modal */}
                   <Modal
@@ -1035,24 +1239,29 @@ const GroupChat = () => {
                     centered
                     size="xl"
                     className="chat-screen-image-annotation-modal"
+                    ref={modalRef}
                   >
                     <Modal.Header closeButton className="chat-screen-modal-header">
                       <Modal.Title className="chat-screen-modal-title">
                         <MdBrush className="chat-screen-title-icon" />
-                        {isAnnotating ? 'Annotate Image' : 'View Image'} - {selectedImage?.name}
+                        {isAnnotating ? "Annotate Image" : "View Image"} - {selectedImage?.name}
                       </Modal.Title>
                     </Modal.Header>
 
                     <Modal.Body className="chat-screen-modal-body">
                       {selectedImage && (
                         <div className="chat-screen-annotation-container">
-                          {/* Annotation Controls */}
+                          {/* Enhanced Annotation Controls */}
                           {isAnnotating && (
                             <div className="chat-screen-annotation-controls">
                               <div className="chat-screen-controls-row">
                                 <div className="chat-screen-controls-left">
+                                  {/* Drawing Controls */}
                                   <div className="chat-screen-control-group">
-                                    <label className="chat-screen-label">Color:</label>
+                                    <label className="chat-screen-label">
+                                      <MdColorize className="me-1" />
+                                      Brush Color:
+                                    </label>
                                     <input
                                       type="color"
                                       value={brushColor}
@@ -1061,47 +1270,205 @@ const GroupChat = () => {
                                     />
                                   </div>
                                   <div className="chat-screen-control-group">
-                                    <label className="chat-screen-label">Size:</label>
+                                    <label className="chat-screen-label">Brush Size:</label>
                                     <input
                                       type="range"
                                       min="1"
                                       max="10"
                                       value={brushRadius}
-                                      onChange={(e) => setBrushRadius(parseInt(e.target.value))}
+                                      onChange={(e) => setBrushRadius(Number.parseInt(e.target.value))}
                                       className="chat-screen-range-input"
                                     />
                                     <span className="chat-screen-size-badge">{brushRadius}px</span>
                                   </div>
+
+                                  {/* Text Controls */}
+                                  <div className="chat-screen-text-controls">
+                                    <div className="chat-screen-control-group">
+                                      <label className="chat-screen-label">
+                                        <MdFormatSize className="me-1" />
+                                        Text Size:
+                                      </label>
+                                      <input
+                                        type="range"
+                                        min="12"
+                                        max="48"
+                                        value={textSettings.fontSize}
+                                        onChange={(e) =>
+                                          setTextSettings((prev) => ({
+                                            ...prev,
+                                            fontSize: Number.parseInt(e.target.value),
+                                          }))
+                                        }
+                                        className="chat-screen-range-input"
+                                      />
+                                      <span className="chat-screen-size-badge">{textSettings.fontSize}px</span>
+                                    </div>
+                                    <div className="chat-screen-control-group">
+                                      <label className="chat-screen-label">Text Color:</label>
+                                      <input
+                                        type="color"
+                                        value={textSettings.color}
+                                        onChange={(e) =>
+                                          setTextSettings((prev) => ({ ...prev, color: e.target.value }))
+                                        }
+                                        className="chat-screen-color-input"
+                                      />
+                                    </div>
+                                    <div className="chat-screen-control-group">
+                                      <label className="chat-screen-label">Font:</label>
+                                      <select
+                                        value={textSettings.fontFamily}
+                                        onChange={(e) =>
+                                          setTextSettings((prev) => ({ ...prev, fontFamily: e.target.value }))
+                                        }
+                                        className="form-select form-select-sm"
+                                      >
+                                        <option value="Arial">Arial</option>
+                                        <option value="Helvetica">Helvetica</option>
+                                        <option value="Times New Roman">Times New Roman</option>
+                                        <option value="Courier New">Courier New</option>
+                                        <option value="Georgia">Georgia</option>
+                                      </select>
+                                    </div>
+                                  </div>
                                 </div>
+
                                 <div className="chat-screen-controls-right">
-                                  <button className="chat-screen-button chat-screen-button-warning" onClick={handleUndo}>
+                                  <button
+                                    className={`chat-screen-button ${isAddingText ? "chat-screen-button-success" : "chat-screen-button-primary"}`}
+                                    onClick={() => setIsAddingText(!isAddingText)}
+                                  >
+                                    <MdPinEnd className="chat-screen-icon" />
+                                    <span className="chat-screen-button-text">
+                                      {isAddingText ? "Adding Text..." : "Add Text"}
+                                    </span>
+                                  </button>
+                                  <button
+                                    className="chat-screen-button chat-screen-button-warning"
+                                    onClick={handleUndo}
+                                  >
                                     <MdUndo className="chat-screen-icon" />
                                     <span className="chat-screen-button-text">Undo</span>
                                   </button>
-                                  <button className="chat-screen-button chat-screen-button-danger" onClick={handleClear}>
+                                  <button
+                                    className="chat-screen-button chat-screen-button-danger"
+                                    onClick={handleClear}
+                                  >
                                     <MdClear className="chat-screen-icon" />
-                                    <span className="chat-screen-button-text">Clear</span>
+                                    <span className="chat-screen-button-text">Clear All</span>
                                   </button>
                                 </div>
                               </div>
+
+                              {/* Text Elements List */}
+                              {textElements.length > 0 && (
+                                <div className="chat-screen-text-elements-list">
+                                  <h6 className="mb-2">Text Elements:</h6>
+                                  <div className="d-flex flex-wrap gap-2">
+                                    {textElements.map((element) => (
+                                      <div
+                                        key={element.id}
+                                        className={`chat-screen-text-element-item ${selectedTextId === element.id ? "selected" : ""}`}
+                                        onClick={() => setSelectedTextId(element.id)}
+                                      >
+                                        <span className="text-truncate" style={{ maxWidth: "100px" }}>
+                                          {element.text}
+                                        </span>
+                                        <button
+                                          className="btn btn-sm btn-outline-danger ms-1"
+                                          onClick={(e) => {
+                                            e.stopPropagation()
+                                            deleteTextElement(element.id)
+                                          }}
+                                        >
+                                          ×
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           )}
 
-                          {/* Canvas Container */}
-                          <div className="chat-screen-canvas-wrapper">
+                          <div className="chat-screen-canvas-wrapper" style={{ position: "relative" }}>
                             {isAnnotating ? (
-                              <div className="chat-screen-canvas-container">
+                              <div className="chat-screen-canvas-container" style={{ position: "relative" }}>
+                                {/* Drawing Canvas */}
                                 <CanvasDraw
                                   ref={canvasRef}
                                   imgSrc={selectedImage?.content}
-                                  canvasWidth={Math.min(800, window.innerWidth - 50)}
-                                  canvasHeight={isMobile ? 170 : Math.min(600, window.innerHeight - 100)}
+                                  canvasWidth={canvasWidth}
+                                  canvasHeight={canvasHeight}
                                   loadTimeOffset={10}
                                   brushRadius={brushRadius}
                                   brushColor={brushColor}
                                   lazyRadius={0}
                                   className="chat-screen-canvas"
                                 />
+
+                                {/* Text Overlay Canvas (only for placing input) */}
+                                <canvas
+                                  ref={textCanvasRef}
+                                  width={canvasWidth}
+                                  height={canvasHeight}
+                                  style={{
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                    pointerEvents: isAddingText ? "auto" : "none",
+                                    zIndex: 10,
+                                    cursor: isAddingText ? "crosshair" : "default",
+                                  }}
+                                  onClick={handleCanvasClick}
+                                />
+
+                                {/* Text Input Field */}
+                                {textPosition && (
+                                  <div
+                                    style={{
+                                      position: "absolute",
+                                      top: textPosition.y,
+                                      left: textPosition.x,
+                                      zIndex: 20,
+                                    }}
+                                  >
+                                    <input
+                                      type="text"
+                                      autoFocus
+                                      value={textInput}
+                                      onChange={(e) => setTextInput(e.target.value)}
+                                      onKeyDown={(e) => {
+                                        if (e.key === "Enter" && textInput.trim()) {
+                                          addTextElement(textPosition.x, textPosition.y, textInput);
+                                        } else if (e.key === "Escape") {
+                                          setTextInput("");
+                                          setTextPosition(null);
+                                          setIsAddingText(false);
+                                        }
+                                      }}
+                                      onBlur={() => {
+                                        if (textInput.trim()) {
+                                          addTextElement(textPosition.x, textPosition.y, textInput);
+                                        } else {
+                                          setTextPosition(null);
+                                          setIsAddingText(false);
+                                        }
+                                      }}
+                                      className="form-control form-control-sm"
+                                      style={{
+                                        fontSize: `${textSettings.fontSize}px`,
+                                        fontFamily: textSettings.fontFamily,
+                                        color: textSettings.color,
+                                        minWidth: "150px",
+                                      }}
+                                      placeholder="Enter text..."
+                                    />
+                                  </div>
+                                )}
+
+                       
                               </div>
                             ) : (
                               <div className="chat-screen-image-container">
@@ -1112,6 +1479,8 @@ const GroupChat = () => {
                                 />
                               </div>
                             )}
+
+                           
                           </div>
                         </div>
                       )}
@@ -1121,10 +1490,7 @@ const GroupChat = () => {
                       <div className="chatn-footer-container">
                         <div>
                           {!isAnnotating ? (
-                            <button
-                              onClick={() => setIsAnnotating(true)}
-                              className="chatn-button chatn-button-primary"
-                            >
+                            <button onClick={() => setIsAnnotating(true)} className="chatn-button chatn-button-primary">
                               <MdBrush className="chatn-icon" />
                               Start Annotating
                             </button>
@@ -1143,68 +1509,56 @@ const GroupChat = () => {
                             <button
                               onClick={handleSendAnnotation}
                               className="chatn-button chatn-button-success"
+                              disabled={loading}
                             >
                               <MdSend className="chatn-icon" />
-                              Send to Chat
+                              {loading ? "Sending..." : "Send to Chat"}
                             </button>
                           )}
-
-                          <button
-                            className="chatn-button chatn-button-outline"
-                            onClick={handleBase64Download}
-                          >
+                          <button className="chatn-button chatn-button-outline" onClick={handleBase64Download}>
                             <MdAttachment className="chatn-icon" />
-                            Download Annotated Image
+                            Download
                           </button>
-
-                          <button
-                            onClick={handleCloseModal}
-                            className="chatn-button chatn-button-secondary"
-                          >
+                          <button onClick={handleCloseModal} className="chatn-button chatn-button-secondary">
                             Close
                           </button>
                         </div>
                       </div>
                     </Modal.Footer>
-
                   </Modal>
-                <form className="chatn-input-wrapper" onSubmit={handleSubmit}>
-  <input
-    type="file"
-    id="chatnFileUpload"
-    onChange={handleFileChange}
-    style={{ display: "none" }}
-    disabled={isChatEnded || chatData?.PaymentStatus?.toLowerCase() !== "paid"}
-    accept="image/*"
-  />
 
-  <label
-    htmlFor="chatnFileUpload"
-    className={`chatn-attachment-button ${
-      isChatEnded || chatData?.PaymentStatus?.toLowerCase() !== "paid" ? "disabled" : ""
-    }`}
-  >
-    <MdAttachment />
-  </label>
-
-  <input
-    type="text"
-    className="chatn-text-input"
-    placeholder="Type your message..."
-    value={message}
-    disabled={isChatEnded || chatData?.PaymentStatus?.toLowerCase() !== "paid"}
-    onChange={(e) => setMessage(e.target.value)}
-  />
-
-  <button
-    type="submit"
-    className="chatn-send-button"
-    disabled={isChatEnded || chatData?.PaymentStatus?.toLowerCase() !== "paid" || !message.trim()}
-  >
-    <MdSend />
-  </button>
-</form>
-
+                  <form className="chatn-input-wrapper" onSubmit={handleSubmit}>
+                    <input
+                      type="file"
+                      id="chatnFileUpload"
+                      onChange={handleFileChange}
+                      style={{ display: "none" }}
+                      disabled={isChatEnded || chatData?.PaymentStatus?.toLowerCase() !== "paid"}
+                      accept="image/*"
+                    />
+                    <label
+                      htmlFor="chatnFileUpload"
+                      className={`chatn-attachment-button ${isChatEnded || chatData?.PaymentStatus?.toLowerCase() !== "paid" ? "disabled" : ""
+                        }`}
+                    >
+                      <MdAttachment />
+                    </label>
+                    <input
+                      type="text"
+                      className="chatn-text-input"
+                      placeholder="Type your message..."
+                      value={message}
+                      disabled={isChatEnded || chatData?.PaymentStatus?.toLowerCase() !== "paid"}
+                      onChange={(e) => setMessage(e.target.value)}
+                    />
+                    <button
+                      type="submit"
+                      className="chatn-send-button"
+                      disabled={isChatEnded || chatData?.PaymentStatus?.toLowerCase() !== "paid" || !message.trim()}
+                    >
+                      <MdSend />
+                    </button>
+                  </form>
                 </>
               ) : (
                 <div className="empty-chat-container">

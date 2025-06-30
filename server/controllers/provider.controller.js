@@ -82,7 +82,12 @@ exports.CreateProvider = async (req, res) => {
             gstDetails,
             coaNumber,
             // expertiseSpecialization: expertiseSpecialization.split(','),
-            location,
+            location: {
+                state: location?.state,
+                city: location?.city,
+                formatted_address: location?.completeAddress,
+                pincode: location?.pincode
+            },
             // photo: uploadedFiles.photo,
             // adhaarCard: uploadedFiles.adhaarCard,
             // panCard: uploadedFiles.panCard,
@@ -367,7 +372,16 @@ exports.updateProvider = async (req, res) => {
                 : language;
         if (mobileNumber) provider.mobileNumber = mobileNumber;
         if (coaNumber) provider.coaNumber = coaNumber;
-        if (location) provider.location = location;
+        if (location) {
+            provider.location = {
+                ...provider.location,
+                ...(location.state && { state: location.state }),
+                ...(location.city && { city: location.city }),
+                ...(location.pincode && { pincode: location.pincode }),
+                ...(location.formatted_address && { formatted_address: location.formatted_address })
+            };
+        }
+
         if (pricePerMin) provider.pricePerMin = pricePerMin;
         if (bio) provider.bio = bio;
         if (expertiseSpecialization) {
@@ -1027,7 +1041,7 @@ exports.verifyOtpForChangeNumber = async (req, res) => {
 
 exports.changeProviderDeactiveStatus = async (req, res) => {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
         const findProvider = await providersModel.findById(id);
         if (!findProvider) {
             return res.status(404).json({
@@ -1042,7 +1056,7 @@ exports.changeProviderDeactiveStatus = async (req, res) => {
             message: "Provider deactive successfully",
         })
     } catch (error) {
-        console.log("Internal server error", error)        
+        console.log("Internal server error", error)
         return res.status(500).json({
             success: false,
             message: 'Internal server error',

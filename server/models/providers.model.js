@@ -83,7 +83,18 @@ const ProviderProfileSchema = new mongoose.Schema({
         }
     ],
     location: {
-        type: String
+        state: {
+            type: String
+        },
+        city: {
+            type: String
+        },
+        pincode: {
+            type: String
+        },
+        formatted_address: {
+            type: String
+        }
     },
     role: {
         type: String,
@@ -293,36 +304,45 @@ ProviderProfileSchema.pre('save', async function (next) {
     next();
 });
 ProviderProfileSchema.pre("save", async function (next) {
-    if (this.unique_id) return next();
+  if (this.unique_id) return next();
 
-    let prefix = "";
+  let prefix = "";
 
-    switch (this.type) {
-        case "Architect":
-            prefix = "HUBA";
-            break;
-        case "Interior":
-            prefix = "HUBI";
-            break;
-        case "Vastu":
-            prefix = "HUBV";
-            break;
-        default:
-            return next(new Error("Invalid type for ID prefix."));
+  switch (this.type) {
+    case "Architect":
+      prefix = "HUBA";
+      break;
+    case "Interior":
+      prefix = "HUBI";
+      break;
+    case "Vastu":
+      prefix = "HUBV";
+      break;
+    default:
+      return next(new Error("Invalid type for ID prefix."));
+  }
+
+  const Provider = mongoose.model("Provider");
+
+  let attempt = 0;
+  const maxAttempts = 10;
+
+  while (attempt < maxAttempts) {
+    const count = await Provider.countDocuments({ unique_id: new RegExp(`^${prefix}`) });
+    const paddedNumber = String(count + 1 + attempt).padStart(4, "0");
+    const generatedId = `${prefix}${paddedNumber}`;
+
+    const existing = await Provider.findOne({ unique_id: generatedId });
+    if (!existing) {
+      this.unique_id = generatedId;
+      return next();
     }
 
+    attempt++;
+  }
 
-    const count = await mongoose.model("YourModel").countDocuments({
-        unique_id: new RegExp(`^${prefix}`)
-    });
-
-
-    const paddedNumber = String(count + 1).padStart(4, "0");
-    this.unique_id = `${prefix}${paddedNumber}`;
-
-    next();
+  return next(new Error("Failed to generate unique ID after multiple attempts."));
 });
-
 // Method to check password validity
 ProviderProfileSchema.methods.comparePassword = async function (password) {
     return await bcrypt.compare(password, this.password);

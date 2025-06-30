@@ -16,9 +16,15 @@ const StepWizard = () => {
         email: "",
         type: "",
         mobileNumber: "",
-        location: "",
+
         password: "",
         couponCode: "",
+        location: {
+            state: "",
+            city: "",
+            pincode: "",
+            formatted_address: ""
+        },
         agree: false,
     });
     const [discountedPrice, setDiscountedPrice] = useState(null);
@@ -51,7 +57,16 @@ const StepWizard = () => {
                 lat: coords.latitude,
                 lng: coords.longitude,
             });
-            setMemberData((prev) => ({ ...prev, location: res.data.data.address.completeAddress }));
+            const { address } = res.data.data
+
+            setMemberData((prev) => ({
+                ...prev, location: {
+                    city: address?.city,
+                    state: address?.state || "",
+                    pincode: address?.postalCode,
+                    formatted_address: address?.completeAddress
+                }
+            }));
         } catch (error) {
             console.error("Error fetching location:", error);
         }
@@ -64,10 +79,23 @@ const StepWizard = () => {
     }, [referralCode]);
 
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setMemberData((prev) => ({ ...prev, [name]: value }));
-    };
+const handleChange = (e) => {
+    const { name, value } = e.target;
+    const keys = name.split(".");
+
+    setMemberData((prev) => {
+        const updated = { ...prev };
+        let current = updated;
+
+        for (let i = 0; i < keys.length - 1; i++) {
+            current = current[keys[i]];
+        }
+
+        current[keys[keys.length - 1]] = value;
+        return { ...updated };
+    });
+};
+
 
     const validatePhone = () => {
         const phoneRegex = /^[0-9]{10}$/;
@@ -196,13 +224,7 @@ const StepWizard = () => {
 
         try {
             const res = await axios.post("https://api.helpubuild.in/api/v1/register-provider", memberData);
-            // const message = res.data.message;
-            // console.log("message",message)
-            // toast.success(res.data.message);
-            // setData("token", res.data.token);
-            // setData("islogin", !!res.data.token);
-            // setData("user", res.data.user);
-            // Proceed to payment after registration
+
             await handlePayment(res.data.user._id);
         } catch (error) {
             console.log("Internal server error", error)
@@ -289,17 +311,62 @@ const StepWizard = () => {
     };
 
 
+
+
     return (
         <div className="container mt-5 mb-5">
             <form onSubmit={handleSubmit}>
                 <h1 className="text-center mb-5">Partner Registration</h1>
                 <div className="row">
-                    {["name", "email", "mobileNumber", "location"].map((field, index) => (
+                    {["name", "email", "mobileNumber"].map((field, index) => (
                         <div key={index} className="col-lg-6 mb-3">
                             <label className="form-label">{field.charAt(0).toUpperCase() + field.slice(1)}</label>
                             <input type="text" name={field} value={memberData[field]} onChange={handleChange} className="form-control" />
                         </div>
                     ))}
+                    <div className="col-lg-6 mb-3">
+                        <label className="form-label">State</label>
+                        <input
+                            type="text"
+                            name="location.state"
+                            value={memberData.location.state}
+                            onChange={handleChange}
+                            className="form-control"
+                        />
+                    </div>
+
+                    <div className="col-lg-6 mb-3">
+                        <label className="form-label">City</label>
+                        <input
+                            type="text"
+                            name="location.city"
+                            value={memberData.location.city}
+                            onChange={handleChange}
+                            className="form-control"
+                        />
+                    </div>
+
+                    <div className="col-lg-6 mb-3">
+                        <label className="form-label">Pincode</label>
+                        <input
+                            type="text"
+                            name="location.pincode"
+                            value={memberData.location.pincode}
+                            onChange={handleChange}
+                            className="form-control"
+                        />
+                    </div>
+
+                    <div className="col-lg-6 mb-3">
+                        <label className="form-label">Street Address</label>
+                        <input
+                            type="text"
+                            name="location.formatted_address"
+                            value={memberData.location.formatted_address}
+                            onChange={handleChange}
+                            className="form-control"
+                        />
+                    </div>
 
                     <div className="col-lg-6 mb-3">
                         <label className="form-label">Partner Type</label>

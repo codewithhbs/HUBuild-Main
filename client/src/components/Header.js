@@ -90,13 +90,13 @@ const Header = () => {
     const UserData = JSON.parse(Data);
 
     if (!UserData) {
-      return toast.error("Please Login First");
+      return 
     }
 
     try {
       const url = UserData?.role === "provider"
-        ? `https://api.helpubuild.in/api/v1/get-chat-by-providerId/${UserData._id}`
-        : `https://api.helpubuild.in/api/v1/get-chat-by-userId/${UserData._id}`;
+        ? `https://testapi.helpubuild.in/api/v1/get-chat-by-providerId/${UserData._id}`
+        : `https://testapi.helpubuild.in/api/v1/get-chat-by-userId/${UserData._id}`;
 
       const { data } = await axios.get(url);
       const fullData = data.data;
@@ -131,7 +131,7 @@ const Header = () => {
     }
 
     try {
-      const url = `https://api.helpubuild.in/api/v1/mark-${UserData.role}-chats-as-read/${UserData._id}`;
+      const url = `https://testapi.helpubuild.in/api/v1/mark-${UserData.role}-chats-as-read/${UserData._id}`;
       await axios.put(url);
     } catch (error) {
       console.log("Internal server error", error);
@@ -159,7 +159,7 @@ const Header = () => {
             return;
           }
 
-          const res = await axios.post(`https://api.helpubuild.in/api/v1/buy_membership/${providerId}`);
+          const res = await axios.post(`https://testapi.helpubuild.in/api/v1/buy_membership/${providerId}`);
           const order = res.data.data.razorpayOrder;
           const amount = res.data.data.discountAmount;
           const providerData = res.data.data.provider;
@@ -172,7 +172,7 @@ const Header = () => {
               name: "Help U Build",
               description: "Buying Membership",
               order_id: order.id,
-              callback_url: "https://api.helpubuild.in/api/v1/membership_payment_verify",
+              callback_url: "https://testapi.helpubuild.in/api/v1/membership_payment_verify",
               prefill: {
                 name: providerData.name,
                 email: providerData.email,
@@ -296,31 +296,33 @@ const Header = () => {
                     Profile
                   </Link>
                 ) : (
-                  <div className="dropdown hub-header__dropdown">
-                    <button
-                      className="btn hub-header__login-btn dropdown-toggle"
-                      type="button"
-                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      aria-expanded={isDropdownOpen}
-                    >
-                      <i className="fas fa-sign-in-alt me-2"></i>
-                      Login
-                    </button>
-                    <ul className={`dropdown-menu hub-header__dropdown-menu ${isDropdownOpen ? 'show' : ''}`}>
-                      <li>
-                        <Link className="dropdown-item hub-header__dropdown-item" to="/login" onClick={handleLinkClick}>
-                          <i className="fas fa-user me-2"></i>
-                          Login as User
-                        </Link>
-                      </li>
-                      <li>
-                        <Link className="dropdown-item hub-header__dropdown-item" to="/partner-login" onClick={handleLinkClick}>
-                          <i className="fas fa-handshake me-2"></i>
-                          Login as Partner
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
+                <div className="dropdown">
+  <button
+    className="btn btn-primary dropdown-toggle custombutton"
+    type="button"
+    id="loginDropdown"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+  >
+    Login
+  </button>
+
+  <ul className="dropdown-menu" aria-labelledby="loginDropdown">
+    <li>
+      <a className="dropdown-item" href="/login">
+        <i className="fas fa-user me-2"></i>
+        Login as User
+      </a>
+    </li>
+    <li>
+      <a className="dropdown-item" href="/partner-login">
+        <i className="fas fa-handshake me-2"></i>
+        Login as Partner
+      </a>
+    </li>
+  </ul>
+</div>
+
                 )}
               </li>
             </ul>

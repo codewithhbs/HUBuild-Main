@@ -26,7 +26,12 @@ const Profile = () => {
     language: '',
     mobileNumber: '',
     coaNumber: '',
-    location: '',
+    location: {
+      state: "",
+      city: "",
+      pincode: "",
+      formatted_address: ""
+    },
     pricePerMin: '',
     bio: '',
     expertiseSpecialization: [],
@@ -51,23 +56,29 @@ const Profile = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Special handling for mobile number
     if (name === 'mobileNumber') {
       setNewMobileNumber(value);
-      // Set mobile as unverified if changed from original
-      if (value !== originalMobileNumber) {
-        setMobileVerified(false);
-      } else {
-        setMobileVerified(true);
-      }
+      setMobileVerified(value === originalMobileNumber);
     } else {
-      // For all other fields, update formData normally
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        [name]: value
-      }));
+      const keys = name.split('.');
+
+      setFormData((prevFormData) => {
+        const updatedForm = { ...prevFormData };
+        let temp = updatedForm;
+
+        for (let i = 0; i < keys.length - 1; i++) {
+          const key = keys[i];
+          // Ensure intermediate objects exist
+          if (!temp[key]) temp[key] = {};
+          temp = temp[key];
+        }
+
+        temp[keys[keys.length - 1]] = value;
+        return updatedForm;
+      });
     }
   };
+
 
   const handleSelectChange = (selectedOptions) => {
     setFormData((prevFormData) => ({
@@ -90,7 +101,12 @@ const Profile = () => {
         language: allData.language || '',
         mobileNumber: allData.mobileNumber || '',
         coaNumber: allData.coaNumber || '',
-        location: allData.location || '',
+        location: {
+          city: allData?.location?.city,
+          state: allData?.location?.state || "",
+          pincode: allData?.location?.pincode,
+          formatted_address: allData?.location?.formatted_address
+        },
         pricePerMin: allData.pricePerMin || '',
         bio: allData.bio || '',
         expertiseSpecialization: allData.expertiseSpecialization.map(exp => ({ label: exp, value: exp })) || [],
@@ -435,19 +451,52 @@ const Profile = () => {
               onChange={handleChange}
             />
           </div>
-          <div className="col-md-6 mt-2">
-            <label htmlFor="location" style={{ fontWeight: '700' }} className="form-label">
-              Address
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="location"
-              name="location"
-              value={formData.location}
-              onChange={handleChange}
-            />
-          </div>
+      <div className="row mt-2">
+  <div className="col-md-6 mb-3">
+    <label className="form-label">State</label>
+    <input
+      type="text"
+      name="location.state"
+      value={formData.location.state}
+      onChange={handleChange}
+      className="form-control"
+    />
+  </div>
+
+  <div className="col-md-6 mb-3">
+    <label className="form-label">City</label>
+    <input
+      type="text"
+      name="location.city"
+      value={formData.location.city}
+      onChange={handleChange}
+      className="form-control"
+    />
+  </div>
+
+  <div className="col-md-6 mb-3">
+    <label className="form-label">Pincode</label>
+    <input
+      type="text"
+      name="location.pincode"
+      value={formData.location.pincode}
+      onChange={handleChange}
+      className="form-control"
+    />
+  </div>
+
+  <div className="col-md-6 mb-3">
+    <label className="form-label">Street Address</label>
+    <input
+      type="text"
+      name="location.formatted_address"
+      value={formData.location.formatted_address}
+      onChange={handleChange}
+      className="form-control"
+    />
+  </div>
+</div>
+
           <div className="col-md-6 mt-2">
             <label htmlFor="yearOfExperience" style={{ fontWeight: '700' }} className="form-label">
               Year Of Experience
