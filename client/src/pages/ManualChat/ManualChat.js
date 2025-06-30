@@ -1,4 +1,4 @@
-
+"use client"
 
 import { useEffect, useMemo, useState, useCallback, useRef } from "react"
 import "./chat.css"
@@ -15,7 +15,8 @@ import {
   MdPinEnd,
   MdFormatSize,
   MdColorize,
-  MdDragIndicator,
+  MdReply,
+  MdClose,
 } from "react-icons/md"
 import ScrollToBottom from "react-scroll-to-bottom"
 import axios from "axios"
@@ -31,9 +32,7 @@ import CanvasDraw from "react-canvas-draw"
 const ENDPOINT = "https://api.helpubuild.in/"
 const MAX_FILE_SIZE = 5 * 1024 * 1024
 
-
-
-const GroupChat = () => {
+const ManualChat = () => {
   // Existing state management
   const [showModal, setShowModal] = useState(false)
   const [selectedImage, setSelectedImage] = useState(null)
@@ -65,6 +64,10 @@ const GroupChat = () => {
   const [isChatEnded, setIsChatEnded] = useState(false)
   const [downloadUrl, setDownloadUrl] = useState(null)
 
+  // Enhanced Reply functionality states
+  const [replyingTo, setReplyingTo] = useState(null)
+  const [showReplyOptions, setShowReplyOptions] = useState({})
+
   // Enhanced Canvas annotation states
   const [brushColor, setBrushColor] = useState("#ff0000")
   const [brushRadius, setBrushRadius] = useState(2)
@@ -86,6 +89,9 @@ const GroupChat = () => {
   const [textHistory, setTextHistory] = useState([])
   const [historyIndex, setHistoryIndex] = useState(-1)
 
+  // Add participants mapping for better sender resolution
+  const [participantsMap, setParticipantsMap] = useState(new Map())
+
   const navigate = useNavigate()
   const location = useLocation()
   const textCanvasRef = useRef(null)
@@ -98,6 +104,123 @@ const GroupChat = () => {
   }, [])
 
   const socket = useSocket()
+
+  // Enhanced function to build participants map
+  const buildParticipantsMap = useCallback(
+    (chatData) => {
+      const map = new Map()
+
+      // Add current user
+      if (userData) {
+        map.set(userData._id, {
+          name: "You",
+          role: userData.role,
+          isCurrentUser: true,
+        })
+      }
+
+      // Add chat user
+      if (chatData?.userId) {
+        map.set(chatData.userId._id, {
+          name: chatData.userId.name,
+          role: "user",
+          isCurrentUser: chatData.userId._id === userData?._id,
+        })
+      }
+
+      // Add providers
+      if (chatData?.providerIds && Array.isArray(chatData.providerIds)) {
+        chatData.providerIds.forEach((provider) => {
+          map.set(provider._id, {
+            name: provider.name,
+            role: "provider",
+            isCurrentUser: provider._id === userData?._id,
+          })
+        })
+      }
+
+      setParticipantsMap(map)
+      return map
+    },
+    [userData],
+  )
+
+  // Enhanced getSenderInfo function
+  const getSenderInfo = useCallback(
+    (senderId) => {
+      // First check the participants map
+      if (participantsMap.has(senderId)) {
+        return participantsMap.get(senderId)
+      }
+
+      // Fallback to current user check
+      if (senderId === userData?._id) {
+        return { name: "You", role: userData?.role, isCurrentUser: true }
+      }
+
+      // Fallback to selectedChat check
+      if (selectedChat?.userId?._id === senderId) {
+        return {
+          name: selectedChat.userId.name,
+          role: "user",
+          isCurrentUser: false,
+        }
+      }
+
+      // Check providers in selectedChat
+      const provider = selectedChat?.providerIds?.find((p) => p._id === senderId)
+      if (provider) {
+        return {
+          name: provider.name,
+          role: "provider",
+          isCurrentUser: false,
+        }
+      }
+
+      // Last resort - try to find in messages for any stored sender info
+      const messageWithSender = messages.find(
+        (msg) => (msg.sender === senderId || msg.senderId === senderId) && msg.senderName,
+      )
+      if (messageWithSender) {
+        return {
+          name: messageWithSender.senderName,
+          role: messageWithSender.senderRole || "unknown",
+          isCurrentUser: false,
+        }
+      }
+
+      return { name: "Unknown User", role: "unknown", isCurrentUser: false }
+    },
+    [participantsMap, userData, selectedChat, messages],
+  )
+
+  // Enhanced Reply functionality functions
+  const handleReplyClick = useCallback(
+    (message, messageIndex) => {
+      const senderInfo = getSenderInfo(message.sender || message.senderId)
+
+      setReplyingTo({
+        ...message,
+        messageIndex,
+        senderName: senderInfo.name,
+        senderRole: senderInfo.role,
+        originalTimestamp: message.timestamp,
+      })
+      setShowReplyOptions({})
+    },
+    [getSenderInfo],
+  )
+
+  const cancelReply = useCallback(() => {
+    setReplyingTo(null)
+  }, [])
+
+  const toggleReplyOptions = useCallback((messageIndex) => {
+    setShowReplyOptions((prev) => ({
+      ...prev,
+      [messageIndex]: !prev[messageIndex],
+    }))
+  }, [])
 
   // Enhanced Text Management Functions
   const addTextToHistory = useCallback(
@@ -320,17 +443,33 @@ const GroupChat = () => {
         }
 
         const mergedDataUrl = mergedCanvas.toDataURL("image/png")
+
         const annotatedFile = {
           name: `annotated_${selectedImage?.name || "image.png"}`,
           type: "image/png",
           content: mergedDataUrl,
         }
 
+        // Get current user info for sender details
+        const currentUserInfo = getSenderInfo(userData._id)
+
         socket.emit("manual_file_upload", {
           room: currentRoomId,
           fileData: annotatedFile,
           senderId: userData._id,
+          senderName: currentUserInfo.name,
+          senderRole: currentUserInfo.role,
           timestamp: new Date().toISOString(),
+          ...(replyingTo && {
+            replyTo: {
+              messageId: replyingTo.messageIndex.toString(),
+              text: replyingTo.text || (replyingTo.file ? "Image" : ""),
+              senderName: replyingTo.senderName,
+              senderRole: replyingTo.senderRole,
+              isFile: !!replyingTo.file,
+              timestamp: replyingTo.originalTimestamp,
+            },
+          }),
         })
 
         toast.success("Annotated image sent to chat!")
@@ -339,6 +478,7 @@ const GroupChat = () => {
         setTextElements([])
         setTextHistory([])
         setHistoryIndex(-1)
+        if (replyingTo) cancelReply()
       }
 
       backgroundImg.onerror = () => {
@@ -375,6 +515,7 @@ const GroupChat = () => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth < 768)
     }
+
     handleResize()
     window.addEventListener("resize", handleResize)
     return () => window.removeEventListener("resize", handleResize)
@@ -416,6 +557,7 @@ const GroupChat = () => {
     }
 
     setDownloadUrl(url)
+
     return () => {
       if (url?.startsWith("blob:")) URL.revokeObjectURL(url)
     }
@@ -499,6 +641,7 @@ const GroupChat = () => {
         const { data } = await fetchWithRetry(
           `${ENDPOINT}api/v1/get-chat-by-id/${currentRoomId}?role=${userData?.role}`,
         )
+
         const chatData = data.data
         setIsAbleToJoinChat(chatData.isChatStarted)
       } catch (error) {
@@ -600,6 +743,7 @@ const GroupChat = () => {
     }
 
     const phoneNumber = member?.phoneNumber
+
     if (!phoneNumber) {
       toast.error(`No phone number available for ${member?.name || "this member"}`)
       return
@@ -614,6 +758,7 @@ const GroupChat = () => {
         const callTo = member?.phoneNumber
 
         console.log("all detail =", room, callFrom, callTo)
+
         const res = await axios.post(`${ENDPOINT}api/v1/create_call_for_free`, { roomId: room, callFrom, callTo })
         toast.success(`Calling ${member.name}...`)
       } else {
@@ -633,6 +778,7 @@ const GroupChat = () => {
 
       try {
         const { data } = await axios.get(`${ENDPOINT}api/v1/get-chat-by-id/${chatId}?role=${userData?.role}`)
+
         const chatData = data.data
 
         if (!chatData) {
@@ -644,7 +790,22 @@ const GroupChat = () => {
         const providerIds = chatData?.providerIds?.map((provider) => provider._id) || []
 
         setChatData(chatData || {})
-        setMessages(chatData.messages || [])
+        setSelectedChat(chatData) // Set this before setting messages
+
+        // Build participants map first
+        buildParticipantsMap(chatData)
+
+        // Then set messages with enhanced sender info
+        const enhancedMessages = (chatData.messages || []).map((msg) => {
+          const senderInfo = getSenderInfo(msg.sender)
+          return {
+            ...msg,
+            senderName: senderInfo.name,
+            senderRole: senderInfo.role,
+          }
+        })
+
+        setMessages(enhancedMessages)
         setSelectedUserId(userId)
         setSelectedProviderIds(providerIds)
         setIsChatBoxActive(true)
@@ -674,7 +835,7 @@ const GroupChat = () => {
         toast.error("Failed to load group chat details")
       }
     },
-    [userData, socket, getGroupMembers],
+    [userData, socket, getGroupMembers, buildParticipantsMap, getSenderInfo],
   )
 
   const endGroupChat = useCallback(() => {
@@ -698,37 +859,6 @@ const GroupChat = () => {
       console.error("Error ending group chat:", error)
     }
   }, [socket, selectedUserId, selectedProviderIds, userData, currentRoomId, fetchGroupChatHistory])
-
-  // Enhanced version that includes role information
-  const getSenderInfo = useCallback(
-    (senderId) => {
-      if (senderId === userData?._id) {
-        return { name: "You", role: userData?.role, isCurrentUser: true }
-      }
-
-      // Check if sender is the user in the chat
-      if (selectedChat?.userId?._id === senderId) {
-        return {
-          name: selectedChat.userId.name,
-          role: "user",
-          isCurrentUser: false,
-        }
-      }
-
-      // Check if sender is one of the providers
-      const provider = selectedChat?.providerIds?.find((p) => p._id === senderId)
-      if (provider) {
-        return {
-          name: provider.name,
-          role: "provider",
-          isCurrentUser: false,
-        }
-      }
-
-      return { name: "Unknown User", role: "unknown", isCurrentUser: false }
-    },
-    [userData, selectedChat],
-  )
 
   // Navigation handling
   useEffect(() => {
@@ -792,14 +922,20 @@ const GroupChat = () => {
       })
     })
 
-    // Enhanced message handler to properly handle files
+    // Enhanced message handler to properly handle files and replies
     socket.on("return_message", (data) => {
       console.log("Received message from others:", data)
-      // Create message object with proper structure
+
+      // Get sender info for the incoming message
+      const senderInfo = getSenderInfo(data.sender || data.senderId)
+
+      // Create message object with proper structure and sender info
       const messageObj = {
         ...data,
         senderId: data.sender || data.senderId,
         sender: data.sender || data.senderId,
+        senderName: data.senderName || senderInfo.name,
+        senderRole: data.senderRole || senderInfo.role,
       }
 
       // If it's a file message, ensure file structure is correct
@@ -809,6 +945,11 @@ const GroupChat = () => {
           type: data.file.type,
           content: data.file.content,
         }
+      }
+
+      // Handle reply data
+      if (data.replyTo) {
+        messageObj.replyTo = data.replyTo
       }
 
       setMessages((prev) => [...prev, messageObj])
@@ -826,6 +967,7 @@ const GroupChat = () => {
           return newSet
         })
       }
+
       setStatus(status)
     })
 
@@ -873,18 +1015,20 @@ const GroupChat = () => {
       socket.off("file_upload_error")
       socket.off("chat_ended")
     }
-  }, [id, socket, userData, selectedProviderIds])
+  }, [id, socket, userData, selectedProviderIds, getSenderInfo])
 
   // Content validation for messages
   const validateMessageContent = useCallback((messageText) => {
     if (!messageText || typeof messageText !== "string" || messageText.trim() === "") {
       return false
     }
+
     const prohibitedPatterns = [
       /\b\d{10}\b/,
       /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/,
       /18\+|\bsex\b|\bxxx\b|\bcall\b|\bphone\b|\bmobile|\bteliphone\b|\bnudes\b|\bporn\b|\bsex\scall\b|\btext\b|\bwhatsapp\b|\bskype\b|\btelegram\b|\bfacetime\b|\bvideo\schat\b|\bdial\snumber\b|\bmessage\b/i,
     ]
+
     return !prohibitedPatterns.some((pattern) => pattern.test(messageText))
   }, [])
 
@@ -907,8 +1051,8 @@ const GroupChat = () => {
       }
 
       const uploadingToast = toast.loading("Uploading file...")
-      const reader = new FileReader()
 
+      const reader = new FileReader()
       reader.onload = () => {
         try {
           const fileData = {
@@ -917,14 +1061,30 @@ const GroupChat = () => {
             content: reader.result,
           }
 
+          // Get current user info for sender details
+          const currentUserInfo = getSenderInfo(userData._id)
+
           socket.emit("manual_file_upload", {
             room: currentRoomId,
             fileData,
             senderId: userData._id,
+            senderName: currentUserInfo.name,
+            senderRole: currentUserInfo.role,
             timestamp: new Date().toISOString(),
+            ...(replyingTo && {
+              replyTo: {
+                messageId: replyingTo.messageIndex.toString(),
+                text: replyingTo.text || (replyingTo.file ? "Image" : ""),
+                senderName: replyingTo.senderName,
+                senderRole: replyingTo.senderRole,
+                isFile: !!replyingTo.file,
+                timestamp: replyingTo.originalTimestamp,
+              },
+            }),
           })
 
           toast.dismiss(uploadingToast)
+          if (replyingTo) cancelReply()
         } catch (error) {
           toast.dismiss(uploadingToast)
           toast.error("Failed to process file")
@@ -939,10 +1099,10 @@ const GroupChat = () => {
       reader.readAsDataURL(file)
       event.target.value = ""
     },
-    [userData, currentRoomId, socket],
+    [userData, currentRoomId, socket, replyingTo, cancelReply, getSenderInfo],
   )
 
-  // Handle message submission
+  // Handle message submission with reply support
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault()
@@ -959,21 +1119,37 @@ const GroupChat = () => {
       }
 
       try {
+        // Get current user info for sender details
+        const currentUserInfo = getSenderInfo(userData._id)
+
         const payload = {
           room: currentRoomId,
           message: trimmedMessage,
           senderId: userData._id,
+          senderName: currentUserInfo.name,
+          senderRole: currentUserInfo.role,
           timestamp: new Date().toISOString(),
           role: userData.role,
+          ...(replyingTo && {
+            replyTo: {
+              messageId: replyingTo.messageIndex.toString(),
+              text: replyingTo.text || (replyingTo.file ? "Image" : ""),
+              senderName: replyingTo.senderName,
+              senderRole: replyingTo.senderRole,
+              isFile: !!replyingTo.file,
+              timestamp: replyingTo.originalTimestamp,
+            },
+          }),
         }
 
         socket.emit("manual_message", payload)
         setMessage("")
+        if (replyingTo) cancelReply()
       } catch (error) {
         toast.error("Failed to send message")
       }
     },
-    [message, userData, currentRoomId, socket, validateMessageContent],
+    [message, userData, currentRoomId, socket, validateMessageContent, replyingTo, cancelReply, getSenderInfo],
   )
 
   // Filter group chats based on search term
@@ -995,8 +1171,9 @@ const GroupChat = () => {
   }
 
   const isMobile = window.innerWidth <= 710
-  const canvasWidth = Math.min(800, window.innerWidth - 50);
-  const canvasHeight = isMobile ? 170 : Math.min(600, window.innerHeight - 100);
+  const canvasWidth = Math.min(800, window.innerWidth - 50)
+  const canvasHeight = isMobile ? 170 : Math.min(600, window.innerHeight - 100)
+
   if (!userData) {
     return <AccessDenied />
   }
@@ -1146,6 +1323,7 @@ const GroupChat = () => {
                             Call Member
                             <MdExpandMore className="ms-1" />
                           </Dropdown.Toggle>
+
                           <Dropdown.Menu>
                             <Dropdown.Header>Group Members</Dropdown.Header>
                             {groupMembers.map((member) => (
@@ -1195,33 +1373,69 @@ const GroupChat = () => {
                               {!isOwn && (
                                 <div className={`chatn-sender-name ${senderInfo.role}`}>{senderInfo.name}</div>
                               )}
+
+                              {/* Enhanced Reply indicator - WhatsApp style */}
+                              {msg.replyTo && (
+                                <div className="chatn-reply-indicator">
+                                  <div className="chatn-reply-line"></div>
+                                  <div className="chatn-reply-content">
+                                    <div className="chatn-reply-sender">{msg.replyTo.senderName}</div>
+                                    <div className="chatn-reply-text">
+                                      {msg.replyTo.isFile ? "📷 Image" : msg.replyTo.text}
+                                    </div>
+                                    <div className="chatn-reply-time">
+                                      {new Date(msg.replyTo.timestamp).toLocaleTimeString("en-US", {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })}
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+
                               {msg.file ? (
-                                <div
-                                  className="chatn-message-bubble chatn-file-message"
-                                  onClick={() => handleImageClick(msg.file)}
-                                  style={{ cursor: "pointer" }}
-                                >
+                                <div className="chatn-message-bubble chatn-file-message">
                                   <img
                                     src={msg.file.content || "/placeholder.svg"}
                                     alt={msg.file.name}
                                     className="chatn-message-image"
+                                    onClick={() => handleImageClick(msg.file)}
+                                    style={{ cursor: "pointer" }}
                                     onError={(e) => (e.target.src = "/placeholder.svg")}
                                   />
-                                  <div className="chatn-message-time">
-                                    {new Date(msg.timestamp).toLocaleTimeString("en-US", {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    })}
+                                  <div className="chatn-message-actions">
+                                    <div className="chatn-message-time">
+                                      {new Date(msg.timestamp).toLocaleTimeString("en-US", {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })}
+                                    </div>
+                                    <button
+                                      className="chatn-reply-button"
+                                      onClick={() => handleReplyClick(msg, idx)}
+                                      title="Reply to this message"
+                                    >
+                                      <MdReply size={16} />
+                                    </button>
                                   </div>
                                 </div>
                               ) : (
                                 <div className="chatn-message-bubble">
                                   <div className="chatn-message-text">{msg.text}</div>
-                                  <div className="chatn-message-time">
-                                    {new Date(msg.timestamp).toLocaleTimeString("en-US", {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    })}
+                                  <div className="chatn-message-actions">
+                                    <div className="chatn-message-time">
+                                      {new Date(msg.timestamp).toLocaleTimeString("en-US", {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })}
+                                    </div>
+                                    <button
+                                      className="chatn-reply-button"
+                                      onClick={() => handleReplyClick(msg, idx)}
+                                      title="Reply to this message"
+                                    >
+                                      <MdReply size={16} />
+                                    </button>
                                   </div>
                                 </div>
                               )}
@@ -1269,6 +1483,7 @@ const GroupChat = () => {
                                       className="chat-screen-color-input"
                                     />
                                   </div>
+
                                   <div className="chat-screen-control-group">
                                     <label className="chat-screen-label">Brush Size:</label>
                                     <input
@@ -1304,6 +1519,7 @@ const GroupChat = () => {
                                       />
                                       <span className="chat-screen-size-badge">{textSettings.fontSize}px</span>
                                     </div>
+
                                     <div className="chat-screen-control-group">
                                       <label className="chat-screen-label">Text Color:</label>
                                       <input
@@ -1315,6 +1531,7 @@ const GroupChat = () => {
                                         className="chat-screen-color-input"
                                       />
                                     </div>
+
                                     <div className="chat-screen-control-group">
                                       <label className="chat-screen-label">Font:</label>
                                       <select
@@ -1344,6 +1561,7 @@ const GroupChat = () => {
                                       {isAddingText ? "Adding Text..." : "Add Text"}
                                     </span>
                                   </button>
+
                                   <button
                                     className="chat-screen-button chat-screen-button-warning"
                                     onClick={handleUndo}
@@ -1351,6 +1569,7 @@ const GroupChat = () => {
                                     <MdUndo className="chat-screen-icon" />
                                     <span className="chat-screen-button-text">Undo</span>
                                   </button>
+
                                   <button
                                     className="chat-screen-button chat-screen-button-danger"
                                     onClick={handleClear}
@@ -1441,19 +1660,19 @@ const GroupChat = () => {
                                       onChange={(e) => setTextInput(e.target.value)}
                                       onKeyDown={(e) => {
                                         if (e.key === "Enter" && textInput.trim()) {
-                                          addTextElement(textPosition.x, textPosition.y, textInput);
+                                          addTextElement(textPosition.x, textPosition.y, textInput)
                                         } else if (e.key === "Escape") {
-                                          setTextInput("");
-                                          setTextPosition(null);
-                                          setIsAddingText(false);
+                                          setTextInput("")
+                                          setTextPosition(null)
+                                          setIsAddingText(false)
                                         }
                                       }}
                                       onBlur={() => {
                                         if (textInput.trim()) {
-                                          addTextElement(textPosition.x, textPosition.y, textInput);
+                                          addTextElement(textPosition.x, textPosition.y, textInput)
                                         } else {
-                                          setTextPosition(null);
-                                          setIsAddingText(false);
+                                          setTextPosition(null)
+                                          setIsAddingText(false)
                                         }
                                       }}
                                       className="form-control form-control-sm"
@@ -1467,8 +1686,6 @@ const GroupChat = () => {
                                     />
                                   </div>
                                 )}
-
-                       
                               </div>
                             ) : (
                               <div className="chat-screen-image-container">
@@ -1479,8 +1696,6 @@ const GroupChat = () => {
                                 />
                               </div>
                             )}
-
-                           
                           </div>
                         </div>
                       )}
@@ -1527,6 +1742,28 @@ const GroupChat = () => {
                     </Modal.Footer>
                   </Modal>
 
+                  {/* Enhanced Reply Bar - WhatsApp style */}
+                  {replyingTo && (
+                    <div className="chatn-reply-bar">
+                      <div className="chatn-reply-info">
+                        <div className="chatn-reply-header">
+                          <MdReply className="chatn-reply-icon" />
+                          <span className="chatn-reply-label">Replying to {replyingTo.senderName}</span>
+                        </div>
+                        <div className="chatn-reply-preview">{replyingTo.file ? "📷 Image" : replyingTo.text}</div>
+                        <div className="chatn-reply-original-time">
+                          {new Date(replyingTo.originalTimestamp).toLocaleTimeString("en-US", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </div>
+                      </div>
+                      <button className="chatn-reply-cancel" onClick={cancelReply}>
+                        <MdClose size={18} />
+                      </button>
+                    </div>
+                  )}
+
                   <form className="chatn-input-wrapper" onSubmit={handleSubmit}>
                     <input
                       type="file"
@@ -1536,21 +1773,25 @@ const GroupChat = () => {
                       disabled={isChatEnded || chatData?.PaymentStatus?.toLowerCase() !== "paid"}
                       accept="image/*"
                     />
+
                     <label
                       htmlFor="chatnFileUpload"
-                      className={`chatn-attachment-button ${isChatEnded || chatData?.PaymentStatus?.toLowerCase() !== "paid" ? "disabled" : ""
-                        }`}
+                      className={`chatn-attachment-button ${
+                        isChatEnded || chatData?.PaymentStatus?.toLowerCase() !== "paid" ? "disabled" : ""
+                      }`}
                     >
                       <MdAttachment />
                     </label>
+
                     <input
                       type="text"
                       className="chatn-text-input"
-                      placeholder="Type your message..."
+                      placeholder={replyingTo ? `Reply to ${replyingTo.senderName}...` : "Type your message..."}
                       value={message}
                       disabled={isChatEnded || chatData?.PaymentStatus?.toLowerCase() !== "paid"}
                       onChange={(e) => setMessage(e.target.value)}
                     />
+
                     <button
                       type="submit"
                       className="chatn-send-button"
@@ -1592,4 +1833,4 @@ const GroupChat = () => {
   )
 }
 
-export default GroupChat
+export default ManualChat
