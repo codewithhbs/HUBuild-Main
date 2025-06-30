@@ -79,6 +79,11 @@ const _nav = [
         name: 'All Expertise',
         to: '/expertise/all_expertise',
       },
+      {
+        component: CNavItem,
+        name: 'All Inquiry',
+        to: '/inquiry/all_inquiry',
+      },
     ],
   },
   {

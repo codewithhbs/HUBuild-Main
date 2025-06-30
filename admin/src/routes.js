@@ -34,6 +34,7 @@ import EditCustomChat from './views/CustomChat/EditCustomChat'
 import Eprivacy from './views/Term/Eprivacy'
 import EDisc from './views/Term/EDisc'
 import ERefund from './views/Term/ERefund'
+import AllInquiry from './views/Inquiry/AllInquiry'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
@@ -238,7 +239,8 @@ const routes = [
   { path: '/project/all_project', name: 'All Project', element: AllCustomChat },
   { path: '/project/add_project', name: 'Add Project', element: AddCustomChat },
   { path: '/project/edit_project/:id', name: 'Edit Project', element: EditCustomChat },
-
+  
+  { path: '/inquiry/all_inquiry', name: 'All Inquiry', element: AllInquiry },
 ]
 
 export default routes

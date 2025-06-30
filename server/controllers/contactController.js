@@ -91,3 +91,32 @@ exports.deleteContact = async (req, res) => {
     });
   }
 };
+
+
+exports.addNote = async (req, res) => {
+  try {
+    const contact = await Contact.findById(req.params.id);
+
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        message: "Contact not found"
+      });
+    }
+
+    contact.note = req.body.note;
+    await contact.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Note added successfully",
+      data: contact
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error adding note",
+      error: error.message
+    });
+  }
+};

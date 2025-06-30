@@ -440,7 +440,7 @@ const Profile = () => {
           }
           <div className="col-md-6 mt-2">
             <label htmlFor="pricePerMin" style={{ fontWeight: '700' }} className="form-label">
-              Price Per Minute
+              Price Per Minute (25% comission included)
             </label>
             <input
               type="number"

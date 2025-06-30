@@ -23,7 +23,7 @@ const { createAdminCoupon, getAllAdminCoupon, getSingleAdminCoupon, updateAdminC
 const { createNewsLetter, getAllNewsLetter, deleteNewsLetter, getSingleNewsLetter, sendNewsLetterMessage } = require('../controllers/newsLetter.controller');
 const { createExpertise, getAllExpertise, getSingleExpertise, updateExpertise, deleteExpertise } = require('../controllers/expertise.controller');
 const { createTerm, getTerm, singleTerm, updateTerm } = require('../controllers/termAndCondition');
-const { createContact, getAllContacts, updateContact, deleteContact } = require('../controllers/contactController');
+const { createContact, getAllContacts, updateContact, deleteContact, addNote } = require('../controllers/contactController');
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 const router = express.Router();
@@ -301,6 +301,7 @@ router.put('/update_manual_chat_ended/:id', updateGroupChatISEnded)
 router.post('/create-contact', createContact);
 router.get('/get-contact', getAllContacts);
 router.put('/update-contact/:id', updateContact);
+router.put('/add-note/:id', addNote);
 router.delete('/delete-contact/:id', deleteContact);
 
 
