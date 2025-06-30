@@ -98,7 +98,7 @@ function App() {
         <Route path="/cancellation-refund-policy" element={<Cancellation />} />
         <Route path="/disclaimer" element={<Disclaimer />} />
         <Route path="/Pages" element={<TermCondition />} />
-        <Route path="/manual-chat" element={<ManualChat />} />
+        {/* <Route path="/manual-chat" element={<ManualChat />} /> */}
       </Routes>
       <Toaster />
       <Footer />
