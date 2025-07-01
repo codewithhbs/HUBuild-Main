@@ -41,7 +41,7 @@ const StepWizard = () => {
 
     const handleFetchmembership = async () => {
         try {
-            const { data } = await axios.get("https://api.helpubuild.in/api/v1/get_all_membership");
+            const { data } = await axios.get("https://testapi.helpubuild.in/api/v1/get_all_membership");
             setMemberShip(data.data[0].planPrice);
         } catch (error) {
             console.log("Internal server error", error)
@@ -53,7 +53,7 @@ const StepWizard = () => {
 
     const fetchCurrentLocation = async () => {
         try {
-            const res = await axios.post("https://api.helpubuild.in/Fetch-Current-Location", {
+            const res = await axios.post("https://testapi.helpubuild.in/Fetch-Current-Location", {
                 lat: coords.latitude,
                 lng: coords.longitude,
             });
@@ -141,7 +141,7 @@ const handleChange = (e) => {
                 toast.error("Failed to load Razorpay SDK. Please check your connection.");
                 return;
             }
-            const res = await axios.post(`https://api.helpubuild.in/api/v1/buy_membership/${providerId}`, {
+            const res = await axios.post(`https://testapi.helpubuild.in/api/v1/buy_membership/${providerId}`, {
                 couponCode: memberData.couponCode,
             });
             const message = res.data?.message;
@@ -165,11 +165,11 @@ const handleChange = (e) => {
                     name: "Help U Build",
                     description: "Buying Membership",
                     order_id: order.id,
-                    // callback_url: "https://api.helpubuild.in/api/v1/membership_payment_verify",
+                    // callback_url: "https://testapi.helpubuild.in/api/v1/membership_payment_verify",
                     handler: async function (response) {
                         // This runs on successful payment
                         try {
-                            const { data } = await axios.post("https://api.helpubuild.in/api/v1/membership_payment_verify", {
+                            const { data } = await axios.post("https://testapi.helpubuild.in/api/v1/membership_payment_verify", {
                                 razorpay_payment_id: response.razorpay_payment_id,
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_signature: response.razorpay_signature,
@@ -223,7 +223,7 @@ const handleChange = (e) => {
         }
 
         try {
-            const res = await axios.post("https://api.helpubuild.in/api/v1/register-provider", memberData);
+            const res = await axios.post("https://testapi.helpubuild.in/api/v1/register-provider", memberData);
 
             await handlePayment(res.data.user._id);
         } catch (error) {
@@ -256,7 +256,7 @@ const handleChange = (e) => {
 
 
         try {
-            const res = await axios.post("https://api.helpubuild.in/api/v1/check_coupon_code", {
+            const res = await axios.post("https://testapi.helpubuild.in/api/v1/check_coupon_code", {
                 couponCode: couponToCheck,
             });
 

@@ -22,7 +22,7 @@ function AllTestimonial() {
     const handleFetchBanner = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('https://api.helpubuild.in/api/v1/get-all-testimonial');
+            const { data } = await axios.get('https://testapi.helpubuild.in/api/v1/get-all-testimonial');
             setBanners(data.data || []); // Ensure default empty array
         } catch (error) {
             console.error('Error fetching banners:', error);
@@ -38,7 +38,7 @@ function AllTestimonial() {
         // console.log("i am hit",currentStatus)
         try {
             const updatedStatus = !currentStatus;
-            const res = await axios.put(`https://api.helpubuild.in/api/v1/update-testimonial-status/${id}`, {
+            const res = await axios.put(`https://testapi.helpubuild.in/api/v1/update-testimonial-status/${id}`, {
                 active: updatedStatus,
             });
 
@@ -68,7 +68,7 @@ function AllTestimonial() {
     const handleDeleteBanner = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`https://api.helpubuild.in/api/v1/delete-testimonial/${id}`);
+            await axios.delete(`https://testapi.helpubuild.in/api/v1/delete-testimonial/${id}`);
             setBanners((prevBanners) => prevBanners.filter((banner) => banner._id !== id));
             toast.success('Testimonial deleted successfully!');
         } catch (error) {

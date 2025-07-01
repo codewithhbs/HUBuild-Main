@@ -14,7 +14,7 @@ function ChatDeductionHistory() {
     const fetchChatDeduction = async () => {
         try {
             const UserId = UserData?._id;
-            const { data } = await axios.get(`https://api.helpubuild.in/api/v1/get-single-user/${UserId}`);
+            const { data } = await axios.get(`https://testapi.helpubuild.in/api/v1/get-single-user/${UserId}`);
             const chatHistory = data.data?.chatTransition;
             setChat(chatHistory.reverse());
         } catch (error) {

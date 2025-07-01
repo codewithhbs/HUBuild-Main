@@ -33,7 +33,7 @@ function EditTestimonial() {
 
     const handleFetchTestimonial = async () => {
         try {
-            const { data } = await axios.get(`https://api.helpubuild.in/api/v1/get-single-testimonial/${id}`);
+            const { data } = await axios.get(`https://testapi.helpubuild.in/api/v1/get-single-testimonial/${id}`);
             const allData = data.data;
             setFormData({
                 name: allData.name,
@@ -66,7 +66,7 @@ function EditTestimonial() {
 
         setLoading(true);
         try {
-            const res = await axios.put(`https://api.helpubuild.in/api/v1/update-testimonial/${id}`, payload, {
+            const res = await axios.put(`https://testapi.helpubuild.in/api/v1/update-testimonial/${id}`, payload, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             toast.success(res.data.message);
