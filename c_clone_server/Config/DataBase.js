@@ -3,25 +3,17 @@ require('dotenv').config()
 
 const connectDB = async (req, res) => {
     try {
-        const MONOGO_LINK = process.env.MONGO_LINK;
-
-        // Connect to MongoDB
-        await mongoose.connect(MONOGO_LINK);
-        console.log('MongoDB Connected...');
-        console.log("MongoDB URI:", process.env.MONGO_LINK);
-        // ✅ Log the database name you're connected to
-        const dbName = mongoose.connection.name;
-        console.log('Connected to database:', dbName);
-
+        const MONOGO_LINK = process.env.MONGO_LINK
+        // mongoose.connect(MONOGO_LINK)
+        mongoose.connect(MONOGO_LINK);
+        console.log('MongoDB Connected...')
     } catch (error) {
-        console.log(error);
-        if (res) {
-            res.status(500).json({
-                success: false,
-                message: 'Internal Server Error'
-            });
-        }
+        console.log(error)
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server Error'
+        })
     }
 }
 
-module.exports = connectDB;
+module.exports = connectDB

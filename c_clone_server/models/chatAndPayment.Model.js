@@ -44,17 +44,29 @@ const ChatAndPaymentSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    messages: [
-        {
-            sender: { type: String, required: true },
-            text: { type: String },
-            file: {
-                name: { type: String },
-                type: { type: String },
-                content: { type: String },
-            },
-            timestamp: { type: Date, default: Date.now },
+   messages: [
+      {
+        sender: { type: String, required: true },
+        text: { type: String },
+        file: {
+          name: { type: String },
+          type: { type: String },
+          content: { type: String },
         },
+        // Enhanced sender information storage
+        senderName: { type: String }, // Store sender's display name
+        senderRole: { type: String }, // Store sender's role (user/provider)
+        // Enhanced reply support with complete sender info
+        replyTo: {
+          messageId: { type: String }, // Reference to original message
+          text: { type: String }, // Original message text
+          senderName: { type: String }, // Original sender name
+          senderRole: { type: String }, // Original sender role
+          isFile: { type: Boolean, default: false }, // Whether original was a file
+          timestamp: { type: Date }, // Original message timestamp
+        },
+        timestamp: { type: Date, default: Date.now },
+      },
     ],
     deleteByUser: {
         type: Boolean,

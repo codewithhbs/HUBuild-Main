@@ -85,7 +85,7 @@ exports.CreateProvider = async (req, res) => {
             location: {
                 state: location?.state,
                 city: location?.city,
-                formatted_address: location?.address,
+                formatted_address: location?.completeAddress,
                 pincode: location?.pincode
             },
             // photo: uploadedFiles.photo,
@@ -372,7 +372,16 @@ exports.updateProvider = async (req, res) => {
                 : language;
         if (mobileNumber) provider.mobileNumber = mobileNumber;
         if (coaNumber) provider.coaNumber = coaNumber;
-        if (location) provider.location = location;
+        if (location) {
+            provider.location = {
+                ...provider.location,
+                ...(location.state && { state: location.state }),
+                ...(location.city && { city: location.city }),
+                ...(location.pincode && { pincode: location.pincode }),
+                ...(location.formatted_address && { formatted_address: location.formatted_address })
+            };
+        }
+
         if (pricePerMin) provider.pricePerMin = pricePerMin;
         if (bio) provider.bio = bio;
         if (expertiseSpecialization) {
