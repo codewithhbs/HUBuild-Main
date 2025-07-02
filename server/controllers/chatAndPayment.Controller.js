@@ -344,6 +344,7 @@ exports.deleteMessageFromRoom = async (req, res) => {
             //     });
             // } else {
             findChat.deleteByUser = true;
+            findChat.userChatTempDeleted = true;
             findChat.deletedDateByUser = new Date();
             await findChat.save();
             return res.status(200).json({
@@ -369,6 +370,7 @@ exports.deleteMessageFromRoom = async (req, res) => {
             //     });
             // } else {
             findChat.deleteByProvider = true;
+            findChat.providerChatTempDeleted = true;
             findChat.deletedDateByProvider = new Date();
             await findChat.save();
             return res.status(200).json({

@@ -149,6 +149,11 @@ const ChatDemo = () => {
                     : `${ENDPOINT}api/v1/get-chat-by-userId/${userData._id}`
 
             const { data } = await axios.get(url)
+            console.log("data.data",data.data)
+            // const filterData =  userData?.role === "provider"
+            //     ? data.data.filter(item => item.providerChatTempDeleted === true)
+            //     : data.data.filter(item => item.userChatTempDeleted === true)
+            //     console.log("filterData",filterData)
             setProviderChat(data.data.reverse()) // Show latest chats first
         } catch (error) {
             toast.error("Failed to load chat history")

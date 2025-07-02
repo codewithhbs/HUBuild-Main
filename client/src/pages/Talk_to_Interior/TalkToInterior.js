@@ -1050,7 +1050,7 @@ function TalkToArchitect() {
             </div>
 
             {/* Specializations */}
-            <div className="col-12 mb-3">
+            {/* <div className="col-12 mb-3">
               <h6>Specializations</h6>
               <div className="row">
                 {getUniqueSpecializations().map((specialization, index) => (
@@ -1067,7 +1067,7 @@ function TalkToArchitect() {
                   </div>
                 ))}
               </div>
-            </div>
+            </div> */}
           </div>
         </Modal.Body>
         <Modal.Footer>

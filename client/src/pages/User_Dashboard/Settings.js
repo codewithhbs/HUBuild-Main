@@ -10,12 +10,68 @@ import { GetData } from '../../utils/sessionStoreage';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import CallDeductionProvider from './Tabs/CallDeductionProvider';
+import Wallet from './Wallet';
+import { useEffect } from 'react';
 
 const Settings = () => {
   const Data = GetData('user');
   const UserData = JSON.parse(Data);
   const type = UserData?.type;
+  const [myProfile, setMyProfile] = useState(null);
+  const [token, setToken] = useState(null);
+    const [providerId, setProviderId] = useState(null);
   const mobileNumber = UserData?.mobileNumber;
+  const [loading, setLoading] = useState(true);
+
+  // Get token from session storage
+    const GetToken = () => {
+      const data = GetData('token');
+      const user = GetData('user');
+      console.log("user",user)
+      const UserData = JSON.parse(user);
+      if (data) {
+        setToken(data);
+      }
+      if (UserData) {
+        setProviderId(UserData._id)
+      } else {
+        // Clear any remaining data and redirect to login
+        localStorage.clear();
+        window.location.href = '/login'; // adjust path as per your routes
+      }
+    };
+
+  const GetMyProfile = async () => {
+      if (!token) return;
+      setLoading(true);
+      try {
+        const { data } = await axios.get(`https://api.helpubuild.in/api/v1/get-single-provider/${providerId}`);
+        console.log(data)
+        setMyProfile(data.data);
+        // setMobileNumber(data.data.mobileNumber)
+        // const formattedAmount = data.data.walletAmount.toFixed(2);
+  
+        // setWalletAmount(formattedAmount);
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        console.error('Error fetching profile:', error);
+        localStorage.clear();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    useEffect(() => {
+        GetToken();
+      }, []);
+
+      useEffect(() => {
+          if (token) {
+            GetMyProfile(); // Fetch profile only if token exists
+            // handleFetchProvider(); // Fetch profile only if token exists
+          }
+        }, [token]);
 
   let tabs;
   if (type === 'Vastu') {
@@ -36,6 +92,7 @@ const Settings = () => {
       { id: 3, title: 'Bank Detail' },
       { id: 4, title: 'Change Password' },
       { id: 5, title: 'Call History' },
+      { id: 7, title: 'Chat History' },
       // { id: 5, title: 'Availability Status' },
     ];
   }
@@ -151,6 +208,7 @@ const Settings = () => {
         {activeTab === 4 && <Password />}
         {activeTab === 5 && <CallDeductionProvider />}
         {activeTab === 6 && <UpdateServices />}
+        {activeTab === 7 &&   <Wallet data={myProfile} />}
       </div>
     </>
   );

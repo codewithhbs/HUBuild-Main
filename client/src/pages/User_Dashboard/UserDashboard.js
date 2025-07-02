@@ -52,7 +52,7 @@ const UserDashboard = () => {
     }
   };
 
-  console.log("token ",providerId)
+  // console.log("token ",providerId)
 
   const GetMyProfile = async () => {
     if (!token) return;
@@ -586,12 +586,12 @@ const UserDashboard = () => {
                     </a>
                   </p>
 
-                  <p onClick={() => setActiveTab('Wallet')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab">
+                  {/* <p onClick={() => setActiveTab('Wallet')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab">
                     <i className="fas fa-link marginnone" />{" "}
                     <a href='#wallet' style={{ cursor: 'pointer', color: 'black' }} className={`cursor-pointer ${activeTab === 'Wallet' ? 'text-danger fw-bold text-decoration-underline' : ''}`}>
                       Wallet
                     </a>
-                  </p>
+                  </p> */}
 
                   <p onClick={() => setActiveTab('Withdraw')} style={{ fontWeight: '700' }} className="mb-0 cursor-pointer text-uppercase forresponsicetab">
                     <i className="fas fa-link marginnone" />{" "}
