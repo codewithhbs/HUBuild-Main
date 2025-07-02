@@ -28,6 +28,16 @@ exports.createChatWithNew = async (req, res) => {
         const room = `${userId}_${providerId}`
         const check = await ChatAndPayment.findOne({ room: room })
         if (check) {
+            if(check.userChatTempDeleted === true && check.providerChatTempDeleted === true){
+                check.userChatTempDeleted = false;
+                check.providerChatTempDeleted = false;
+                await check.save();
+                return res.status(201).json({
+                    success: true,
+                    message: 'New chat created successfully',
+                    data: check
+                })
+            }
             return res.status(400).json({
                 success: false,
                 message: 'Chat is already started. Check Your chat room.',

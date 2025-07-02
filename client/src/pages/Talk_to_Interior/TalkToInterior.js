@@ -902,7 +902,7 @@ function TalkToArchitect() {
                 <div className="col-6">
                   <input
                     type="number"
-                    className="form-control"
+                    className="form-control filter-border"
                     placeholder="Min"
                     value={filters.experienceRange.min}
                     onChange={(e) =>
@@ -916,7 +916,7 @@ function TalkToArchitect() {
                 <div className="col-6">
                   <input
                     type="number"
-                    className="form-control"
+                    className="form-control filter-border"
                     placeholder="Max"
                     value={filters.experienceRange.max}
                     onChange={(e) =>
@@ -937,7 +937,7 @@ function TalkToArchitect() {
                 <div className="col-6">
                   <input
                     type="number"
-                    className="form-control"
+                    className="form-control filter-border"
                     placeholder="Min"
                     value={filters.priceRange.min}
                     onChange={(e) =>
@@ -951,7 +951,7 @@ function TalkToArchitect() {
                 <div className="col-6">
                   <input
                     type="number"
-                    className="form-control"
+                    className="form-control filter-border"
                     placeholder="Max"
                     value={filters.priceRange.max}
                     onChange={(e) =>
@@ -972,7 +972,7 @@ function TalkToArchitect() {
                 <div className="col-6">
                   <input
                     type="number"
-                    className="form-control"
+                    className="form-control filter-border"
                     placeholder="Min"
                     min="0"
                     max="5"
@@ -989,7 +989,7 @@ function TalkToArchitect() {
                 <div className="col-6">
                   <input
                     type="number"
-                    className="form-control"
+                    className="form-control filter-border"
                     placeholder="Max"
                     min="0"
                     max="5"
@@ -1011,7 +1011,7 @@ function TalkToArchitect() {
               <h6>Availability</h6>
               <div className="form-check">
                 <input
-                  className="form-check-input"
+                  className="form-check-input filter-border"
                   type="checkbox"
                   checked={filters.availableForChat}
                   onChange={(e) => handleFilterChange("availableForChat", e.target.checked)}
@@ -1020,7 +1020,7 @@ function TalkToArchitect() {
               </div>
               <div className="form-check">
                 <input
-                  className="form-check-input"
+                  className="form-check-input filter-border"
                   type="checkbox"
                   checked={filters.availableForCall}
                   onChange={(e) => handleFilterChange("availableForCall", e.target.checked)}

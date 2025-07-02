@@ -44,6 +44,7 @@ const ChatDemo = () => {
     const [showChatList, setShowChatList] = useState(true)
     const navigate = useNavigate()
     const location = useLocation()
+    const [chatStart, setChatStart] = useState(false)
 
     const [isChatOnGoing, setIsChatOnGoing] = useState(false)
     const [showPrompt, setShowPrompt] = useState(false)
@@ -149,12 +150,12 @@ const ChatDemo = () => {
                     : `${ENDPOINT}api/v1/get-chat-by-userId/${userData._id}`
 
             const { data } = await axios.get(url)
-            console.log("data.data",data.data)
-            // const filterData =  userData?.role === "provider"
-            //     ? data.data.filter(item => item.providerChatTempDeleted === true)
-            //     : data.data.filter(item => item.userChatTempDeleted === true)
-            //     console.log("filterData",filterData)
-            setProviderChat(data.data.reverse()) // Show latest chats first
+            console.log("data.data", data.data)
+            const filterData = userData?.role === "provider"
+                ? data.data.filter(item => item.providerChatTempDeleted === false)
+                : data.data.filter(item => item.userChatTempDeleted === false)
+            console.log("filterData", filterData)
+            setProviderChat(filterData.reverse()) // Show latest chats first
         } catch (error) {
             toast.error("Failed to load chat history")
         }
@@ -239,6 +240,7 @@ const ChatDemo = () => {
         }
 
         if (userData?.role === "provider") {
+            setChatStart(true)
             socket.emit("join_room", {
                 userId: selectedUserId,
                 astrologerId: selectedProviderId,
@@ -247,7 +249,9 @@ const ChatDemo = () => {
             socket.emit("provider_connected", { room })
             setIsChatOnGoing(true)
             setIsChatStarted(true)
+            setChatStart(false)
         } else {
+            setChatStart(true)
             socket.emit(
                 "join_room",
                 {
@@ -263,6 +267,7 @@ const ChatDemo = () => {
                         setIsChatStarted(true)
                         toast.success(response.message)
                         setIsChatOnGoing(true)
+                        setChatStart(false)
                     } else {
                         toast.error(response?.message || "Failed to join chat")
                     }
@@ -786,7 +791,7 @@ const ChatDemo = () => {
                                             ) : (
                                                 // <li>
                                                 <button className="btn btn-success" onClick={handleStartChat}>
-                                                    Start Chat
+                                                   {chatStart ? "Chat Starting..." : "Start Chat"}
                                                 </button>
                                                 // </li>
                                             )
@@ -801,7 +806,7 @@ const ChatDemo = () => {
                                             ) : (
                                                 // <li>
                                                 <button className="btn btn-success" onClick={handleStartChat}>
-                                                    Start Chat
+                                                    {chatStart ? "Chat Starting..." : "Start Chat"}
                                                 </button>
                                                 // </li>
                                             ))

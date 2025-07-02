@@ -427,3 +427,7 @@ a {
     height: 140px;
   }
 }
+
+.filter-border{
+  border: 1px solid #e2e6ea !important;
+}

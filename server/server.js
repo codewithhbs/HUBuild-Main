@@ -343,86 +343,86 @@ io.on('connection', (socket) => {
     }
 
     // Handle group chat messages with enhanced sender info
-socket.on("manual_message", async ({ room, message, senderId, senderName, senderRole, timestamp, role, replyTo }) => {
-  try {
-    if (!room || !message || !senderId || !role) {
-      throw new Error("Missing required parameters")
-    }
+    socket.on("manual_message", async ({ room, message, senderId, senderName, senderRole, timestamp, role, replyTo }) => {
+        try {
+            if (!room || !message || !senderId || !role) {
+                throw new Error("Missing required parameters")
+            }
 
-    console.log(`Group message received in room ${room} from ${senderId}:`, message)
-    if (replyTo) {
-      console.log("Reply data:", replyTo)
-    }
+            console.log(`Group message received in room ${room} from ${senderId}:`, message)
+            if (replyTo) {
+                console.log("Reply data:", replyTo)
+            }
 
-    // Check for prohibited content
-    if (PROHIBITED_PATTERNS.some((pattern) => pattern.test(message))) {
-      socket.emit("wrong_message", {
-        message: "Your message contains prohibited content.",
-      })
-      return
-    }
+            // Check for prohibited content
+            if (PROHIBITED_PATTERNS.some((pattern) => pattern.test(message))) {
+                socket.emit("wrong_message", {
+                    message: "Your message contains prohibited content.",
+                })
+                return
+            }
 
-    // Create message object with enhanced sender info and reply support
-    const messageData = {
-      sender: senderId,
-      text: message,
-      senderName: senderName, // Store sender name
-      senderRole: senderRole, // Store sender role
-      timestamp: timestamp || new Date().toISOString(),
-    }
+            // Create message object with enhanced sender info and reply support
+            const messageData = {
+                sender: senderId,
+                text: message,
+                senderName: senderName, // Store sender name
+                senderRole: senderRole, // Store sender role
+                timestamp: timestamp || new Date().toISOString(),
+            }
 
-    // Add reply data if present
-    if (replyTo) {
-      messageData.replyTo = {
-        messageId: replyTo.messageId,
-        text: replyTo.text,
-        senderName: replyTo.senderName,
-        senderRole: replyTo.senderRole,
-        isFile: replyTo.isFile || false,
-        timestamp: replyTo.timestamp,
-      }
-    }
+            // Add reply data if present
+            if (replyTo) {
+                messageData.replyTo = {
+                    messageId: replyTo.messageId,
+                    text: replyTo.text,
+                    senderName: replyTo.senderName,
+                    senderRole: replyTo.senderRole,
+                    isFile: replyTo.isFile || false,
+                    timestamp: replyTo.timestamp,
+                }
+            }
 
-    // Save message to GroupChat DB
-    await Chat.findOneAndUpdate(
-      { _id: room },
-      {
-        $push: {
-          messages: messageData,
-        },
-      },
-      { upsert: true, new: true },
-    )
+            // Save message to GroupChat DB
+            await Chat.findOneAndUpdate(
+                { _id: room },
+                {
+                    $push: {
+                        messages: messageData,
+                    },
+                },
+                { upsert: true, new: true },
+            )
 
-    // Prepare response data with sender info
-    const responseData = {
-      text: message,
-      sender: senderId,
-      senderId: senderId,
-      senderName: senderName,
-      senderRole: senderRole,
-      timestamp: timestamp || new Date().toISOString(),
-    }
+            // Prepare response data with sender info
+            const responseData = {
+                text: message,
+                sender: senderId,
+                senderId: senderId,
+                senderName: senderName,
+                senderRole: senderRole,
+                timestamp: timestamp || new Date().toISOString(),
+            }
 
-    // Add reply data to response if present
-    if (replyTo) {
-      responseData.replyTo = messageData.replyTo
-    }
+            // Add reply data to response if present
+            if (replyTo) {
+                responseData.replyTo = messageData.replyTo
+            }
 
-    // Emit message to ENTIRE room (including sender)
-    io.to(room).emit("return_message", responseData)
+            // Emit message to ENTIRE room (including sender)
+            io.to(room).emit("return_message", responseData)
 
-    // Optional: Still emit confirmation to sender
-    socket.emit("message_sent", {
-      success: true,
-      text: message,
-      timestamp: timestamp || new Date().toISOString(),
+            // Optional: Still emit confirmation to sender
+            socket.emit("message_sent", {
+                success: true,
+                text: message,
+                timestamp: timestamp || new Date().toISOString(),
+            })
+        } catch (error) {
+            console.error("Group message error:", error.message)
+            socket.emit("error_message", { message: `Message failed: ${error.message}` })
+        }
     })
-  } catch (error) {
-    console.error("Group message error:", error.message)
-    socket.emit("error_message", { message: `Message failed: ${error.message}` })
-  }
-})
 
     // Handle chat messages
     socket.on('message', async ({ room, message, senderId, timestamp, role }) => {
@@ -534,102 +534,102 @@ socket.on("manual_message", async ({ room, message, senderId, senderName, sender
     });
 
     // Handle file upload for group chat with enhanced sender info and reply support
-socket.on("manual_file_upload", async ({ room, fileData, senderId, senderName, senderRole, timestamp, replyTo }) => {
-  try {
-    if (!room || !fileData || !senderId) {
-      throw new Error("Missing required parameters for file upload")
-    }
+    socket.on("manual_file_upload", async ({ room, fileData, senderId, senderName, senderRole, timestamp, replyTo }) => {
+        try {
+            if (!room || !fileData || !senderId) {
+                throw new Error("Missing required parameters for file upload")
+            }
 
-    console.log(`File upload received in room ${room} from ${senderId}:`, fileData.name)
-    if (replyTo) {
-      console.log("File reply data:", replyTo)
-    }
+            console.log(`File upload received in room ${room} from ${senderId}:`, fileData.name)
+            if (replyTo) {
+                console.log("File reply data:", replyTo)
+            }
 
-    // Validate file data
-    if (!fileData.content || !fileData.name || !fileData.type) {
-      throw new Error("Invalid file data")
-    }
+            // Validate file data
+            if (!fileData.content || !fileData.name || !fileData.type) {
+                throw new Error("Invalid file data")
+            }
 
-    // Check file type (only images allowed)
-    if (!fileData.type.startsWith("image/")) {
-      socket.emit("file_upload_error", {
-        error: "Only image files are allowed",
-      })
-      return
-    }
+            // Check file type (only images allowed)
+            if (!fileData.type.startsWith("image/")) {
+                socket.emit("file_upload_error", {
+                    error: "Only image files are allowed",
+                })
+                return
+            }
 
-    // Create file message object with enhanced sender info and reply support
-    const fileMessage = {
-      sender: senderId,
-      file: {
-        name: fileData.name,
-        type: fileData.type,
-        content: fileData.content,
-      },
-      senderName: senderName, // Store sender name
-      senderRole: senderRole, // Store sender role
-      timestamp: timestamp || new Date().toISOString(),
-    }
+            // Create file message object with enhanced sender info and reply support
+            const fileMessage = {
+                sender: senderId,
+                file: {
+                    name: fileData.name,
+                    type: fileData.type,
+                    content: fileData.content,
+                },
+                senderName: senderName, // Store sender name
+                senderRole: senderRole, // Store sender role
+                timestamp: timestamp || new Date().toISOString(),
+            }
 
-    // Add reply data if present
-    if (replyTo) {
-      fileMessage.replyTo = {
-        messageId: replyTo.messageId,
-        text: replyTo.text,
-        senderName: replyTo.senderName,
-        senderRole: replyTo.senderRole,
-        isFile: replyTo.isFile || false,
-        timestamp: replyTo.timestamp,
-      }
-    }
+            // Add reply data if present
+            if (replyTo) {
+                fileMessage.replyTo = {
+                    messageId: replyTo.messageId,
+                    text: replyTo.text,
+                    senderName: replyTo.senderName,
+                    senderRole: replyTo.senderRole,
+                    isFile: replyTo.isFile || false,
+                    timestamp: replyTo.timestamp,
+                }
+            }
 
-    // Save file message to GroupChat DB
-    await Chat.findOneAndUpdate(
-      { _id: room },
-      {
-        $push: {
-          messages: fileMessage,
-        },
-      },
-      { upsert: true, new: true },
-    )
+            // Save file message to GroupChat DB
+            await Chat.findOneAndUpdate(
+                { _id: room },
+                {
+                    $push: {
+                        messages: fileMessage,
+                    },
+                },
+                { upsert: true, new: true },
+            )
 
-    // Prepare response data with sender info
-    const responseData = {
-      file: {
-        name: fileData.name,
-        type: fileData.type,
-        content: fileData.content,
-      },
-      sender: senderId,
-      senderId: senderId,
-      senderName: senderName,
-      senderRole: senderRole,
-      timestamp: timestamp || new Date().toISOString(),
-    }
+            // Prepare response data with sender info
+            const responseData = {
+                file: {
+                    name: fileData.name,
+                    type: fileData.type,
+                    content: fileData.content,
+                },
+                sender: senderId,
+                senderId: senderId,
+                senderName: senderName,
+                senderRole: senderRole,
+                timestamp: timestamp || new Date().toISOString(),
+            }
 
-    // Add reply data to response if present
-    if (replyTo) {
-      responseData.replyTo = fileMessage.replyTo
-    }
+            // Add reply data to response if present
+            if (replyTo) {
+                responseData.replyTo = fileMessage.replyTo
+            }
 
-    // Broadcast file to ENTIRE room (including sender)
-    io.to(room).emit("return_message", responseData)
+            // Broadcast file to ENTIRE room (including sender)
+            io.to(room).emit("return_message", responseData)
 
-    // Emit success confirmation to sender
-    socket.emit("file_upload_success", {
-      message: "File uploaded successfully",
-      fileName: fileData.name,
+            // Emit success confirmation to sender
+            socket.emit("file_upload_success", {
+                message: "File uploaded successfully",
+                fileName: fileData.name,
+            })
+
+            console.log(`File ${fileData.name} successfully uploaded and broadcasted to room ${room}`)
+        } catch (error) {
+            console.error("File upload error:", error.message)
+            socket.emit("file_upload_error", {
+                error: `File upload failed: ${error.message}`,
+            })
+        }
     })
-
-    console.log(`File ${fileData.name} successfully uploaded and broadcasted to room ${room}`)
-  } catch (error) {
-    console.error("File upload error:", error.message)
-    socket.emit("file_upload_error", {
-      error: `File upload failed: ${error.message}`,
-    })
-  }
-})
 
     // Optional: Handle file download requests
     socket.on("request_file_download", async ({ room, messageId, senderId }) => {

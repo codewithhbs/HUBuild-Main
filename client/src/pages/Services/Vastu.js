@@ -902,7 +902,7 @@ function TalkToArchitect() {
                 <div className="col-6">
                   <input
                     type="number"
-                    className="form-control"
+                    className="form-control filter-border"
                     placeholder="Min"
                     value={filters.experienceRange.min}
                     onChange={(e) =>
@@ -916,7 +916,7 @@ function TalkToArchitect() {
                 <div className="col-6">
                   <input
                     type="number"
-                    className="form-control"
+                    className="form-control filter-border"
                     placeholder="Max"
                     value={filters.experienceRange.max}
                     onChange={(e) =>
@@ -937,7 +937,7 @@ function TalkToArchitect() {
                 <div className="col-6">
                   <input
                     type="number"
-                    className="form-control"
+                    className="form-control filter-border"
                     placeholder="Min"
                     value={filters.priceRange.min}
                     onChange={(e) =>
@@ -951,7 +951,7 @@ function TalkToArchitect() {
                 <div className="col-6">
                   <input
                     type="number"
-                    className="form-control"
+                    className="form-control filter-border"
                     placeholder="Max"
                     value={filters.priceRange.max}
                     onChange={(e) =>
@@ -972,7 +972,7 @@ function TalkToArchitect() {
                 <div className="col-6">
                   <input
                     type="number"
-                    className="form-control"
+                    className="form-control filter-border"
                     placeholder="Min"
                     min="0"
                     max="5"
@@ -989,7 +989,7 @@ function TalkToArchitect() {
                 <div className="col-6">
                   <input
                     type="number"
-                    className="form-control"
+                    className="form-control filter-border"
                     placeholder="Max"
                     min="0"
                     max="5"
