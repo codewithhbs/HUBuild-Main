@@ -52,15 +52,19 @@ function Register() {
         }
 
         try {
-            const res = await axios.post('https://testapi.helpubuild.in/api/v1/register', formData)
+            const res = await axios.post('https://api.helpubuild.in/api/v1/register', formData)
 
             toast.success(res.data.message)
             console.log("res.data", res.data.data)
+            if (redirectPath && typeof redirectPath === "string") {
+                window.location.href = `/otp-verification/user?email=${formData.PhoneNumber}&expires=${res.data?.data}&redirect=${encodeURIComponent(redirectPath)}`;
+            } else {
+                window.location.href = `/otp-verification/user?email=${formData.PhoneNumber}&expires=${res.data?.data}`;
+            }
 
-            window.location.href = `/otp-verification/user?email=${formData.PhoneNumber}&expires=${res.data?.data}&redirect=${redirectPath}`
             setloading(false)
         } catch (error) {
-            console.log(error?.response?.data);
+            console.log(error);
             setloading(false)
             // toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Invalid Error")
             Swal.fire({
@@ -76,7 +80,7 @@ function Register() {
         <>
             <section className="py-5">
                 <div className="container">
-                    <div style={{display:'flex'}} className="row justify-content-center align-items-center h-100">
+                    <div style={{ display: 'flex' }} className="row justify-content-center align-items-center h-100">
                         <div className="col-lg-12 col-xl-11">
                             <div className="card text-black" style={{ borderRadius: 25 }}>
                                 <div className="card-body register-bg p-md-5">
@@ -88,7 +92,7 @@ function Register() {
                                             <form onSubmit={handlSubmit} className="mx-1 mx-md-4">
                                                 <div className='row'>
                                                     <div className='col-lg-6'>
-                                                        <div style={{display:'flex'}} className="flex-row mb-4">
+                                                        <div style={{ display: 'flex' }} className="flex-row mb-4">
                                                             <i className="fas fa-user fa-lg me-3 fa-fw lable-icon" />
                                                             <div
                                                                 data-mdb-input-init=""
@@ -109,7 +113,7 @@ function Register() {
                                                         </div>
                                                     </div>
                                                     <div className='col-lg-6'>
-                                                        <div style={{display:'flex'}} className="flex-row mb-4">
+                                                        <div style={{ display: 'flex' }} className="flex-row mb-4">
                                                             <i className="fas fa-envelope fa-lg me-3 fa-fw lable-icon" />
                                                             <div
                                                                 data-mdb-input-init=""
@@ -130,7 +134,7 @@ function Register() {
                                                         </div>
                                                     </div>
                                                     <div className='col-lg-6'>
-                                                        <div style={{display:'flex'}} className="flex-row mb-4">
+                                                        <div style={{ display: 'flex' }} className="flex-row mb-4">
                                                             <i className="fas fa-phone fa-lg me-3 fa-fw lable-icon" />
                                                             <div
                                                                 data-mdb-input-init=""
@@ -153,7 +157,7 @@ function Register() {
                                                     </div>
 
                                                     <div className='col-lg-6 position-relative'>
-                                                        <div style={{display:'flex'}} className="flex-row mb-4">
+                                                        <div style={{ display: 'flex' }} className="flex-row mb-4">
                                                             <i className="fas fa-lock fa-lg me-3 fa-fw lable-icon" />
                                                             <div
                                                                 data-mdb-input-init=""
@@ -177,7 +181,7 @@ function Register() {
                                                     </div>
 
                                                     <div className='col-lg-6 position-relative'>
-                                                        <div style={{display:'flex'}} className="flex-row mb-4">
+                                                        <div style={{ display: 'flex' }} className="flex-row mb-4">
                                                             <i className="fas fa-key fa-lg me-3 fa-fw lable-icon" />
                                                             <div data-mdb-input-init=""
                                                                 className="form-outline flex-fill mb-0" >
@@ -199,7 +203,7 @@ function Register() {
 
                                                 </div>
                                                 <div className="col-lg-12">
-                                                    <div style={{display:'flex'}} className="form-check justify-content-start">
+                                                    <div style={{ display: 'flex' }} className="form-check justify-content-start">
                                                         <input
                                                             className="form-check-input me-2"
                                                             type="checkbox"
@@ -220,7 +224,7 @@ function Register() {
                                                 </div>
 
 
-                                                <div style={{display:'flex'}} className="justify-content-center mx-5 mb-3 mb-lg-4">
+                                                <div style={{ display: 'flex' }} className="justify-content-center mx-5 mb-3 mb-lg-4">
                                                     <button
                                                         type="submit"
                                                         className="btn btn-primary btn-lg mt-4 as_btn"
@@ -239,7 +243,7 @@ function Register() {
                                                 </div>
 
                                                 <div className='col-lg-12'>
-                                                    <div style={{display:'flex'}} class="form-check justify-content-center mb-5">
+                                                    <div style={{ display: 'flex' }} class="form-check justify-content-center mb-5">
 
                                                         <label class="form-check-label text-white" for="form2Example3">
                                                             Already have an Account? <a href="/login" class="text-warning">Login here</a>

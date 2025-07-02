@@ -36,7 +36,7 @@ function Dashboard() {
     }
     setLoading(true);
     try {
-      const { data } = await axios.get(`https://testapi.helpubuild.in/api/v1/get-single-user/${userId}`);
+      const { data } = await axios.get(`https://api.helpubuild.in/api/v1/get-single-user/${userId}`);
       // console.log("data: ", data.data)
       setMyProfile(data.data);
       // console.log("object", data)
@@ -66,7 +66,7 @@ function Dashboard() {
     const formData = new FormData();
     formData.append('ProfileImage', blob);
     try {
-      const res = await axios.put(`https://testapi.helpubuild.in/api/v1/update_user_profile_image/${userId}`, formData)
+      const res = await axios.put(`https://api.helpubuild.in/api/v1/update_user_profile_image/${userId}`, formData)
       if (res.data.success) {
         setProfileLoading(false)
         toast.success('Image updated successfully');
@@ -145,7 +145,7 @@ function Dashboard() {
 
       const UserId = UserData?._id;
 
-      const res = await axios.post(`https://testapi.helpubuild.in/api/v1/create-payment/${UserId}`, {
+      const res = await axios.post(`https://api.helpubuild.in/api/v1/create-payment/${UserId}`, {
         price: amount
       })
       // console.log("Order", res.data.data)
@@ -160,7 +160,7 @@ function Dashboard() {
           name: 'Help U Build',
           description: 'Doing Recharge',
           order_id: order?.id || '',
-          callback_url: "https://testapi.helpubuild.in/api/v1/verify-payment",
+          callback_url: "https://api.helpubuild.in/api/v1/verify-payment",
           prefill: {
             name: UserData?.name,
             email: UserData?.email,
@@ -208,7 +208,7 @@ function Dashboard() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axios.delete(`https://testapi.helpubuild.in/api/v1/user-delete/${id}`);
+          const res = await axios.delete(`https://api.helpubuild.in/api/v1/user-delete/${id}`);
           if (res.data.success) {
             Swal.fire('Deleted!', 'Your account has been deleted.', 'success');
             localStorage.clear();
@@ -241,7 +241,27 @@ function Dashboard() {
   }
 
   if (loading || !myProfile) {
-    return <div>Loading...</div>;
+    return       <div
+        className="d-flex flex-column justify-content-center align-items-center bg-light"
+        style={{ height: "100dvh", textAlign: "center" }}
+      >
+        <div
+          className="spinner-border"
+          role="status"
+          style={{
+            width: "3rem",
+            height: "3rem",
+            borderColor: "#eab936",
+            borderRightColor: "transparent",
+          }}
+        >
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <h5 className="fw-semibold mb-1 mt-4" style={{ color: "#eab936" }}>
+          Fetching Your Profile...
+        </h5>
+        <small className="text-muted">Please wait while we prepare your Profile.</small>
+      </div>
   }
 
   return (
