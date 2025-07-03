@@ -37,7 +37,7 @@ function AllProvider() {
     const fetchProviders = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('https://testapi.helpubuild.in/api/v1/get-all-provider');
+            const { data } = await axios.get('https://api.helpubuild.in/api/v1/get-all-provider');
             setProviders(data.data.reverse() || []);
         } catch (error) {
             console.error('Error fetching provider:', error);
@@ -54,7 +54,7 @@ function AllProvider() {
         try {
             const updatedStatus = !currentStatus;
             const res = await axios.put(
-                `https://testapi.helpubuild.in/api/v1/update-provider-isbanned/${id}`,
+                `https://api.helpubuild.in/api/v1/update-provider-isbanned/${id}`,
                 { isBanned: updatedStatus }
             );
             fetchProviders();
@@ -77,7 +77,7 @@ function AllProvider() {
     const handleDelete = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`https://testapi.helpubuild.in/api/v1/delete-provider/${id}`);
+            await axios.delete(`https://api.helpubuild.in/api/v1/delete-provider/${id}`);
             fetchProviders();
             toast.success('Provider deleted successfully!');
         } catch (error) {
@@ -123,7 +123,7 @@ function AllProvider() {
 
         try {
             const res = await axios.put(
-                `https://testapi.helpubuild.in/api/v1/provider_verify/${providerId}`,
+                `https://api.helpubuild.in/api/v1/provider_verify/${providerId}`,
                 { accountVerified: status, verificationRejectReason }
             );
 
@@ -171,6 +171,7 @@ function AllProvider() {
     const heading = [
         'S.No',
         'Profile Image',
+        'Unique ID',
         'Name',
         'Email',
         'Phone Number',
@@ -189,10 +190,6 @@ function AllProvider() {
                 <div className="spin-style">
                     <CSpinner color="primary" variant="grow" />
                 </div>
-            ) : providers.length === 0 ? (
-                <div className="no-data">
-                    <p>No data available</p>
-                </div>
             ) : (
                 <Table
                     heading="All Consultant"
@@ -209,6 +206,7 @@ function AllProvider() {
                                     width={100}
                                 />
                             </CTableDataCell>
+                            <CTableDataCell>{item.unique_id || 'N/A'}</CTableDataCell>
                             <CTableDataCell>{item.name || 'N/A'}</CTableDataCell>
                             <CTableDataCell>{item.email || 'N/A'}</CTableDataCell>
                             <CTableDataCell>{item.mobileNumber || 'N/A'}</CTableDataCell>

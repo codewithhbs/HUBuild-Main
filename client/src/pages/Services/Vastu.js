@@ -603,7 +603,7 @@ function TalkToArchitect() {
                           <button
                             type="button"
                             className="btn filter_short-btn"
-                            style={{border:'1px solid black'}}
+                            style={{ border: '1px solid black' }}
                             onClick={() => setShowFilterModal(true)}
                           >
                             <i className="fa fa-filter"></i> <span className="text-remove">Filter</span>
@@ -614,7 +614,7 @@ function TalkToArchitect() {
 
                           <button
                             type="button"
-                            style={{border:'1px solid black'}}
+                            style={{ border: '1px solid black' }}
                             className="btn filter-short-by"
                             data-bs-toggle="modal"
                             data-bs-target="#staticBackdrop"
@@ -785,6 +785,11 @@ function TalkToArchitect() {
                       <h5 className="formarginzero">
                         {item.name ? <Link to={`/architect-profile/${item._id}`}>{item.name}</Link> : "Not Available"}
                       </h5>
+                      <p className="pricing formarginzero">
+                        {item?.unique_id
+                          ? `Id: ${item?.unique_id}`
+                          : ""}
+                      </p>
                       <p className="formarginzero">
                         {item.language && item.language.length > 0
                           ? item.language.map((lang, index) => (

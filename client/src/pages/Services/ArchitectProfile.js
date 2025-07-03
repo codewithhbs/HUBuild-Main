@@ -410,6 +410,10 @@ function ArchitectProfile() {
                                     </h4>
 
                                     <p className="archi-cateogry">
+                                        Unique Id: {profile.unique_id ? profile.unique_id : "Profile is not Updated"}
+                                    </p>
+
+                                    <p className="archi-cateogry">
                                         {profile.type ? profile.type : "Profile is not Updated"}
                                     </p>
 

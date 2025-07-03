@@ -14,6 +14,8 @@ function ForgotPassword() {
   const [resendTimer, setResendTimer] = useState(0);
   const [passwordError, setPasswordError] = useState('');
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Password strength checker
   const checkPasswordStrength = (password) => {
@@ -349,36 +351,58 @@ function ForgotPassword() {
                       </div>
                     </div>
 
-                    <div className="form-floating mb-3">
-                      <input
-                        type="password"
-                        className="form-control"
-                        id="newPassword"
-                        placeholder="Create new password"
-                        value={password}
-                        onChange={handlePasswordChange}
-                        required
-                        minLength="8"
-                      />
-                      <label htmlFor="newPassword">New Password</label>
+                    <div className="mb-3 position-relative">
+                      <div className="form-floating">
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          className="form-control"
+                          id="newPassword"
+                          placeholder="Create new password"
+                          value={password}
+                          onChange={handlePasswordChange}
+                          required
+                          minLength="8"
+                        />
+                        <label htmlFor="newPassword">New Password</label>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 p-0"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        tabIndex={-1}
+                      >
+                        <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
+                      </button>
                       <PasswordStrengthIndicator />
                     </div>
 
-                    <div className="form-floating mb-4">
-                      <input
-                        type="password"
-                        className="form-control"
-                        id="confirmPassword"
-                        placeholder="Confirm new password"
-                        value={confirmPassword}
-                        onChange={handleConfirmPasswordChange}
-                        required
-                      />
-                      <label htmlFor="confirmPassword">Confirm Password</label>
+
+                    <div className="mb-4 position-relative">
+                      <div className="form-floating">
+                        <input
+                          type={showConfirmPassword ? "text" : "password"}
+                          className="form-control"
+                          id="confirmPassword"
+                          placeholder="Confirm new password"
+                          value={confirmPassword}
+                          onChange={handleConfirmPasswordChange}
+                          required
+                        />
+                        <label htmlFor="confirmPassword">Confirm Password</label>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 p-0"
+                        onClick={() => setShowConfirmPassword((prev) => !prev)}
+                        tabIndex={-1}
+                      >
+                        <i className={`fas ${showConfirmPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
+                      </button>
                       {passwordError && (
                         <small className="text-danger">{passwordError}</small>
                       )}
                     </div>
+
 
                     <div className="d-grid gap-2">
                       <button
