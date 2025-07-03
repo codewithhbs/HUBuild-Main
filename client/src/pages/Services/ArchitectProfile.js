@@ -44,12 +44,12 @@ function ArchitectProfile() {
     const [profileLoading, setProfileLoading] = useState(true);
     const [callLoader, setCallLoader] = useState(false);
 
-    useEffect(()=>{
+    useEffect(() => {
         window.scrollTo({
             top: 0,
             behavior: 'smooth',
         });
-    },[])
+    }, [])
 
     const handleFetchProvider = async (providerId) => {
         setLoading(true);
@@ -399,59 +399,65 @@ function ArchitectProfile() {
                             </div>
                             <div className='col-xl-4 col-lg-4 col-md-6 col-12'>
                                 <div className='profile-info'>
-                                    <h4 className='fw-bold archi-profile-name'>
-                                        {profile.name ? (
-                                            <>
-                                                {profile.name} <HiBadgeCheck />
-                                            </>
-                                        ) : (
-                                            "Profile is not Updated"
-                                        )}
-                                    </h4>
+                                    {/* Name */}
+                                    {profile.name && (
+                                        <h4 className='fw-bold archi-profile-name'>
+                                            {profile.name} <HiBadgeCheck />
+                                        </h4>
+                                    )}
 
-                                    <p className="archi-cateogry">
-                                        Unique Id: {profile.unique_id ? profile.unique_id : "Profile is not Updated"}
-                                    </p>
+                                    {/* Unique ID */}
+                                    {profile.unique_id && (
+                                        <p className="archi-cateogry">
+                                            Unique Id: {profile.unique_id}
+                                        </p>
+                                    )}
 
-                                    <p className="archi-cateogry">
-                                        {profile.type ? profile.type : "Profile is not Updated"}
-                                    </p>
+                                    {/* Type */}
+                                    {profile.type && (
+                                        <p className="archi-cateogry">
+                                            {profile.type}
+                                        </p>
+                                    )}
 
-                                    <p className='archi-Language'>
-                                        {profile.language && profile.language.length > 0 ? (
-                                            profile.language.map((lang, index) => (
+                                    {/* Language */}
+                                    {profile.language && profile.language.length > 0 && (
+                                        <p className='archi-Language'>
+                                            {profile.language.map((lang, index) => (
                                                 <span key={index} className="archi-language-tag">
                                                     {lang}{index < profile.language.length - 1 ? ', ' : ''}
                                                 </span>
-                                            ))
-                                        ) : (
-                                            "Profile is not Updated"
-                                        )}
-                                    </p>
+                                            ))}
+                                        </p>
+                                    )}
 
-                                    <p className='archi-experties'>
-                                        {profile.expertiseSpecialization && profile.expertiseSpecialization.length > 0 ? (
-                                            profile.expertiseSpecialization.map((specialization, index) => (
+                                    {/* Expertise Specialization */}
+                                    {profile.expertiseSpecialization && profile.expertiseSpecialization.length > 0 && (
+                                        <p className='archi-experties'>
+                                            {profile.expertiseSpecialization.map((specialization, index) => (
                                                 <span key={index} className="archi-language-tag">
                                                     {specialization}{index < profile.expertiseSpecialization.length - 1 ? ', ' : ''}
                                                 </span>
-                                            ))
-                                        ) : (
-                                            "Profile is not Updated"
-                                        )}
-                                    </p>
+                                            ))}
+                                        </p>
+                                    )}
 
-                                    <p className='archi-exp'>
-                                        {profile.experience ? `Exp: ${profile.experience} Years` : "Experience is not Updated"}
-                                    </p>
+                                    {/* Experience */}
+                                    {profile.experience && (
+                                        <p className='archi-exp'>
+                                            Exp: {profile.experience} Years
+                                        </p>
+                                    )}
 
-                                    <p className="fw-bold archi-duration-price">
-                                        {profile.pricePerMin ? `₹ ${profile.pricePerMin}/min` : "Pricing is not Updated"}
-                                    </p>
-                                    {/* Uncomment if required */}
-                                    {/* <p className="text-muted total-archi-duration">59K mins | 29K mins</p> */}
+                                    {/* Pricing */}
+                                    {profile.pricePerMin && (
+                                        <p className="fw-bold archi-duration-price">
+                                            ₹ {profile.pricePerMin}/min
+                                        </p>
+                                    )}
                                 </div>
                             </div>
+
 
                             <div className='col-xl-4 col-lg-4 col-md-6 col-12'>
                                 <div className='connect-area'>

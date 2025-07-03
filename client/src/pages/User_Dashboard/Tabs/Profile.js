@@ -505,7 +505,7 @@ const Profile = () => {
           }
           <div className="col-md-6 mt-2">
             <label htmlFor="pricePerMin" style={{ fontWeight: '700' }} className="form-label">
-              Price Per Minute (Set more than 20)
+              Price Per Minute (Not less than 20)
             </label>
             {/* <div className="mb-1">
               <small className="text-primary fw-bold"></small>

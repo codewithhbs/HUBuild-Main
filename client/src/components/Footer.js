@@ -87,12 +87,12 @@ const Footer = () => {
                   E-520A, 3rd Floor, Sector 7, Dwarka, New Delhi- 110075
                 </p>
               </li>
-              <li className="footer-contact-item">
+              {/* <li className="footer-contact-item">
                 <Phone className="footer-contact-icon" />
                 <a style={{ color: 'white' }} href="tel:+919220441214">
                   +91 9220441214
                 </a>
-              </li>
+              </li> */}
               <li className="footer-contact-item">
                 <Mail className="footer-contact-icon" />
                 <a style={{ color: 'white' }} href="mailto:info@helpubuild.in">

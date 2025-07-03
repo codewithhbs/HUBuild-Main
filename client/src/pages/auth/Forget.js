@@ -194,7 +194,7 @@ function ForgotPassword() {
           }
         }).then((result) => {
           if (result.isConfirmed) {
-            window.location.href = '/login';
+            window.location.href = '/';
           }
         });
       } else {
@@ -351,8 +351,9 @@ function ForgotPassword() {
                       </div>
                     </div>
 
-                    <div className="mb-3 position-relative">
-                      <div className="form-floating">
+                    <div className="mb-3">
+                      <div className="form-floating position-relative">
+
                         <input
                           type={showPassword ? "text" : "password"}
                           className="form-control"
@@ -364,15 +365,16 @@ function ForgotPassword() {
                           minLength="8"
                         />
                         <label htmlFor="newPassword">New Password</label>
+                        <button
+                          type="button"
+                          className="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 p-0"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                          tabIndex={-1}
+                        >
+                          <i style={{ color: 'rgb(153, 153, 153)' }} className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+                          
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        className="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 p-0"
-                        onClick={() => setShowPassword((prev) => !prev)}
-                        tabIndex={-1}
-                      >
-                        <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
-                      </button>
                       <PasswordStrengthIndicator />
                     </div>
 
@@ -396,7 +398,8 @@ function ForgotPassword() {
                         onClick={() => setShowConfirmPassword((prev) => !prev)}
                         tabIndex={-1}
                       >
-                        <i className={`fas ${showConfirmPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
+                        <i style={{ color: 'rgb(153, 153, 153)' }} className={`bi ${showConfirmPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+                        
                       </button>
                       {passwordError && (
                         <small className="text-danger">{passwordError}</small>
