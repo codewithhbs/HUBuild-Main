@@ -12,6 +12,7 @@ const Contact = () => {
         number: '',
         message: ''
     });
+    const [phoneError, setPhoneError] = useState('');
 
     const [loading, setLoading] = useState(false);
     const [successMsg, setSuccessMsg] = useState('');
@@ -19,21 +20,52 @@ const Contact = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+
+        if (name === "number") {
+            // Remove non-digits if you want to enforce numeric only
+            const cleanedValue = value.replace(/\D/g, '');
+
+            // Update form data
+            setFormData((prev) => ({
+                ...prev,
+                [name]: cleanedValue
+            }));
+
+            // Live validation
+            if (cleanedValue.length === 0) {
+                setPhoneError("Phone number is required.");
+            } else if (cleanedValue.length !== 10) {
+                setPhoneError("Phone number must be exactly 10 digits.");
+            } else {
+                setPhoneError(""); // No error
+            }
+        } else {
+            // Other fields
+            setFormData((prev) => ({
+                ...prev,
+                [name]: value
+            }));
+        }
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setErrorMsg('');
         setSuccessMsg('');
+        // Clear previous error
+        setPhoneError('');
 
         // Simple validation
         const { name, lastName, subject, number, message } = formData;
         if (!name || !lastName || !subject || !number || !message) {
             setErrorMsg("Please fill in all fields.");
+            return;
+        }
+
+        // Validate phone number length
+        if (!/^\d{10}$/.test(number)) {
+            setPhoneError("Phone number must be exactly 10 digits.");
             return;
         }
 
@@ -50,7 +82,7 @@ const Contact = () => {
                 message: ''
             });
         } catch (error) {
-          setErrorMsg("😔 Oops! Something went wrong. Please try again or contact us directly.");
+            setErrorMsg("😔 Oops! Something went wrong. Please try again or contact us directly.");
         } finally {
             setLoading(false);
         }
@@ -201,17 +233,25 @@ const Contact = () => {
                                                             type="tel"
                                                             name="number"
                                                             value={formData.number}
-                                                            className="form-control"
+                                                            className={`form-control ${phoneError ? 'is-invalid' : ''}`}
                                                             id="phoneNumber"
                                                             placeholder="Phone Number"
                                                             onChange={handleChange}
                                                             required
                                                         />
+
                                                         <label htmlFor="phoneNumber">
                                                             <i className="fas fa-phone me-2"></i>Phone Number
                                                         </label>
                                                     </div>
+                                                    {phoneError && (
+                                                        <div className="invalid-feedback d-block">
+                                                            {phoneError}
+                                                        </div>
+                                                    )}
+
                                                 </div>
+
 
                                                 <div className="col-12">
                                                     <div className="form-floating">
