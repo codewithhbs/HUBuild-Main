@@ -27,7 +27,7 @@ const Settings = () => {
     const GetToken = () => {
       const data = GetData('token');
       const user = GetData('user');
-      console.log("user",user)
+      // console.log("user",user)
       const UserData = JSON.parse(user);
       if (data) {
         setToken(data);
@@ -46,7 +46,7 @@ const Settings = () => {
       setLoading(true);
       try {
         const { data } = await axios.get(`https://api.helpubuild.in/api/v1/get-single-provider/${providerId}`);
-        console.log(data)
+        // console.log(data)
         setMyProfile(data.data);
         // setMobileNumber(data.data.mobileNumber)
         // const formattedAmount = data.data.walletAmount.toFixed(2);

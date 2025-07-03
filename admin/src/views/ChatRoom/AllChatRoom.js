@@ -24,7 +24,7 @@ function AllChatRoom() {
     const handleFetchBanner = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('https://testapi.helpubuild.in/api/v1/get-all-chat-record');
+            const { data } = await axios.get('https://api.helpubuild.in/api/v1/get-all-chat-record');
             // console.log("all data", data.data)
             const filterData = data.data.filter((item) => item.isManualChat === false);
             setBanners(filterData.reverse() || []);
@@ -38,7 +38,7 @@ function AllChatRoom() {
 
     const handleFetchChat = async (chatRoomId) => {
         try {
-            const { data } = await axios.get(`https://testapi.helpubuild.in/api/v1/get-chat-by-room/${chatRoomId}`);
+            const { data } = await axios.get(`https://api.helpubuild.in/api/v1/get-chat-by-room/${chatRoomId}`);
             setSelectedChat(data.data[0]);
             setShowChatModal(true);
         } catch (error) {
@@ -50,7 +50,7 @@ function AllChatRoom() {
     const handleDeleteBanner = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`https://testapi.helpubuild.in/api/v1/delete-chat-room/${id}`);
+            await axios.delete(`https://api.helpubuild.in/api/v1/delete-chat-room/${id}`);
             handleFetchBanner();
             toast.success('Chat room deleted successfully!');
         } catch (error) {

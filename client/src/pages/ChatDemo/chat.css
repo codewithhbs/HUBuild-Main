@@ -113,7 +113,7 @@
     background-color: rgba(99, 102, 241, 0.1);
 }
 
-.active{
+.active {
     color: #EAB936 !important;
 }
 
@@ -486,11 +486,11 @@
 @media (max-width: 767.98px) {
 
     .modern-chat-container .container-fluid,
-.modern-chat-container .row,
-.modern-chat-container .col-md-4,
-.modern-chat-container .col-md-8 {
-    height: 93%;
-}
+    .modern-chat-container .row,
+    .modern-chat-container .col-md-4,
+    .modern-chat-container .col-md-8 {
+        height: 93%;
+    }
 
     .chat-list-container,
     .chat-window-container {
