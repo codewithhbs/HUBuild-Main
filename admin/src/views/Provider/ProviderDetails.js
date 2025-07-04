@@ -79,7 +79,12 @@ function ProviderDetails() {
                         <li><strong>Phone:</strong> {provider.mobileNumber}</li>
                         <li><strong>Age:</strong> {provider.age}</li>
                         <li><strong>DOB:</strong> {formatDate(provider.DOB)}</li>
-                        <li><strong>Location:</strong> {provider.location}</li>
+                       <li>
+  <strong>Location:</strong>{" "}
+  {provider.location?.formatted_address ||
+   `${provider.location?.city || ''}, ${provider.location?.state || ''} - ${provider.location?.pincode || ''}`}
+</li>
+
                         <li><strong>Experience:</strong> {provider.yearOfExperience} years</li>
                         <li><strong>COA Number:</strong> {provider.coaNumber || 'N/A'}</li>
                       </ul>
