@@ -508,7 +508,7 @@ exports.login = async (req, res) => {
             console.log("🚫 Account is banned");
             return res.status(403).json({
                 success: false,
-                message: `Your ${isProvider ? "provider" : "user"} account has been banned. Please contact our support team.`
+                message: `Your ${isProvider ? "provider" : "user"} account has been blocked. Please contact our support team.`
             });
         }
 
@@ -1062,6 +1062,14 @@ exports.chatStart = async (userId, astrologerId) => {
                 success: true,
                 message: 'Chat started',
                 error: 'Chat started',
+            };
+        }
+
+        if(provider?.isBanned === true){
+            return {
+                success: false,
+                message: 'Provider is banned',
+                error: 'Provider is banned',
             };
         }
 

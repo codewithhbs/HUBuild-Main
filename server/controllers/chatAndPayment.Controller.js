@@ -44,6 +44,24 @@ exports.createChatWithNew = async (req, res) => {
                 error: 'Chat is already started. Check Your chat room.'
             })
         }
+
+        const provider = await Provider.findById(providerId)
+        if (!provider) {
+            return res.status(400).json({
+                success: false,
+                message: 'Provider not found',
+                error: 'Provider not found'
+            })
+        }
+
+        if(provider?.isBanned === true){
+            return res.status(400).json({
+                success: false,
+                message: 'Provider is blocked',
+                error: 'Provider is blocked'
+            })
+        }
+
         const newChat = new ChatAndPayment({
             userId,
             providerId,
