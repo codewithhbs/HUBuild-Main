@@ -321,7 +321,7 @@ const UserDashboard = () => {
       });
 
       if (response.data.success) {
-        // toast.success(response.data.message);
+        toast.success(response.data.message);
         setAmount("");
         setCommission(0);
         setFinalAmount(0);

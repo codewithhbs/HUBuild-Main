@@ -25,6 +25,22 @@ const Profile = () => {
     { label: 'Hindi', value: 'Hindi' },
     { label: 'English', value: 'English' }
   ];
+  const [commissionPercent, setCommissionPercent] = useState(0)
+
+  const handleFetchCommission = async () => {
+    try {
+      const { data } = await axios.get('https://api.helpubuild.in/api/v1/get-all-commision')
+      const commissiondata = data.data
+      // console.log("commission",commissiondata[0]?.commissionPercent)
+      setCommissionPercent(commissiondata[0]?.commissionPercent)
+    } catch (error) {
+      console.log("Internale server error", error)
+    }
+  }
+
+  useEffect(() => {
+    handleFetchCommission();
+  }, [])
 
   const [formData, setFormData] = useState({
     name: '',
@@ -520,7 +536,7 @@ const Profile = () => {
               min="20"
             />
             <div className="mt-1">
-              <small className="text-muted">25% commission included</small>
+              <small className="text-muted">{commissionPercent}% commission included</small>
             </div>
             {priceError && (
               <div className="invalid-feedback d-block">

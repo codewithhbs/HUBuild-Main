@@ -270,6 +270,11 @@ const ChatDemo = () => {
                         setChatStart(false)
                     } else {
                         toast.error(response?.message || "Failed to join chat")
+                        setIsChatBoxActive(false)
+                        // setIsActive(response.status)
+                        setIsChatStarted(false)
+                        // toast.success(response.message)
+                        setIsChatOnGoing(false)
                     }
                 },
             )

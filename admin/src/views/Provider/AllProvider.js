@@ -178,7 +178,7 @@ function AllProvider() {
         'Type',
         'Wallet Amount',
         'Portfolio',
-        'Is Banned',
+        'Is Blocked',
         'Profile Approve',
         'Chat Transition',
         'Action',

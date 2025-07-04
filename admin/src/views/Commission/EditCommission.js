@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom';
 
 const EditCommission = () => {
     // const { id } = useParams();
-    const id = '675a98006fcbd3c680f2653b'
+    const id = '686379855d0f76f01fb9ba69'
     const [loading, setLoading] = useState(false);
     const [commissionPercent, setCommissionPercent] = useState('');
 
