@@ -43,12 +43,12 @@ const Footer = () => {
             item.type === 'privacy'
               ? 'Privacy Policy'
               : item.type === 'disclamier'
-              ? 'Disclaimer'
-              : item.type === 'refund'
-              ? 'Cancellation & Refund Policy'
-              : item.type === 'term'
-              ? 'Terms & Conditions'
-              : item.type.charAt(0).toUpperCase() + item.type.slice(1),
+                ? 'Disclaimer'
+                : item.type === 'refund'
+                  ? 'Cancellation & Refund Policy'
+                  : item.type === 'term'
+                    ? 'Terms & Conditions'
+                    : item.type.charAt(0).toUpperCase() + item.type.slice(1),
         }));
         setLegalLinks(terms);
       }
