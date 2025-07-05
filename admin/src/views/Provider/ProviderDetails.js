@@ -28,31 +28,31 @@ function ProviderDetails() {
       <div className="card shadow-lg">
         <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
           <h3 className="mb-0">Provider Details</h3>
-          <button 
+          <button
             className="btn btn-light"
             onClick={() => navigate(-1)}
           >
             Back
           </button>
         </div>
-        
+
         <div className="card-body">
           <div className="row">
             {/* Profile Section */}
             <div className="col-md-4 text-center mb-4">
               <div className="card h-100">
                 <div className="card-body">
-                  <img 
-                    src={provider.photo?.imageUrl || 'https://via.placeholder.com/200'} 
-                    alt="Provider" 
+                  <img
+                    src={provider.photo?.imageUrl || 'https://via.placeholder.com/200'}
+                    alt="Provider"
                     className="img-fluid rounded-circle mb-3"
                     style={{ width: '200px', height: '200px', objectFit: 'cover' }}
                   />
                   <h4>{provider.name}</h4>
                   <p className="badge bg-success">{provider.type}</p>
                   <div className="mt-3">
-                    <p className="mb-1"><strong>Status:</strong> 
-                      <span className={`badge ${provider.accountVerified === 'Verified' ? 'bg-success' : 
+                    <p className="mb-1"><strong>Status:</strong>
+                      <span className={`badge ${provider.accountVerified === 'Verified' ? 'bg-success' :
                         provider.accountVerified === 'Rejected' ? 'bg-danger' : 'bg-warning'} ms-2`}>
                         {provider.accountVerified}
                       </span>
@@ -79,11 +79,11 @@ function ProviderDetails() {
                         <li><strong>Phone:</strong> {provider.mobileNumber}</li>
                         <li><strong>Age:</strong> {provider.age}</li>
                         <li><strong>DOB:</strong> {formatDate(provider.DOB)}</li>
-                       <li>
-  <strong>Location:</strong>{" "}
-  {provider.location?.formatted_address ||
-   `${provider.location?.city || ''}, ${provider.location?.state || ''} - ${provider.location?.pincode || ''}`}
-</li>
+                        <li>
+                          <strong>Location:</strong>{" "}
+                          {provider.location?.formatted_address ||
+                            `${provider.location?.city || ''}, ${provider.location?.state || ''} - ${provider.location?.pincode || ''}`}
+                        </li>
 
                         <li><strong>Experience:</strong> {provider.yearOfExperience} years</li>
                         <li><strong>COA Number:</strong> {provider.coaNumber || 'N/A'}</li>
@@ -91,7 +91,7 @@ function ProviderDetails() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="col-md-6">
                   <div className="card h-100">
                     <div className="card-body">
@@ -124,9 +124,9 @@ function ProviderDetails() {
                         <div className="card-body">
                           <h6 className="card-subtitle mb-2">Aadhaar Card</h6>
                           {provider.adhaarCard?.imageUrl ? (
-                            <img 
-                              src={provider.adhaarCard.imageUrl} 
-                              alt="Aadhaar Card" 
+                            <img
+                              src={provider.adhaarCard.imageUrl}
+                              alt="Aadhaar Card"
                               className="img-fluid rounded"
                               style={{ maxHeight: '200px', objectFit: 'cover' }}
                             />
@@ -143,9 +143,9 @@ function ProviderDetails() {
                         <div className="card-body">
                           <h6 className="card-subtitle mb-2">PAN Card</h6>
                           {provider.panCard?.imageUrl ? (
-                            <img 
-                              src={provider.panCard.imageUrl} 
-                              alt="PAN Card" 
+                            <img
+                              src={provider.panCard.imageUrl}
+                              alt="PAN Card"
                               className="img-fluid rounded"
                               style={{ maxHeight: '200px', objectFit: 'cover' }}
                             />
@@ -162,9 +162,9 @@ function ProviderDetails() {
                         <div className="card-body">
                           <h6 className="card-subtitle mb-2">Qualification Proof</h6>
                           {provider.qualificationProof?.imageUrl ? (
-                            <img 
-                              src={provider.qualificationProof.imageUrl} 
-                              alt="Qualification Proof" 
+                            <img
+                              src={provider.qualificationProof.imageUrl}
+                              alt="Qualification Proof"
                               className="img-fluid rounded"
                               style={{ maxHeight: '200px', objectFit: 'cover' }}
                             />
@@ -188,9 +188,9 @@ function ProviderDetails() {
                     <div className="row g-3">
                       {provider.gallery.map((image, index) => (
                         <div key={index} className="col-md-4 col-lg-3">
-                          <img 
-                            src={image.imageUrl} 
-                            alt={`Gallery ${index + 1}`} 
+                          <img
+                            src={image.imageUrl}
+                            alt={`Gallery ${index + 1}`}
                             className="img-fluid rounded"
                             style={{ width: '100%', height: '200px', objectFit: 'cover' }}
                           />
