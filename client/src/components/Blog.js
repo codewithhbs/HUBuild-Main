@@ -92,7 +92,7 @@ const Blog = () => {
                               {post.title}
                             </Link>
                           </h4>
-                          <p style={{ color: "black" }} className="as_font14 as_margin0 two-line-clamp">{post.content}</p>
+                          <p style={{ color: "black" }} className="as_font14 as_margin0 two-line-clamp">{post.smallDesc}</p>
                         </div>
                       </div>
                     </Link>

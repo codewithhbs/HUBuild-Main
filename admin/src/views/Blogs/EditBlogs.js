@@ -13,6 +13,7 @@ function EditBlogs() {
     const [formData, setFormData] = React.useState({
         title: '',
         content: '',
+        smallDesc: '',
     });
     const [smallImage, setSmallImage] = React.useState(null);
     const [largeImage, setLargeImage] = React.useState(null);
@@ -44,6 +45,7 @@ function EditBlogs() {
             setFormData({
                 title: allData.title,
                 content: allData.content,
+                smallDesc: allData.smallDesc,
             });
             setSmallImage(allData.image.url);
             setLargeImage(allData.largeImage.url);
@@ -159,6 +161,18 @@ function EditBlogs() {
                                 name="title"
                                 placeholder="Enter blog title"
                                 value={formData.title}
+                                onChange={handleChange}
+                            />
+                        </CCol>
+
+                        {/* Title Input */}
+                        <CCol md={12}>
+                            <CFormLabel className="form_label" htmlFor="smallDesc">Small Description</CFormLabel>
+                            <CFormInput
+                                id="smallDesc"
+                                name="smallDesc"
+                                placeholder="Enter blog small description"
+                                value={formData.smallDesc}
                                 onChange={handleChange}
                             />
                         </CCol>
