@@ -325,6 +325,7 @@ const UserDashboard = () => {
         setAmount("");
         setCommission(0);
         setFinalAmount(0);
+        closeWithdrawModal();
       } else {
         // setError(response.data.message);
         // toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later");
