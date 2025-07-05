@@ -77,6 +77,7 @@ function EditBlogs() {
         const payload = new FormData();
         payload.append('title', formData.title);
         payload.append('content', formData.content);
+        payload.append('smallDesc', formData.smallDesc);
         payload.append('image', smallImage);
         payload.append('largeImage', largeImage);
 

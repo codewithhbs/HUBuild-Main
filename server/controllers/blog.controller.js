@@ -143,6 +143,7 @@ exports.updateBlog = async (req, res) => {
         const { id } = req.params;
         const blogs = await Blog.findById(id)
         const { title, content, smallDesc } = req.body;
+        console.log("title, content, smallDesc",title, content, smallDesc)
         if (!blogs) {
             return res.status(400).json({
                 success: false,
