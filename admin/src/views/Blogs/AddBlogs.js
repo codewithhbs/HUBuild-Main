@@ -11,6 +11,7 @@ function AddBlogs() {
     const [formData, setFormData] = React.useState({
         title: '',
         content: '',
+        smallDesc: '',
     });
     const [smallImage, setSmallImage] = React.useState(null);
     const [largeImage, setLargeImage] = React.useState(null);
@@ -43,6 +44,7 @@ function AddBlogs() {
         const payload = new FormData();
         payload.append('title', formData.title);
         payload.append('content', formData.content);
+        payload.append('smallDesc', formData.smallDesc);
         payload.append('image', smallImage);
         payload.append('largeImage', largeImage);
 
@@ -114,6 +116,17 @@ function AddBlogs() {
                                 name="title"
                                 placeholder="Enter blog title"
                                 value={formData.title}
+                                onChange={handleChange}
+                            />
+                        </CCol>
+
+                        <CCol md={12}>
+                            <CFormLabel htmlFor="title">Small Description</CFormLabel>
+                            <CFormInput
+                                id="smallDesc"
+                                name="smallDesc"
+                                placeholder="Enter blog small description"
+                                value={formData.smallDesc}
                                 onChange={handleChange}
                             />
                         </CCol>
