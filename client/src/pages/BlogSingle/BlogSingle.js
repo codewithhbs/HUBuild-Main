@@ -86,7 +86,7 @@ const BlogSingle = () => {
       <section class="as_blog_wrapper as_padderBottom90 as_padderTop80">
         <div class="container">
           <div class="row">
-            <div class="col-lg-9 col-md-10 col-sm-12 col-xs-12">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <div class="as_blog_box">
                 <div class="as_blog_img">
                   <a>
@@ -112,7 +112,7 @@ const BlogSingle = () => {
                     </li>
 
                   </ul>
-                  <h4 className=" fs-2 fw-bold as_subheading">
+                  <h4 style={{color:'black !important'}} className=" fs-2 fw-bold as_subheading">
                     {" "}
                     {data.title}
                   </h4>

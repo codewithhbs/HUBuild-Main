@@ -553,7 +553,7 @@ const UserDashboard = () => {
                     <a
                       className="architectur-bar btn btn-primary align-items-center justify-content-center"
                       style={{ display: 'flex', gap: '8px', padding: '8px 16px', borderRadius: '8px' }}
-                      href={`https://wa.me/?text=Join%20HelpUBuild%20and%20get%20amazing%20benefits!%20Register%20here:%20https://test.helpubuild.in/member-registration?ref=${myProfile?.couponCode}`}
+                      href={`https://wa.me/?text=Join%20HelpUBuild%20and%20get%20amazing%20benefits!%20Register%20here:%20https://helpubuild.in/member-registration?ref=${myProfile?.couponCode}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >

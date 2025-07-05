@@ -10,7 +10,7 @@ import Swal from "sweetalert2"
 import ModelOfPriceAndTime from "../Services/ModelOfPriceAndTime"
 import CallLoader from "../Services/CallLoader"
 
-function TalkToArchitect() {
+function TalkToInterior() {
   const [id, setId] = useState(null)
   const [allProviders, setAllProviders] = useState([])
   const [filteredProviders, setFilteredProviders] = useState([])
@@ -1145,4 +1145,4 @@ function TalkToArchitect() {
   )
 }
 
-export default TalkToArchitect
+export default TalkToInterior

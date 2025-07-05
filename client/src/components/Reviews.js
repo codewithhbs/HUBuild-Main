@@ -15,7 +15,6 @@ const Reviews = () => {
       setReview(data.data);
     } catch (error) {
       console.log("Internal server error in getting reviews");
-      // toast.error(error?.response?.data?.errors?.[0] || error?.response?.data?.message || "Please try again later");
     }
   };
 

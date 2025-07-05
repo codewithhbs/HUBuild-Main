@@ -409,7 +409,7 @@ function ArchitectProfile() {
                                     {/* Unique ID */}
                                     {profile.unique_id && (
                                         <p className="archi-cateogry">
-                                            Unique Id: {profile.unique_id}
+                                            ID: {profile.unique_id}
                                         </p>
                                     )}
 

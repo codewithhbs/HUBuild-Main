@@ -72,13 +72,13 @@ const Blog = () => {
                         <div className="as_blog_detail">
                           <ul>
                             <li>
-                              <a>
+                              <a style={{ color: "black" }}>
                                 <img src="assets/images/svg/user2.svg" alt="" />
                                 By - {post.writer}
                               </a>
                             </li>
                             <li>
-                              <a>
+                              <a style={{ color: "black" }}>
                                 <img
                                   src="assets/images/svg/comment1.svg"
                                   alt=""
@@ -88,11 +88,11 @@ const Blog = () => {
                             </li>
                           </ul>
                           <h4 className="as_subheading ">
-                            <Link className="two-line-clamp" to={`/blog-details/${post._id}`}>
+                            <Link className="two-line-clamp" style={{ color: "black" }} to={`/blog-details/${post._id}`}>
                               {post.title}
                             </Link>
                           </h4>
-                          <p className="as_font14 as_margin0 two-line-clamp">{post.content}</p>
+                          <p style={{ color: "black" }} className="as_font14 as_margin0 two-line-clamp">{post.content}</p>
                         </div>
                       </div>
                     </Link>
