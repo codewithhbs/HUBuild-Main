@@ -76,9 +76,9 @@
     transition: color 0.2s ease;
   }
   
-  .footer-links a:hover {
+  /* .footer-links a:hover {
     color: #4299e1;
-  }
+  } */
   
   .newsletter-form {
     margin-top: 1.5rem;
