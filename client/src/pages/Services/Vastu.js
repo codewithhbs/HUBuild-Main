@@ -1,3 +1,4 @@
+"use client"
 
 import { useEffect, useState } from "react"
 import StarRating from "../../components/StarRating/StarRating"
@@ -10,7 +11,7 @@ import Swal from "sweetalert2"
 import ModelOfPriceAndTime from "./ModelOfPriceAndTime"
 import CallLoader from "./CallLoader"
 
-function TalkToArchitect() {
+function Vastu() {
   const [id, setId] = useState(null)
   const [allProviders, setAllProviders] = useState([])
   const [filteredProviders, setFilteredProviders] = useState([])
@@ -21,6 +22,17 @@ function TalkToArchitect() {
 
   // Enhanced filter states
   const [filters, setFilters] = useState({
+    experienceRange: { min: "", max: "" },
+    priceRange: { min: "", max: "" },
+    ratingRange: { min: "", max: "" },
+    selectedLanguages: [],
+    selectedSpecializations: [],
+    availableForChat: false,
+    availableForCall: false,
+  })
+
+  // Add temporary filter states for the modal
+  const [tempFilters, setTempFilters] = useState({
     experienceRange: { min: "", max: "" },
     priceRange: { min: "", max: "" },
     ratingRange: { min: "", max: "" },
@@ -75,7 +87,6 @@ function TalkToArchitect() {
     try {
       const UserId = UserData?._id
       const { data } = await axios.get(`https://api.helpubuild.in/api/v1/get-single-user/${UserId}`)
-
       const formattedAmount = data.data.walletAmount.toFixed(2)
       setUser(data?.data)
       setWalletAmount(formattedAmount)
@@ -136,12 +147,9 @@ function TalkToArchitect() {
       const { data } = await axios.get(
         `https://api.helpubuild.in/api/v1/get-service-by-provider/${providerId}/Residential`,
       )
-
       // Find the service data for the selected category
       const serviceData = data.data.find((service) => service.category === "Residential")
-
       const price = serviceData.conceptDesignWithStructure
-
       return price
     } catch (error) {
       console.error("Error fetching provider data", error)
@@ -152,7 +160,6 @@ function TalkToArchitect() {
 
   const applyFilters = () => {
     let sortedData = [...allProviders]
-
     // Apply search filter
     if (searchText) {
       sortedData = sortedData.filter((provider) => provider.name.toLowerCase().includes(searchText.toLowerCase()))
@@ -164,7 +171,6 @@ function TalkToArchitect() {
         (provider) => (provider.yearOfExperience || 0) >= Number.parseInt(filters.experienceRange.min),
       )
     }
-
     if (filters.experienceRange.max !== "") {
       sortedData = sortedData.filter(
         (provider) => (provider.yearOfExperience || 0) <= Number.parseInt(filters.experienceRange.max),
@@ -176,7 +182,6 @@ function TalkToArchitect() {
         (provider) => (provider.pricePerMin || 0) >= Number.parseFloat(filters.priceRange.min),
       )
     }
-
     if (filters.priceRange.max !== "") {
       sortedData = sortedData.filter(
         (provider) => (provider.pricePerMin || 0) <= Number.parseFloat(filters.priceRange.max),
@@ -188,7 +193,6 @@ function TalkToArchitect() {
         (provider) => (provider.averageRating || 0) >= Number.parseFloat(filters.ratingRange.min),
       )
     }
-
     if (filters.ratingRange.max !== "") {
       sortedData = sortedData.filter(
         (provider) => (provider.averageRating || 0) <= Number.parseFloat(filters.ratingRange.max),
@@ -263,7 +267,6 @@ function TalkToArchitect() {
       if (PricePerMin === 0) {
         maxTimeForCall = 600
       }
-
       return maxTimeForCall
     } catch (error) {
       console.error("Error calculating max time for call:", error)
@@ -282,9 +285,9 @@ function TalkToArchitect() {
         confirmButtonText: "Okay",
       })
     }
+
     try {
       const data = await fetchProviderData(id)
-
       if (!data.success) {
         setCallLoader(false)
         return Swal.fire({
@@ -339,7 +342,6 @@ function TalkToArchitect() {
         console.log("seconds", user)
         setTimeout(async () => {
           const data = await callCulateMaxTimeForCall(user?.walletAmount, profile.pricePerMin)
-
           setId(profile._id)
           setOpen(true)
           setTime(data)
@@ -368,16 +370,16 @@ function TalkToArchitect() {
     setSearchText(e.target.value)
   }
 
-  // Filter handlers
-  const handleFilterChange = (filterType, value) => {
-    setFilters((prev) => ({
+  // Updated filter handlers for temporary filters
+  const handleTempFilterChange = (filterType, value) => {
+    setTempFilters((prev) => ({
       ...prev,
       [filterType]: value,
     }))
   }
 
-  const handleLanguageToggle = (language) => {
-    setFilters((prev) => ({
+  const handleTempLanguageToggle = (language) => {
+    setTempFilters((prev) => ({
       ...prev,
       selectedLanguages: prev.selectedLanguages.includes(language)
         ? prev.selectedLanguages.filter((lang) => lang !== language)
@@ -385,8 +387,8 @@ function TalkToArchitect() {
     }))
   }
 
-  const handleSpecializationToggle = (specialization) => {
-    setFilters((prev) => ({
+  const handleTempSpecializationToggle = (specialization) => {
+    setTempFilters((prev) => ({
       ...prev,
       selectedSpecializations: prev.selectedSpecializations.includes(specialization)
         ? prev.selectedSpecializations.filter((spec) => spec !== specialization)
@@ -394,8 +396,20 @@ function TalkToArchitect() {
     }))
   }
 
+  // Function to apply temporary filters to actual filters
+  const applyTempFilters = () => {
+    setFilters(tempFilters)
+    setShowFilterModal(false)
+  }
+
+  // Function to open filter modal and set temp filters to current filters
+  const openFilterModal = () => {
+    setTempFilters(filters)
+    setShowFilterModal(true)
+  }
+
   const clearAllFilters = () => {
-    setFilters({
+    const clearedFilters = {
       experienceRange: { min: "", max: "" },
       priceRange: { min: "", max: "" },
       ratingRange: { min: "", max: "" },
@@ -403,7 +417,9 @@ function TalkToArchitect() {
       selectedSpecializations: [],
       availableForChat: false,
       availableForCall: false,
-    })
+    }
+    setFilters(clearedFilters)
+    setTempFilters(clearedFilters)
     setSortCriteria("")
     setSearchText("")
   }
@@ -424,7 +440,6 @@ function TalkToArchitect() {
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
   const currentProviders = filteredProviders.slice(indexOfFirstItem, indexOfLastItem)
-
   const paginate = (pageNumber) => setCurrentPage(pageNumber)
 
   const handleOpenModel = async () => {
@@ -465,7 +480,6 @@ function TalkToArchitect() {
         confirmButtonText: "Okay",
       })
     }
-
     if (UserData.role === "provider") {
       return Swal.fire({
         title: "Error!",
@@ -509,7 +523,6 @@ function TalkToArchitect() {
     if (!amount || amount <= 0) {
       return toast.error("Please enter a valid amount")
     }
-
     try {
       const scriptLoaded = await loadRazorpayScript()
       if (!scriptLoaded) {
@@ -518,7 +531,6 @@ function TalkToArchitect() {
       }
 
       const UserId = UserData?._id
-
       const res = await axios.post(`https://api.helpubuild.in/api/v1/create-payment/${UserId}`, {
         price: amount,
       })
@@ -543,7 +555,6 @@ function TalkToArchitect() {
             color: "#F37254",
           },
         }
-
         const rzp = new window.Razorpay(options)
         rzp.open()
       }
@@ -598,30 +609,28 @@ function TalkToArchitect() {
                           ) : (
                             <></>
                           )}
-
                           {/* Enhanced Filter Button */}
                           <button
                             type="button"
                             className="btn filter_short-btn"
-                            style={{ border: '1px solid black' }}
-                            onClick={() => setShowFilterModal(true)}
+                            style={{ border: "1px solid black" }}
+                            onClick={openFilterModal}
                           >
                             <i className="fa fa-filter"></i> <span className="text-remove">Filter</span>
                             {getActiveFiltersCount() > 0 && (
                               <span className="badge badge-primary ml-1">{getActiveFiltersCount()}</span>
                             )}
                           </button>
-
                           <button
                             type="button"
-                            style={{ border: '1px solid black' }}
+                            style={{ border: "1px solid black" }}
                             className="btn filter-short-by"
                             data-bs-toggle="modal"
                             data-bs-target="#staticBackdrop"
                           >
-                            <i className="fa fa-sort-amount-desc"></i><span className="text-remove"> Sort by</span>
+                            <i className="fa fa-sort-amount-desc"></i>
+                            <span className="text-remove"> Sort by</span>
                           </button>
-
                           {/* Sort Modal */}
                           <div
                             className="modal fade"
@@ -716,7 +725,6 @@ function TalkToArchitect() {
                               </div>
                             </div>
                           </div>
-
                           <div className="form-search classsearhMbile">
                             <input
                               name="searchText"
@@ -739,12 +747,11 @@ function TalkToArchitect() {
             </div>
           </div>
         </div>
-
         {/* Results Summary */}
         <div className="container-fluid architecture-section-p">
           <div className="row">
             <div className="col-12">
-              <div className="results-summary">
+              <div className="results-summary mb-3">
                 <p className="mb-0">
                   Showing {currentProviders.length} of {filteredProviders.length} architects
                   {getActiveFiltersCount() > 0 && (
@@ -762,7 +769,6 @@ function TalkToArchitect() {
             </div>
           </div>
         </div>
-
         <div className="section architecture-section-2 mb-5">
           <div className="container-fluid architecture-section-p">
             <div className="profile-card-box">
@@ -785,29 +791,25 @@ function TalkToArchitect() {
                       <h5 className="formarginzero">
                         {item.name ? <Link to={`/architect-profile/${item._id}`}>{item.name}</Link> : "Not Available"}
                       </h5>
-                      <p className="pricing formarginzero">
-                        {item?.unique_id
-                          ? `ID: ${item?.unique_id}`
-                          : ""}
-                      </p>
+                      <p className="pricing formarginzero">{item?.unique_id ? `ID: ${item?.unique_id}` : ""}</p>
                       <p className="formarginzero">
                         {item.language && item.language.length > 0
                           ? item.language.map((lang, index) => (
-                            <span key={index} className="archi-language-tag">
-                              {lang}
-                              {index < item.language.length - 1 ? ", " : ""}
-                            </span>
-                          ))
+                              <span key={index} className="archi-language-tag">
+                                {lang}
+                                {index < item.language.length - 1 ? ", " : ""}
+                              </span>
+                            ))
                           : "Not Available"}
                       </p>
                       <p className="formarginzero">
                         {item.expertiseSpecialization && item.expertiseSpecialization.length > 0
                           ? item.expertiseSpecialization.map((specialization, index) => (
-                            <span key={index} className="archi-language-tag">
-                              {specialization}
-                              {index < item.expertiseSpecialization.length - 1 ? ", " : ""}
-                            </span>
-                          ))
+                              <span key={index} className="archi-language-tag">
+                                {specialization}
+                                {index < item.expertiseSpecialization.length - 1 ? ", " : ""}
+                              </span>
+                            ))
                           : "Not Updated"}
                       </p>
                       <p className="experience">
@@ -824,7 +826,6 @@ function TalkToArchitect() {
                           : ""}
                       </p>
                     </div>
-
                     <div className="right-section">
                       <div style={{ padding: "0px" }} className="buttons chat-call-btn">
                         <button
@@ -847,7 +848,6 @@ function TalkToArchitect() {
                   </div>
                 ))}
             </div>
-
             {/* Pagination */}
             {filteredProviders.length >= 1 && (
               <nav className="d-flex justify-content-center mt-4">
@@ -857,7 +857,6 @@ function TalkToArchitect() {
                       Previous
                     </button>
                   </li>
-
                   {currentPage > 1 && (
                     <li className="page-item">
                       <button className="page-link" onClick={() => paginate(currentPage - 1)}>
@@ -865,11 +864,9 @@ function TalkToArchitect() {
                       </button>
                     </li>
                   )}
-
                   <li className="page-item active">
                     <span className="page-link">{currentPage}</span>
                   </li>
-
                   {currentPage < Math.ceil(filteredProviders.length / itemsPerPage) && (
                     <li className="page-item">
                       <button className="page-link" onClick={() => paginate(currentPage + 1)}>
@@ -877,10 +874,10 @@ function TalkToArchitect() {
                       </button>
                     </li>
                   )}
-
                   <li
-                    className={`page-item ${currentPage === Math.ceil(filteredProviders.length / itemsPerPage) ? "disabled" : ""
-                      }`}
+                    className={`page-item ${
+                      currentPage === Math.ceil(filteredProviders.length / itemsPerPage) ? "disabled" : ""
+                    }`}
                   >
                     <button className="page-link" onClick={() => paginate(currentPage + 1)}>
                       Next
@@ -892,7 +889,6 @@ function TalkToArchitect() {
           </div>
         </div>
       </div>
-
       {/* Enhanced Filter Modal */}
       <Modal show={showFilterModal} onHide={() => setShowFilterModal(false)} size="lg" centered>
         <Modal.Header closeButton>
@@ -909,10 +905,10 @@ function TalkToArchitect() {
                     type="number"
                     className="form-control filter-border"
                     placeholder="Min"
-                    value={filters.experienceRange.min}
+                    value={tempFilters.experienceRange.min}
                     onChange={(e) =>
-                      handleFilterChange("experienceRange", {
-                        ...filters.experienceRange,
+                      handleTempFilterChange("experienceRange", {
+                        ...tempFilters.experienceRange,
                         min: e.target.value,
                       })
                     }
@@ -923,10 +919,10 @@ function TalkToArchitect() {
                     type="number"
                     className="form-control filter-border"
                     placeholder="Max"
-                    value={filters.experienceRange.max}
+                    value={tempFilters.experienceRange.max}
                     onChange={(e) =>
-                      handleFilterChange("experienceRange", {
-                        ...filters.experienceRange,
+                      handleTempFilterChange("experienceRange", {
+                        ...tempFilters.experienceRange,
                         max: e.target.value,
                       })
                     }
@@ -934,7 +930,6 @@ function TalkToArchitect() {
                 </div>
               </div>
             </div>
-
             {/* Price Range */}
             <div className="col-md-6 mb-3">
               <h6>Price Range (₹/min)</h6>
@@ -944,10 +939,10 @@ function TalkToArchitect() {
                     type="number"
                     className="form-control filter-border"
                     placeholder="Min"
-                    value={filters.priceRange.min}
+                    value={tempFilters.priceRange.min}
                     onChange={(e) =>
-                      handleFilterChange("priceRange", {
-                        ...filters.priceRange,
+                      handleTempFilterChange("priceRange", {
+                        ...tempFilters.priceRange,
                         min: e.target.value,
                       })
                     }
@@ -958,10 +953,10 @@ function TalkToArchitect() {
                     type="number"
                     className="form-control filter-border"
                     placeholder="Max"
-                    value={filters.priceRange.max}
+                    value={tempFilters.priceRange.max}
                     onChange={(e) =>
-                      handleFilterChange("priceRange", {
-                        ...filters.priceRange,
+                      handleTempFilterChange("priceRange", {
+                        ...tempFilters.priceRange,
                         max: e.target.value,
                       })
                     }
@@ -969,7 +964,6 @@ function TalkToArchitect() {
                 </div>
               </div>
             </div>
-
             {/* Rating Range */}
             <div className="col-md-6 mb-3">
               <h6>Rating Range</h6>
@@ -982,10 +976,10 @@ function TalkToArchitect() {
                     min="0"
                     max="5"
                     step="0.1"
-                    value={filters.ratingRange.min}
+                    value={tempFilters.ratingRange.min}
                     onChange={(e) =>
-                      handleFilterChange("ratingRange", {
-                        ...filters.ratingRange,
+                      handleTempFilterChange("ratingRange", {
+                        ...tempFilters.ratingRange,
                         min: e.target.value,
                       })
                     }
@@ -999,10 +993,10 @@ function TalkToArchitect() {
                     min="0"
                     max="5"
                     step="0.1"
-                    value={filters.ratingRange.max}
+                    value={tempFilters.ratingRange.max}
                     onChange={(e) =>
-                      handleFilterChange("ratingRange", {
-                        ...filters.ratingRange,
+                      handleTempFilterChange("ratingRange", {
+                        ...tempFilters.ratingRange,
                         max: e.target.value,
                       })
                     }
@@ -1010,7 +1004,6 @@ function TalkToArchitect() {
                 </div>
               </div>
             </div>
-
             {/* Availability */}
             <div className="col-md-6 mb-3">
               <h6>Availability</h6>
@@ -1018,8 +1011,8 @@ function TalkToArchitect() {
                 <input
                   className="form-check-input"
                   type="checkbox"
-                  checked={filters.availableForChat}
-                  onChange={(e) => handleFilterChange("availableForChat", e.target.checked)}
+                  checked={tempFilters.availableForChat}
+                  onChange={(e) => handleTempFilterChange("availableForChat", e.target.checked)}
                 />
                 <label className="form-check-label">Available for Chat</label>
               </div>
@@ -1027,13 +1020,12 @@ function TalkToArchitect() {
                 <input
                   className="form-check-input"
                   type="checkbox"
-                  checked={filters.availableForCall}
-                  onChange={(e) => handleFilterChange("availableForCall", e.target.checked)}
+                  checked={tempFilters.availableForCall}
+                  onChange={(e) => handleTempFilterChange("availableForCall", e.target.checked)}
                 />
                 <label className="form-check-label">Available for Call</label>
               </div>
             </div>
-
             {/* Languages */}
             <div className="col-12 mb-3">
               <h6>Languages</h6>
@@ -1044,8 +1036,8 @@ function TalkToArchitect() {
                       <input
                         className="form-check-input"
                         type="checkbox"
-                        checked={filters.selectedLanguages.includes(language)}
-                        onChange={() => handleLanguageToggle(language)}
+                        checked={tempFilters.selectedLanguages.includes(language)}
+                        onChange={() => handleTempLanguageToggle(language)}
                       />
                       <label className="form-check-label">{language}</label>
                     </div>
@@ -1053,26 +1045,6 @@ function TalkToArchitect() {
                 ))}
               </div>
             </div>
-
-            {/* Specializations */}
-            {/* <div className="col-12 mb-3">
-              <h6>Specializations</h6>
-              <div className="row">
-                {getUniqueSpecializations().map((specialization, index) => (
-                  <div key={index} className="col-md-4 col-6">
-                    <div className="form-check">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        checked={filters.selectedSpecializations.includes(specialization)}
-                        onChange={() => handleSpecializationToggle(specialization)}
-                      />
-                      <label className="form-check-label">{specialization}</label>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div> */}
           </div>
         </Modal.Body>
         <Modal.Footer>
@@ -1084,14 +1056,13 @@ function TalkToArchitect() {
           </Button>
           <Button
             variant="primary"
-            onClick={() => setShowFilterModal(false)}
+            onClick={applyTempFilters}
             style={{ backgroundColor: "#E9BB37", border: "1px solid #E9BB37" }}
           >
             Apply Filters ({getActiveFiltersCount()})
           </Button>
         </Modal.Footer>
       </Modal>
-
       {/* Recharge Modal */}
       <Modal show={showModal} onHide={handleCloseModel} centered>
         <Modal.Header closeButton>
@@ -1131,7 +1102,6 @@ function TalkToArchitect() {
           </Button>
         </Modal.Footer>
       </Modal>
-
       {open && (
         <ModelOfPriceAndTime
           seconds={time}
@@ -1145,4 +1115,4 @@ function TalkToArchitect() {
   )
 }
 
-export default TalkToArchitect
+export default Vastu
