@@ -76,6 +76,16 @@ const _nav = [
       },
       {
         component: CNavItem,
+        name: 'Consultant NDA',
+        to: '/term/edit_consultant_nda?type=consultant nda',
+      },
+      {
+        component: CNavItem,
+        name: 'Consultant Term',
+        to: '/term/edit_consultant_term?type=consultant term',
+      },
+      {
+        component: CNavItem,
         name: 'All Expertise',
         to: '/expertise/all_expertise',
       },

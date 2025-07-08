@@ -170,7 +170,7 @@ function AllProvider() {
 
     const heading = [
         'S.No',
-        'Profile Image',
+        // 'Profile Image',
         'Unique ID',
         'Name',
         'Email',
@@ -178,6 +178,8 @@ function AllProvider() {
         'Type',
         'Wallet Amount',
         'Portfolio',
+        'NDA',
+        'Term',
         'Is Blocked',
         'Profile Approve',
         'Chat Transition',
@@ -199,13 +201,13 @@ function AllProvider() {
                     tableContent={currentData.map((item, index) => (
                         <CTableRow key={item._id}>
                             <CTableDataCell>{startIndex + index + 1}</CTableDataCell>
-                            <CTableDataCell>
+                            {/* <CTableDataCell>
                                 <img
                                     src={item.photo?.imageUrl || 'https://via.placeholder.com/100'}
                                     alt="Profile"
                                     width={100}
                                 />
-                            </CTableDataCell>
+                            </CTableDataCell> */}
                             <CTableDataCell>{item.unique_id || 'N/A'}</CTableDataCell>
                             <CTableDataCell>{item.name || 'N/A'}</CTableDataCell>
                             <CTableDataCell>{item.email || 'N/A'}</CTableDataCell>
@@ -225,6 +227,18 @@ function AllProvider() {
                                     'N/A'
                                 )}
                             </CTableDataCell>
+                            <CTableDataCell>
+                                <span className={`badge ${item.nda ? 'bg-success' : 'bg-danger'}`}>
+                                    {item.nda ? 'Accepted' : 'Rejected'}
+                                </span>
+                            </CTableDataCell>
+
+                            <CTableDataCell>
+                                <span className={`badge ${item.termAndCondition ? 'bg-success' : 'bg-danger'}`}>
+                                    {item.termAndCondition ? 'Accepted' : 'Rejected'}
+                                </span>
+                            </CTableDataCell>
+
                             <CTableDataCell>
                                 <CFormSwitch
                                     id={`formSwitch-${item._id}`}

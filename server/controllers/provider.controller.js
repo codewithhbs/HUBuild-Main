@@ -21,11 +21,30 @@ const generateReferralCode = (providerId) => {
 
 exports.CreateProvider = async (req, res) => {
     try {
-
-        const { type, name, email, password, DOB, age, language, mobileNumber, gstDetails, coaNumber, expertiseSpecialization, location } = req.body;
+        console.log("req.body", req.body);
+        const { type, name, email, password, DOB, age, language, mobileNumber, gstDetails, coaNumber, expertiseSpecialization, location, termAndCondition, nda } = req.body;
+        
+        // Debug: Log the exact values
+        console.log("termAndCondition value:", termAndCondition, "type:", typeof termAndCondition);
+        console.log("nda value:", nda, "type:", typeof nda);
+        
         const existingMobile = await providersModel.findOne({ mobileNumber });
         const existingEmail = await providersModel.findOne({ email });
-
+        
+        // Fixed validation for boolean fields
+        if (nda !== true) {
+            return res.status(400).json({
+                success: false,
+                message: "NDA acceptance is required"
+            });
+        }
+        
+        if (termAndCondition !== true) {
+            return res.status(400).json({
+                success: false,
+                message: "Terms and conditions acceptance is required"
+            });
+        }
 
         if (existingEmail) {
             if (existingEmail.PaymentStatus === 'pending') {
@@ -39,6 +58,7 @@ exports.CreateProvider = async (req, res) => {
                 message: 'Email is already exists with another account'
             })
         }
+        
         if (existingMobile) {
             if (existingMobile.PaymentStatus === 'pending') {
                 return res.status(400).json({
@@ -53,70 +73,56 @@ exports.CreateProvider = async (req, res) => {
             })
         }
 
-
-
-        // Upload images to Cloudinary
-        // const uploadedFiles = {};
-        // if (adhaarCard) {
-        //     uploadedFiles.adhaarCard = await uploadToCloudinary(adhaarCard[0].buffer);
-        // }
-        // if (panCard) {
-        //     uploadedFiles.panCard = await uploadToCloudinary(panCard[0].buffer);
-        // }
-        // if (qualificationProof) {
-        //     uploadedFiles.qualificationProof = await uploadToCloudinary(qualificationProof[0].buffer);
-        // }
-        // if (photo) {
-        //     uploadedFiles.photo = await uploadToCloudinary(photo[0].buffer);
-        // }
-        // console.log(uploadedFiles)
-        const newProvider = new providersModel({
+        // Create the provider object - be explicit about boolean values
+        const providerData = {
             DOB,
             type,
             name,
             email,
             password: password,
             age,
-            // language: language.split(','),
             mobileNumber,
             gstDetails,
             coaNumber,
-            // expertiseSpecialization: expertiseSpecialization.split(','),
             location: {
                 state: location?.state,
                 city: location?.city,
-                formatted_address: location?.completeAddress,
+                formatted_address: location?.formatted_address,
                 pincode: location?.pincode
             },
-            // photo: uploadedFiles.photo,
-            // adhaarCard: uploadedFiles.adhaarCard,
-            // panCard: uploadedFiles.panCard,
-            // qualificationProof: uploadedFiles.qualificationProof
-        });
+            termAndCondition: Boolean(termAndCondition), // Ensure it's a boolean
+            nda: Boolean(nda), // Ensure it's a boolean
+        };
+
+        // Debug: Log the data being saved
+        console.log("Provider data before save:", JSON.stringify(providerData, null, 2));
+
+        const newProvider = new providersModel(providerData);
 
         const couponDiscount = await GlobelUserRefDis.find();
-        if (!couponDiscount) {
-            newProvider.discount = 10
+        if (!couponDiscount || couponDiscount.length === 0) {
+            newProvider.discount = 10;
+        } else {
+            const firstDis = couponDiscount[0];
+            newProvider.discount = firstDis._id;
         }
-        const firstDis = couponDiscount[0];
+        
         newProvider.couponCode = generateReferralCode(newProvider._id);
 
-        newProvider.discount = firstDis._id
+        // Debug: Log the final object before save
+        console.log("Final provider object before save:", JSON.stringify(newProvider.toObject(), null, 2));
 
         // Save the provider
         await newProvider.save();
 
-        // Send welcome email
-        // const emailOptions = {
-        //     email: email,
-        //     subject: "Welcome to HelpUBuild",
-        //     message: "Hello, Welcome to HelpUBuild! We are excited to have you on board. Please find your login details below.",
-        // }
-        // await sendEmail(emailOptions);
-        const providerNumber = newProvider.mobileNumber
+        // Debug: Log the saved object
+        console.log("Saved provider:", JSON.stringify(newProvider.toObject(), null, 2));
+
+        const providerNumber = newProvider.mobileNumber;
         const message = `Hello,  
-        Welcome to HelpUBuild! 🎉 We're excited to have you on board.`
-        await SendWhatsapp(providerNumber, message)
+        Welcome to HelpUBuild! 🎉 We're excited to have you on board.`;
+        await SendWhatsapp(providerNumber, message);
+        
         // Send token for authentication
         sendToken(newProvider, res, 201, "Account Created successfully");
 

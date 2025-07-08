@@ -3,7 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import JoditEditor from 'jodit-react';
 
-const Eprivacy = () => {
+const EConsultantNDA = () => {
   const [text, setText] = useState('');
   const [typse, setType] = useState('');
   const [id, setId] = useState(null);
@@ -120,7 +120,7 @@ const Eprivacy = () => {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">
-        Edit Term: <span className="text-blue-600">Privacy Policy</span>
+        Edit Term: <span className="text-blue-600">Consultant NDA</span>
       </h1>
 
       <form onSubmit={handleSubmit}>
@@ -135,7 +135,7 @@ const Eprivacy = () => {
           />
         </div>
 
-        <button
+       <button
   type="submit"
   disabled={loading || !id}
   className={`mt-4 btn btn-lg d-flex align-items-center gap-2 ${
@@ -158,9 +158,10 @@ const Eprivacy = () => {
     </>
   )}
 </button>
+
       </form>
     </div>
   );
 };
 
-export default Eprivacy;
+export default EConsultantNDA;
