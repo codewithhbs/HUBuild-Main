@@ -3,7 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import JoditEditor from 'jodit-react';
 
-const Eprivacy = () => {
+const EConsultantTerm = () => {
   const [text, setText] = useState('');
   const [typse, setType] = useState('');
   const [id, setId] = useState(null);
@@ -120,7 +120,7 @@ const Eprivacy = () => {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">
-        Edit Term: <span className="text-blue-600">Privacy Policy</span>
+        Edit Term: <span className="text-blue-600">Consultant Term</span>
       </h1>
 
       <form onSubmit={handleSubmit}>
@@ -163,4 +163,4 @@ const Eprivacy = () => {
   );
 };
 
-export default Eprivacy;
+export default EConsultantTerm;

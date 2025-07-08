@@ -35,6 +35,8 @@ import Eprivacy from './views/Term/Eprivacy'
 import EDisc from './views/Term/EDisc'
 import ERefund from './views/Term/ERefund'
 import AllInquiry from './views/Inquiry/AllInquiry'
+import EConsultantNDA from './views/Term/EConsultantNDA'
+import EConsultantTerm from './views/Term/EConsultantTerm'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
@@ -233,6 +235,8 @@ const routes = [
   { path: '/term/edit_privacy', name: 'Edit Privacy Policy', element: Eprivacy },
   { path: '/term/edit_disclamier', name: 'Edit Disclaimer', element: EDisc },
   { path: '/term/edit_refund', name: 'Edit Cancellation and refund', element: ERefund },
+  { path: '/term/edit_consultant_nda', name: 'Edit Consultant NDA', element: EConsultantNDA },
+  { path: '/term/edit_consultant_term', name: 'Edit Consultant Term', element: EConsultantTerm },
 
   { path: '/call/all_call', name: 'All Call', element: AllCallHistory },
 

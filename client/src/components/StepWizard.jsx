@@ -16,7 +16,6 @@ const StepWizard = () => {
         email: "",
         type: "",
         mobileNumber: "",
-
         password: "",
         couponCode: "",
         location: {
@@ -25,7 +24,8 @@ const StepWizard = () => {
             pincode: "",
             formatted_address: ""
         },
-        agree: false,
+        termAndCondition: false,
+        nda: false,
     });
     const [discountedPrice, setDiscountedPrice] = useState(null);
     const [couponDetail, setCouponDetail] = useState(null);
@@ -79,8 +79,8 @@ const StepWizard = () => {
     }, [referralCode]);
 
 
-const handleChange = (e) => {
-    const { name, value } = e.target;
+    const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
     const keys = name.split(".");
 
     setMemberData((prev) => {
@@ -91,7 +91,8 @@ const handleChange = (e) => {
             current = current[keys[i]];
         }
 
-        current[keys[keys.length - 1]] = value;
+        // Use checked for checkboxes, value for other inputs
+        current[keys[keys.length - 1]] = type === 'checkbox' ? checked : value;
         return { ...updated };
     });
 };
@@ -117,6 +118,28 @@ const handleChange = (e) => {
                 title: 'Error!',
                 text: "Password must be at least 7 characters long.",
                 icon: 'error', // use lowercase
+                confirmButtonText: 'Okay'
+            });
+            return false;
+        }
+        return true;
+    };
+
+    const validateAgreements = () => {
+        if (!memberData.termAndCondition) {
+            Swal.fire({
+                title: 'Error!',
+                text: "Please accept Terms & Conditions to continue.",
+                icon: 'error',
+                confirmButtonText: 'Okay'
+            });
+            return false;
+        }
+        if (!memberData.nda) {
+            Swal.fire({
+                title: 'Error!',
+                text: "Please accept NDA to continue.",
+                icon: 'error',
                 confirmButtonText: 'Okay'
             });
             return false;
@@ -209,18 +232,10 @@ const handleChange = (e) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!validatePhone() || !validatePassword()) return;
-        setLoading(true);
-
-        if (memberData.agree === false) {
-            setLoading(false)
-            Swal.fire({
-                title: 'Error!',
-                text: "Please accept terms and conditions",
-                icon: 'error', // use lowercase
-                confirmButtonText: 'Okay'
-            });
+        if (!validatePhone() || !validatePassword() || !validateAgreements()) {
+            return;
         }
+        setLoading(true);
 
         try {
             const res = await axios.post("https://api.helpubuild.in/api/v1/register-provider", memberData);
@@ -470,30 +485,48 @@ const handleChange = (e) => {
                             </div>
                         </div>
 
-
-
-
                     </div>
+
                     <div className="col-lg-12">
-                        <div style={{ display: 'flex' }} className="form-check justify-content-start mb-4">
+                        <div style={{ display: 'flex' }} className="form-check justify-content-start mb-3">
                             <input
                                 className="form-check-input me-2"
                                 type="checkbox"
                                 id="termsCheck"
-                                checked={memberData.agree}
-                                onChange={(e) =>
-                                    setMemberData({ ...memberData, agree: e.target.checked })
-                                }
+                                name="termAndCondition"
+                                checked={memberData.termAndCondition}
+                                onChange={handleChange}
                                 required
                             />
                             <label className="form-check-label text-black" htmlFor="termsCheck">
                                 I agree to the
-                                <a href="/Pages?type=term" target="_blank" rel="noopener noreferrer" className="text-warning ms-1">
+                                <a href="/Pages?type=consultant term" target="_blank" rel="noopener noreferrer" className="text-warning ms-1">
                                     Terms & Conditions
                                 </a>
                             </label>
                         </div>
                     </div>
+
+                    <div className="col-lg-12">
+                        <div style={{ display: 'flex' }} className="form-check justify-content-start mb-4">
+                            <input
+                                className="form-check-input me-2"
+                                type="checkbox"
+                                id="ndaCheck"
+                                name="nda"
+                                checked={memberData.nda}
+                                onChange={handleChange}
+                                required
+                            />
+                            <label className="form-check-label text-black" htmlFor="ndaCheck">
+                                I agree to the
+                                <a href="/Pages?type=consultant nda" target="_blank" rel="noopener noreferrer" className="text-warning ms-1">
+                                    NDA
+                                </a>
+                            </label>
+                        </div>
+                    </div>
+
                 </div>
                 <button type="submit" className="btn btn-success">{loading ? "Loading..." : "Register"}</button>
             </form>
