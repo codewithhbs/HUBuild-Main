@@ -163,7 +163,7 @@ function AllUser() {
                                     <CButton
                                         color="info"
                                         size="sm"
-                                        style={{color:'white'}}
+                                        style={{ color: 'white' }}
                                         onClick={() => openChatTransitionModal(item.rechargeHistory || [])}
                                     >
                                         View
@@ -221,30 +221,44 @@ function AllUser() {
                 />
             )}
 
-            {/* Modal for Chat Transition Details */}
+            {/* Modal for Recharge History Details */}
             <CModal visible={modalVisible} onClose={() => setModalVisible(false)}>
                 <CModalHeader>
                     <CModalTitle>Recharge History</CModalTitle>
                 </CModalHeader>
+
                 <CModalBody style={{ maxHeight: '500px', overflowY: 'auto', minWidth: '100%' }}>
                     {selectedTransition.length > 0 ? (
                         <table className="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th style={{whiteSpace:"nowrap"}}>Transaction Id</th>
-                                    <th style={{whiteSpace:"nowrap"}}>Amount</th>
-                                    <th style={{whiteSpace:"nowrap"}}>Payment Method</th>
-                                    <th style={{whiteSpace:"nowrap"}}>Payment Status</th>
-                                    <th style={{whiteSpace:"nowrap"}}>Date</th>
+                                    <th style={{ whiteSpace: 'nowrap' }}>Transaction ID</th>
+                                    <th style={{ whiteSpace: 'nowrap' }}>Base Amount</th>
+                                    <th style={{ whiteSpace: 'nowrap' }}>Bonus</th>
+                                    <th style={{ whiteSpace: 'nowrap' }}>Total Credited</th>
+                                    <th style={{ whiteSpace: 'nowrap' }}>Coupon Code</th>
+                                    <th style={{ whiteSpace: 'nowrap' }}>Method</th>
+                                    <th style={{ whiteSpace: 'nowrap' }}>Status</th>
+                                    <th style={{ whiteSpace: 'nowrap' }}>Date</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {selectedTransition.map((transition) => (
-                                    <tr key={transition._id}>
+                                {selectedTransition.reverse().map((transition, index) => (
+                                    <tr key={index}>
                                         <td>{transition.transactionId}</td>
-                                        <td>{transition.amount}</td>
-                                        <td>{transition.paymentMethod}</td>
-                                        <td>{transition.PaymentStatus}</td>
+                                        <td>₹{transition.baseAmount || 0}</td>
+                                        <td>
+                                            ₹{transition.bonusAmount || 0}
+                                            {transition.couponDiscount ? ` (${transition.couponDiscount}%)` : ''}
+                                        </td>
+                                        <td>₹{transition.totalCredited || 0}</td>
+                                        <td>{transition.couponCode || 'N/A'}</td>
+                                        <td>{transition.paymentMethod || 'N/A'}</td>
+                                        <td>
+                                            <span className={`badge ${transition.paymentStatus === 'paid' ? 'bg-success' : 'bg-danger'}`}>
+                                                {transition.paymentStatus === 'paid' ? 'Paid' : 'Failed'}
+                                            </span>
+                                        </td>
                                         <td>{new Date(transition.time).toLocaleString()}</td>
                                     </tr>
                                 ))}
@@ -254,12 +268,14 @@ function AllUser() {
                         <p>No Recharge History available.</p>
                     )}
                 </CModalBody>
+
                 <CModalFooter>
                     <CButton color="secondary" onClick={() => setModalVisible(false)}>
                         Close
                     </CButton>
                 </CModalFooter>
             </CModal>
+
         </>
     );
 }

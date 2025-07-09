@@ -37,6 +37,9 @@ import ERefund from './views/Term/ERefund'
 import AllInquiry from './views/Inquiry/AllInquiry'
 import EConsultantNDA from './views/Term/EConsultantNDA'
 import EConsultantTerm from './views/Term/EConsultantTerm'
+import AllRechargeCoupon from './views/RechargeCoupon/AllRechargeCoupon'
+import AddRechargeCoupon from './views/RechargeCoupon/AddRechargeCoupon'
+import EditRechargeCoupon from './views/RechargeCoupon/EditRechargeCoupon'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
@@ -245,6 +248,10 @@ const routes = [
   { path: '/project/edit_project/:id', name: 'Edit Project', element: EditCustomChat },
   
   { path: '/inquiry/all_inquiry', name: 'All Inquiry', element: AllInquiry },
+  
+    { path: '/recharge_coupon/all_recharge_coupon', name: 'All Recharge Coupon', element: AllRechargeCoupon },
+    { path: '/recharge_coupon/add_recharge_coupon', name: 'Add Recharge Coupon', element: AddRechargeCoupon },
+    { path: '/recharge_coupon/edit_recharge_coupon/:id', name: 'Edit Recharge Coupon', element: EditRechargeCoupon },
 ]
 
 export default routes

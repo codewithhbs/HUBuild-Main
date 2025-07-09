@@ -24,6 +24,7 @@ const { createNewsLetter, getAllNewsLetter, deleteNewsLetter, getSingleNewsLette
 const { createExpertise, getAllExpertise, getSingleExpertise, updateExpertise, deleteExpertise } = require('../controllers/expertise.controller');
 const { createTerm, getTerm, singleTerm, updateTerm } = require('../controllers/termAndCondition');
 const { createContact, getAllContacts, updateContact, deleteContact, addNote } = require('../controllers/contactController');
+const { createRechargeCoupon, getAllRechargeCoupons, getSingleRechargeCoupon, updateRechargeCoupon, deleteRechargeCoupon, checkCouponIsExist } = require('../controllers/rechargeCoupon.controller');
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 const router = express.Router();
@@ -308,5 +309,14 @@ router.delete('/delete-contact/:id', deleteContact);
 
 
 router.post('/create_call_for_free', createCallFreeModule)
+
+// recharge coupon routes 
+
+router.post('/create_recharge_coupon', createRechargeCoupon)
+router.get('/all_recharge_coupon', getAllRechargeCoupons)
+router.get('/recharge_coupon/:id', getSingleRechargeCoupon)
+router.put('/update_recharge_coupon/:id', updateRechargeCoupon)
+router.delete('/delete_recharge_coupon/:id', deleteRechargeCoupon)
+router.post('/check_coupon', checkCouponIsExist);
 
 module.exports = router;

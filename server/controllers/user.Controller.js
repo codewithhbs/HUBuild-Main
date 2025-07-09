@@ -15,6 +15,7 @@ const bcrypt = require('bcrypt');
 const GlobelUserRefDis = require("../models/globelUserRefDis.model");
 const providersModel = require("../models/providers.model");
 const ChatAndPayment = require("../models/chatAndPayment.Model");
+const RechargeCoupon = require("../models/rechargeCoupon.model");
 // const { SendWhatsapp } = require("../utils/SendWhatsapp");
 // const SendWhatsapp = require("../utils/SendWhatsapp");
 const razorpayInstance = new Razorpay({
@@ -774,7 +775,20 @@ exports.createPayment = async (req, res) => {
     try {
         // console.log("i create payment start")
         const { userId } = req.params;
-        const { price } = req.body;
+        const { price, couponCode } = req.body;
+        if (!couponCode || typeof couponCode !== 'string') {
+            return res.status(400).json({
+                success: false,
+                message: 'Coupon code is required and must be a string',
+            });
+        }
+        const rechargeCoupon = await RechargeCoupon.findOne({ couponCode: couponCode.trim() });
+        if (!rechargeCoupon) {
+            return res.status(400).json({
+                success: false,
+                message: 'Recharge coupon not found',
+            });
+        }
         const user = await User.findById(userId);
         if (!user) {
             return res.status(400).json({
@@ -814,7 +828,7 @@ exports.createPayment = async (req, res) => {
         }
         // console.log("create payment end")
         user.razorpayOrderId = razorpayOrder.id
-
+        user.rechargeCoupon = rechargeCoupon?._id
         await user.save()
 
         return res.status(200).json({
@@ -839,7 +853,6 @@ exports.createPayment = async (req, res) => {
 
 exports.PaymentVerify = async (req, res) => {
     try {
-        // console.log("payment verify start")
         const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
 
         // Validate request body
@@ -853,9 +866,6 @@ exports.PaymentVerify = async (req, res) => {
         // Generate signature for verification
         const genreaterSignature = validatePaymentVerification({ "order_id": razorpay_order_id, "payment_id": razorpay_payment_id }, razorpay_signature, process.env.RAZORPAY_KEY_SECRET);
 
-        // console.log("aIM7S3NfvUHlM84tcZRQpNht",process.env.RAZORPAY_KEY_SECRET)
-
-        // console.log("genreaterSignature",genreaterSignature)
 
         if (!genreaterSignature) {
             return res.status(400).json({
@@ -863,7 +873,7 @@ exports.PaymentVerify = async (req, res) => {
                 message: 'Invalid signature',
             });
         }
-
+        // console.log("process.env.RAZORPAY_KEY_ID", process.env.RAZORPAY_KEY_ID,process.env.RAZORPAY_KEY_SECRET)
         // Fetch payment details from Razorpay
         const paymentDetails = await axios.get(`https://api.razorpay.com/v1/payments/${razorpay_payment_id}`, {
             auth: {
@@ -875,9 +885,7 @@ exports.PaymentVerify = async (req, res) => {
         const { method, status, amount } = paymentDetails.data;
         const currentTime = new Date().toISOString(); // Get current timestamp
 
-        // console.log("id",razorpay_order_id)
-        // Find the order in the database
-        const findOrder = await User.findOne({ razorpayOrderId: razorpay_order_id });
+        const findOrder = await User.findOne({ razorpayOrderId: razorpay_order_id }).populate('rechargeCoupon');
         if (!findOrder) {
             return res.status(400).json({
                 success: false,
@@ -885,13 +893,25 @@ exports.PaymentVerify = async (req, res) => {
             });
         }
 
+        const bonusPercentage = findOrder.rechargeCoupon?.discount || 0;
         // If payment is not successful, handle failure
         if (status !== 'captured') {
             const failedAmount = amount / 100; // Convert amount from paise to INR
-
+            
             // Log failed payment with timestamp
             findOrder.rechargeHistory = findOrder.rechargeHistory || []; // Initialize if undefined
-            findOrder.rechargeHistory.push({ amount: failedAmount, time: currentTime, transactionId: razorpay_payment_id, PaymentStatus: 'failed', paymentMethod: method });
+            findOrder.rechargeHistory.push({
+                baseAmount: failedAmount,
+                bonusAmount: 0,
+                totalCredited: 0,
+                time: currentTime,
+                transactionId: razorpay_payment_id,
+                paymentStatus: 'failed',
+                paymentMethod: method,
+                couponCode: findOrder.rechargeCoupon?.couponCode || null,
+                couponDiscount: bonusPercentage,
+            });
+
 
             // Save updated order
             await findOrder.save();
@@ -901,33 +921,33 @@ exports.PaymentVerify = async (req, res) => {
             );
         }
 
-        // Update payment details for successful payment
-        // findOrder.transactionId = razorpay_payment_id;
-        // findOrder.PaymentStatus = 'paid';
-        // findOrder.paymentMethod = method;
 
-        const previousWalletAmount = findOrder.walletAmount || 0; // Default to 0 if undefined
-        const price = amount / 100; // Convert amount from paise to INR
-        findOrder.walletAmount = previousWalletAmount + price;
+        const previousWalletAmount = findOrder.walletAmount || 0;
+        const baseAmount = amount / 100; // Convert amount from paise to INR
+        const bonusAmount = (baseAmount * bonusPercentage) / 100;
+        const totalAmount = baseAmount + bonusAmount;
+
+        findOrder.walletAmount = previousWalletAmount + totalAmount;
+
 
         // Log successful payment with timestamp
         findOrder.rechargeHistory = findOrder.rechargeHistory || []; // Initialize if undefined
-        findOrder.rechargeHistory.push({ amount: price, time: currentTime, transactionId: razorpay_payment_id, PaymentStatus: 'paid', paymentMethod: method });
+        findOrder.rechargeHistory.push({
+            baseAmount: baseAmount,
+            bonusAmount: bonusAmount,
+            totalCredited: totalAmount,
+            time: currentTime,
+            transactionId: razorpay_payment_id,
+            paymentStatus: 'paid',
+            paymentMethod: method,
+            couponCode: findOrder.rechargeCoupon?.couponCode || null,
+            couponDiscount: bonusPercentage,
+        });
+
 
         // Save updated order
         await findOrder.save();
-        // console.log("payment verify end")
-
-        // return res.status(200).json({
-        //     success: true,
-        //     message: 'Payment verified and wallet updated successfully',
-        //     data: {
-        //         transactionId: razorpay_payment_id,
-        //         walletAmount: findOrder.walletAmount,
-        //         rechargeHistory: findOrder.rechargeHistory,
-        //     },
-        // });
-        return res.redirect(`https://helpubuild.in/successfull-recharge?amount=${price}&transactionId=${razorpay_payment_id}&date=${currentTime}`)
+       return res.redirect(`https://helpubuild.in/successfull-recharge?amount=${totalAmount}&transactionId=${razorpay_payment_id}&date=${currentTime}`)
     } catch (error) {
         console.log('Internal server error', error);
         return res.status(500).json({
@@ -1065,7 +1085,7 @@ exports.chatStart = async (userId, astrologerId) => {
             };
         }
 
-        if(provider?.isBanned === true){
+        if (provider?.isBanned === true) {
             return {
                 success: false,
                 message: 'Provider is banned',
@@ -1256,7 +1276,7 @@ exports.chatStartFromProvider = async (userId, astrologerId) => {
 exports.chatEnd = async (userId, astrologerId, actualStartTime = null) => {
     try {
         console.log("i am hit for deduction in chat")
-        console.log("actualStartTime",actualStartTime)
+        console.log("actualStartTime", actualStartTime)
         // First, find the user by userId
         const findUser = await User.findById(userId);
         if (!findUser) {
@@ -1507,7 +1527,7 @@ exports.changeAvailableStatus = async (id, status) => {
 exports.getAllUser = async (req, res) => {
     try {
         const users = await User.find({});
-        if(!users){
+        if (!users) {
             return res.status(500).json({
                 success: false,
                 message: "User not found",
@@ -1520,7 +1540,7 @@ exports.getAllUser = async (req, res) => {
             data: users
         });
     } catch (error) {
-        console.log("Internal server error",error)
+        console.log("Internal server error", error)
         res.status(500).json({
             success: false,
             message: "Internal server error",
