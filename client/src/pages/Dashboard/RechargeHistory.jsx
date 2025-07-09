@@ -27,27 +27,20 @@ function RechargeHistory() {
         handleFetchUser();
     }, []);
 
-    // Calculate the paginated data
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = rechargeHistory.slice(indexOfFirstItem, indexOfLastItem);
 
-    // Change page
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     const totalPages = Math.ceil(rechargeHistory.length / itemsPerPage);
 
-    // Navigate to previous or next page
     const handlePreviousPage = () => {
-        if (currentPage > 1) {
-            setCurrentPage(currentPage - 1);
-        }
+        if (currentPage > 1) setCurrentPage(currentPage - 1);
     };
 
     const handleNextPage = () => {
-        if (currentPage < totalPages) {
-            setCurrentPage(currentPage + 1);
-        }
+        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
     };
 
     return (
@@ -55,69 +48,57 @@ function RechargeHistory() {
             <h2 className="text-center mb-4">Recharge History</h2>
             <div className="table-responsive">
                 <table className="table table-bordered table-hover">
-                    <thead style={{backgroundColor: '#093369',color: 'white'}} className="">
+                    <thead style={{ backgroundColor: '#093369', color: 'white' }}>
                         <tr>
                             <th>#</th>
-                            <th>Amount</th>
+                            <th>Base Amount</th>
+                            <th>Bonus</th>
+                            <th>Total Credited</th>
+                            <th>Coupon</th>
                             <th>Transaction ID</th>
-                            <th>Payment Status</th>
-                            <th>Payment Method</th>
+                            <th>Status</th>
+                            <th>Method</th>
                             <th>Time</th>
                         </tr>
                     </thead>
                     <tbody>
                         {currentItems.map((record, index) => (
-                            <tr key={record._id}>
+                            <tr key={index}>
                                 <td>{indexOfFirstItem + index + 1}</td>
-                                <td>₹{record.amount}</td>
+                                <td>₹{record.baseAmount || 0}</td>
+                                <td>₹{record.bonusAmount || 0} {record.couponDiscount ? `(${record.couponDiscount}%)` : ''}</td>
+                                <td>₹{record.totalCredited || 0}</td>
+                                <td>{record.couponCode || 'N/A'}</td>
                                 <td>{record.transactionId}</td>
                                 <td>
-                                    <span
-                                        className={`badge ${record.PaymentStatus === 'paid'
-                                            ? 'bg-success'
-                                            : 'bg-danger'
-                                            }`}
-                                    >
-                                        {record.PaymentStatus === 'paid'
-                                            ? 'Payment Done'
-                                            : 'Failed Transaction'}
+                                    <span className={`badge ${record.paymentStatus === 'paid' ? 'bg-success' : 'bg-danger'}`}>
+                                        {record.paymentStatus === 'paid' ? 'Payment Done' : 'Failed Transaction'}
                                     </span>
                                 </td>
-                                <td>{record.paymentMethod}</td>
+                                <td>{record.paymentMethod || 'N/A'}</td>
                                 <td>{new Date(record.time).toLocaleString()}</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+
                 {totalPages > 1 && (
                     <nav className="d-flex justify-content-center">
                         <ul className="pagination">
                             <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                                <button
-                                    className="page-link"
-                                    onClick={handlePreviousPage}
-                                >
+                                <button className="page-link" onClick={handlePreviousPage}>
                                     Previous
                                 </button>
                             </li>
                             {Array.from({ length: totalPages }, (_, index) => (
-                                <li
-                                    key={index}
-                                    className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}
-                                >
-                                    <button
-                                        onClick={() => paginate(index + 1)}
-                                        className="page-link"
-                                    >
+                                <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
+                                    <button onClick={() => paginate(index + 1)} className="page-link">
                                         {index + 1}
                                     </button>
                                 </li>
                             ))}
                             <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                                <button
-                                    className="page-link"
-                                    onClick={handleNextPage}
-                                >
+                                <button className="page-link" onClick={handleNextPage}>
                                     Next
                                 </button>
                             </li>

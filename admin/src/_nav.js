@@ -166,6 +166,11 @@ const _nav = [
         name: 'Admin Coupon',
         to: '/admin-coupon/all_admin_coupon',
       },
+      {
+        component: CNavItem,
+        name: 'Recharge Coupon',
+        to: '/recharge_coupon/all_recharge_coupon',
+      },
     ],
   },
 ]
