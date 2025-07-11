@@ -5,6 +5,8 @@ import {
     CSpinner,
     CPagination,
     CPaginationItem,
+    CFormInput,
+    CButton,
 } from '@coreui/react';
 import Table from '../../components/Table/Table';
 import axios from 'axios';
@@ -18,6 +20,7 @@ function AllChatRoom() {
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedChat, setSelectedChat] = useState(null);
     const [showChatModal, setShowChatModal] = useState(false);
+    const [filterText, setFilterText] = useState('');
     const chatContainerRef = useRef(null);
     const itemsPerPage = 10;
 
@@ -25,7 +28,6 @@ function AllChatRoom() {
         setLoading(true);
         try {
             const { data } = await axios.get('https://api.helpubuild.in/api/v1/get-all-chat-record');
-            // console.log("all data", data.data)
             const filterData = data.data.filter((item) => item.isManualChat === false);
             setBanners(filterData.reverse() || []);
         } catch (error) {
@@ -87,9 +89,19 @@ function AllChatRoom() {
         }
     }, [selectedChat]);
 
+    // Filter logic
+    const filteredBanners = banners.filter((item) => {
+        const search = filterText.toLowerCase();
+        return (
+            item?.room?.toLowerCase().includes(search) ||
+            item?.userId?.name?.toLowerCase().includes(search) ||
+            item?.providerId?.name?.toLowerCase().includes(search)
+        );
+    });
+
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentData = banners.slice(startIndex, startIndex + itemsPerPage);
-    const totalPages = Math.ceil(banners.length / itemsPerPage);
+    const currentData = filteredBanners.slice(startIndex, startIndex + itemsPerPage);
+    const totalPages = Math.ceil(filteredBanners.length / itemsPerPage);
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
@@ -116,15 +128,30 @@ function AllChatRoom() {
         return message.text;
     };
 
-    const heading = ['S.No', 'Chat room', 'User Name', 'Provider Name', 'Action'];
+    const heading = ['S.No', 'Chat room', 'User Name', 'Consultant Name', 'Action'];
 
     return (
         <>
+            <div className="mb-3 d-flex gap-2">
+                <CFormInput
+                    type="text"
+                    placeholder="Search by Room ID, User or Consultant Name"
+                    value={filterText}
+                    onChange={(e) => {
+                        setFilterText(e.target.value);
+                        setCurrentPage(1);
+                    }}
+                />
+                <CButton color="secondary" onClick={() => setFilterText('')}>
+                    Clear
+                </CButton>
+            </div>
+
             {loading ? (
                 <div className="spin-style">
                     <CSpinner color="primary" variant="grow" />
                 </div>
-            ) : banners.length === 0 ? (
+            ) : filteredBanners.length === 0 ? (
                 <div className="no-data">
                     <p>No data available</p>
                 </div>
@@ -151,10 +178,7 @@ function AllChatRoom() {
                                     <CTableDataCell>{item?.providerId?.name}</CTableDataCell>
                                     <CTableDataCell>
                                         <div className="action-parent">
-                                            <div
-                                                className="delete"
-                                                onClick={() => confirmDelete(item._id)}
-                                            >
+                                            <div className="delete" onClick={() => confirmDelete(item._id)}>
                                                 <i className="ri-delete-bin-fill"></i>
                                             </div>
                                         </div>
@@ -192,7 +216,6 @@ function AllChatRoom() {
                     {/* Chat Modal */}
                     {showChatModal && selectedChat && (
                         <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
-                            {console.log("object", selectedChat?.messages)}
                             <div className="modal-dialog modal-dialog-centered modal-lg">
                                 <div className="modal-content">
                                     <div className="modal-header bg-primary text-white">
@@ -236,7 +259,6 @@ function AllChatRoom() {
                                             )}
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                         </div>

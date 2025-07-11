@@ -722,7 +722,8 @@ exports.deleteprovider = async (req, res) => {
     // console.log("i am hit")
     try {
         const { id } = req.params;
-        const findProvider = await providersModel.findByIdAndDelete(id)
+        // const findProvider = await providersModel.findByIdAndDelete(id)
+        const findProvider = await providersModel.findById(id)
         if (!findProvider) {
             return res.status(500).json({
                 success: false,
@@ -731,7 +732,10 @@ exports.deleteprovider = async (req, res) => {
             })
         }
 
-        const providerChat = await ChatAndPayment.deleteMany({ providerId: id });
+        findProvider.isDeleted = true;
+        await findProvider.save();
+
+        // const providerChat = await ChatAndPayment.deleteMany({ providerId: id });
         res.status(200).json({
             success: true,
             message: "Provider deleted successfully",

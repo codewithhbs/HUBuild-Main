@@ -112,7 +112,7 @@ function AllWithdraw() {
         setCurrentPage(page);
     };
 
-    const heading = ['S.No', 'Provider Name', 'Provider Number', 'Request Amount', 'Commission %', 'Commission Amount', 'Final Amount', 'Bank Detail', 'Status', 'Action'];
+    const heading = ['S.No', 'Consultant Name', 'Provider Number', 'Request Amount', 'Commission %', 'Commission Amount', 'Final Amount', 'Bank Detail', 'Status', 'Action'];
 
     return (
         <>
