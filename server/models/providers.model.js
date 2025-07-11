@@ -300,6 +300,10 @@ const ProviderProfileSchema = new mongoose.Schema({
     nda: {
         type: Boolean,
         default: false
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
     }
 });
 

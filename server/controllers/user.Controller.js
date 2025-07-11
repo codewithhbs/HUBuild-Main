@@ -495,6 +495,14 @@ exports.login = async (req, res) => {
             });
         }
 
+        if(user.isDeleted === true){
+            console.log("❌ Account is deleted.");
+            return res.status(404).json({
+                success: false,
+                message: `No account found with that email/phone number${isProvider ? " for user" : " for provider"}.`
+            });
+        }
+
         // Step 6: Check password
         console.log("🔐 Checking password...");
         const isMatch = await user.comparePassword(password);
@@ -707,12 +715,15 @@ exports.deleteAccount = async (req, res) => {
     try {
         const { userId } = req.params;
 
-        const user = await User.findByIdAndDelete(userId);
+        // const user = await User.findByIdAndDelete(userId);
+        const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        const userChat = await ChatAndPayment.deleteMany({ userId: userId });
+        user.isDeleted = true; // Set isDeleted to true
+        await user.save();
+        // const userChat = await ChatAndPayment.deleteMany({ userId: userId });
 
         res.status(200).json({ success: true, message: "User account deleted successfully" });
     } catch (error) {

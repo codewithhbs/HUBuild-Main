@@ -115,6 +115,10 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'RechargeCoupon'
     },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
     chatRoomIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ChatAndPayment' }]
 }, { timestamps: true });
 

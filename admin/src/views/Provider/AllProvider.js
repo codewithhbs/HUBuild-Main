@@ -32,6 +32,12 @@ function AllProvider() {
     const [selectedProvider, setSelectedProvider] = React.useState(null);
     const [accountVerified, setAccountVerified] = React.useState('Pending');
     const [verificationRejectReason, setVerificationRejectReason] = React.useState('');
+    const [filters, setFilters] = React.useState({
+        search: '',
+        type: '',
+        accountVerified: '',
+        isBanned: '',
+    });
     const itemsPerPage = 10;
 
     const fetchProviders = async () => {
@@ -90,7 +96,7 @@ function AllProvider() {
 
     const handleChange = (e) => {
         const { value } = e.target;
-        const providerId = e.target.getAttribute("data-id"); // Get provider ID
+        const providerId = e.target.getAttribute("data-id");
 
         if (!providerId || providerId === "null" || providerId.length !== 24) {
             toast.error("Invalid Provider ID. Please refresh and try again.");
@@ -105,10 +111,9 @@ function AllProvider() {
             setVerificationModal(true);
         } else {
             setVerificationRejectReason('');
-            handleAccountVerification(value, providerId); // Pass providerId explicitly
+            handleAccountVerification(value, providerId);
         }
     };
-
 
     const handleAccountVerification = async (status, providerId = selectedProvider) => {
         if (!providerId || providerId === "null" || providerId.length !== 24) {
@@ -129,7 +134,7 @@ function AllProvider() {
 
             toast.success(res?.data?.message || 'Account verification updated successfully.');
             setVerificationRejectReason('');
-            setSelectedProvider(null); // Reset after successful update
+            setSelectedProvider(null);
             fetchProviders();
             setVerificationModal(false);
         } catch (error) {
@@ -137,7 +142,6 @@ function AllProvider() {
             toast.error(error?.response?.data?.message || 'Error verifying account.');
         }
     };
-
 
     const confirmDelete = (id) => {
         Swal.fire({
@@ -159,10 +163,31 @@ function AllProvider() {
         fetchProviders();
     }, []);
 
-    // Pagination
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setFilters((prev) => ({ ...prev, [name]: value }));
+        setCurrentPage(1);
+    };
+
+    const filteredData = providers.filter((item) => {
+        const searchMatch = filters.search
+            ? item.name?.toLowerCase().includes(filters.search.toLowerCase()) ||
+              item.email?.toLowerCase().includes(filters.search.toLowerCase()) ||
+              item.mobileNumber?.includes(filters.search)
+            : true;
+
+        const typeMatch = filters.type ? item.type === filters.type : true;
+        const verifiedMatch = filters.accountVerified ? item.accountVerified === filters.accountVerified : true;
+        const isBannedMatch = filters.isBanned !== ''
+            ? String(item.isBanned) === filters.isBanned
+            : true;
+
+        return searchMatch && typeMatch && verifiedMatch && isBannedMatch;
+    });
+
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentData = providers.slice(startIndex, startIndex + itemsPerPage);
-    const totalPages = Math.ceil(providers.length / itemsPerPage);
+    const currentData = filteredData.slice(startIndex, startIndex + itemsPerPage);
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
     const viewProviderDetails = (provider) => {
         navigate(`/provider/${provider._id}`, { state: { provider } });
@@ -170,7 +195,6 @@ function AllProvider() {
 
     const heading = [
         'S.No',
-        // 'Profile Image',
         'Unique ID',
         'Name',
         'Email',
@@ -188,6 +212,36 @@ function AllProvider() {
 
     return (
         <>
+            {/* Filters */}
+            <div className="mb-4 d-flex flex-wrap gap-2">
+                <CFormInput
+                    type="text"
+                    placeholder="Search by name/email/phone"
+                    name="search"
+                    value={filters.search}
+                    onChange={handleFilterChange}
+                />
+                <CFormSelect name="type" value={filters.type} onChange={handleFilterChange}>
+                    <option value="">All Types</option>
+                    <option value="Consultant">Consultant</option>
+                    <option value="Service Provider">Service Provider</option>
+                </CFormSelect>
+                <CFormSelect name="accountVerified" value={filters.accountVerified} onChange={handleFilterChange}>
+                    <option value="">All Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Verified">Verified</option>
+                    <option value="Rejected">Rejected</option>
+                </CFormSelect>
+                <CFormSelect name="isBanned" value={filters.isBanned} onChange={handleFilterChange}>
+                    <option value="">All Block Status</option>
+                    <option value="true">Blocked</option>
+                    <option value="false">Unblocked</option>
+                </CFormSelect>
+                <CButton color="secondary" onClick={() => setFilters({ search: '', type: '', accountVerified: '', isBanned: '' })}>
+                    Clear Filters
+                </CButton>
+            </div>
+
             {loading ? (
                 <div className="spin-style">
                     <CSpinner color="primary" variant="grow" />
@@ -201,13 +255,6 @@ function AllProvider() {
                     tableContent={currentData.map((item, index) => (
                         <CTableRow key={item._id}>
                             <CTableDataCell>{startIndex + index + 1}</CTableDataCell>
-                            {/* <CTableDataCell>
-                                <img
-                                    src={item.photo?.imageUrl || 'https://via.placeholder.com/100'}
-                                    alt="Profile"
-                                    width={100}
-                                />
-                            </CTableDataCell> */}
                             <CTableDataCell>{item.unique_id || 'N/A'}</CTableDataCell>
                             <CTableDataCell>{item.name || 'N/A'}</CTableDataCell>
                             <CTableDataCell>{item.email || 'N/A'}</CTableDataCell>
@@ -232,13 +279,11 @@ function AllProvider() {
                                     {item.nda ? 'Accepted' : 'Rejected'}
                                 </span>
                             </CTableDataCell>
-
                             <CTableDataCell>
                                 <span className={`badge ${item.termAndCondition ? 'bg-success' : 'bg-danger'}`}>
                                     {item.termAndCondition ? 'Accepted' : 'Rejected'}
                                 </span>
                             </CTableDataCell>
-
                             <CTableDataCell>
                                 <CFormSwitch
                                     id={`formSwitch-${item._id}`}
@@ -250,7 +295,7 @@ function AllProvider() {
                                 <CFormSelect
                                     value={item.accountVerified || "Pending"}
                                     onChange={(e) => handleChange(e)}
-                                    data-id={item._id || ""} // Ensure ID is not null
+                                    data-id={item._id || ""}
                                 >
                                     <option value="Pending">Pending</option>
                                     <option value="Verified">Verified</option>
@@ -266,7 +311,6 @@ function AllProvider() {
                                     View Chat Transition
                                 </CButton>
                             </CTableDataCell>
-
                             <CTableDataCell>
                                 <div className="action-parent">
                                     <CButton
@@ -315,7 +359,7 @@ function AllProvider() {
                 />
             )}
 
-            {/* Modal for Chat Transition Details */}
+            {/* Chat Transition Modal */}
             <CModal visible={modalVisible} onClose={() => setModalVisible(false)}>
                 <CModalHeader>
                     <CModalTitle>Chat Transition Details</CModalTitle>
@@ -357,6 +401,7 @@ function AllProvider() {
                 </CModalFooter>
             </CModal>
 
+            {/* Verification Modal */}
             <CModal visible={verificationModal} onClose={() => setVerificationModal(false)}>
                 <CModalHeader>
                     <CModalTitle>Account Verification</CModalTitle>
@@ -374,7 +419,6 @@ function AllProvider() {
                     <CButton color="secondary" onClick={() => setVerificationModal(false)}>Close</CButton>
                 </CModalFooter>
             </CModal>
-
         </>
     );
 }
