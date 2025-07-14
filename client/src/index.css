@@ -158,6 +158,10 @@ a {
   }
 }
 
+.formarginzero svg{
+  color: #80c519 !important;
+}
+
 .pricing {
   font-weight: bold;
   margin: 5px 0;

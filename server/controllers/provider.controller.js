@@ -23,14 +23,14 @@ exports.CreateProvider = async (req, res) => {
     try {
         console.log("req.body", req.body);
         const { type, name, email, password, DOB, age, language, mobileNumber, gstDetails, coaNumber, expertiseSpecialization, location, termAndCondition, nda } = req.body;
-        
+
         // Debug: Log the exact values
         console.log("termAndCondition value:", termAndCondition, "type:", typeof termAndCondition);
         console.log("nda value:", nda, "type:", typeof nda);
-        
+
         const existingMobile = await providersModel.findOne({ mobileNumber });
         const existingEmail = await providersModel.findOne({ email });
-        
+
         // Fixed validation for boolean fields
         if (nda !== true) {
             return res.status(400).json({
@@ -38,7 +38,7 @@ exports.CreateProvider = async (req, res) => {
                 message: "NDA acceptance is required"
             });
         }
-        
+
         if (termAndCondition !== true) {
             return res.status(400).json({
                 success: false,
@@ -58,7 +58,7 @@ exports.CreateProvider = async (req, res) => {
                 message: 'Email is already exists with another account'
             })
         }
-        
+
         if (existingMobile) {
             if (existingMobile.PaymentStatus === 'pending') {
                 return res.status(400).json({
@@ -106,7 +106,7 @@ exports.CreateProvider = async (req, res) => {
             const firstDis = couponDiscount[0];
             newProvider.discount = firstDis._id;
         }
-        
+
         newProvider.couponCode = generateReferralCode(newProvider._id);
 
         // Debug: Log the final object before save
@@ -122,7 +122,7 @@ exports.CreateProvider = async (req, res) => {
         const message = `Hello,  
         Welcome to HelpUBuild! 🎉 We're excited to have you on board.`;
         await SendWhatsapp(providerNumber, message);
-        
+
         // Send token for authentication
         sendToken(newProvider, res, 201, "Account Created successfully");
 
@@ -1074,3 +1074,45 @@ exports.changeProviderDeactiveStatus = async (req, res) => {
         })
     }
 }
+
+exports.helpubuildverified = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { isHelpuBuildVerified } = req.body;
+
+        // Find provider by ID
+        const provider = await providersModel.findById(id);
+
+        if (!provider) {
+            return res.status(404).json({
+                success: false,
+                message: 'Provider not found'
+            });
+        }
+
+        // Ensure only 'Architect' type can be verified
+        if (provider.type !== 'Architect') {
+            return res.status(400).json({
+                success: false,
+                message: 'This profile is not an Architect'
+            });
+        }
+
+        // Update verification status
+        provider.isHelpuBuildVerified = isHelpuBuildVerified;
+        await provider.save();
+
+        return res.status(200).json({
+            success: true,
+            message: 'Architect verification status updated successfully'
+        });
+
+    } catch (error) {
+        console.error("Internal server error:", error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error.message
+        });
+    }
+};

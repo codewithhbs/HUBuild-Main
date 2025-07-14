@@ -10,6 +10,7 @@ import { Modal, Button, Form } from "react-bootstrap"
 import Swal from "sweetalert2"
 import ModelOfPriceAndTime from "./ModelOfPriceAndTime"
 import CallLoader from "./CallLoader"
+import { HiBadgeCheck } from "react-icons/hi"
 
 function TalkToArchitect() {
   const [id, setId] = useState(null)
@@ -789,7 +790,7 @@ function TalkToArchitect() {
                     </div>
                     <div className="left-section">
                       <h5 className="formarginzero">
-                        {item.name ? <Link to={`/architect-profile/${item._id}`}>{item.name}</Link> : "Not Available"}
+                        {item.name ? <Link to={`/architect-profile/${item._id}`}>{item.name}</Link> : "Not Available"} {item.isHelpuBuildVerified && <HiBadgeCheck />}
                       </h5>
                       <p className="pricing formarginzero">{item?.unique_id ? `ID: ${item?.unique_id}` : ""}</p>
                       <p className="formarginzero">
