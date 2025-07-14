@@ -11,7 +11,7 @@ require('dotenv').config();
 // Import local modules
 const ConnectDB = require('./Config/DataBase');
 const router = require('./routes/routes');
-const Chat = require('./models/chatAndPayment.Model');
+const Chat = require('./models/chatAndPayment.Model.js');
 const { chatStart, chatEnd, chatStartFromProvider, changeAvailableStatus } = require('./controllers/user.Controller');
 const { update_profile_status } = require('./controllers/call.controller');
 

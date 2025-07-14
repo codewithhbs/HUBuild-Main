@@ -159,6 +159,22 @@ function AllProvider() {
         });
     };
 
+    const handleHelpuBuildVerify = async (id, currentStatus) => {
+        try {
+            const updatedStatus = !currentStatus;
+            const res = await axios.put(
+                `https://api.helpubuild.in/api/v1/verified-provider/${id}`,
+                { isHelpuBuildVerified: updatedStatus }
+            );
+            toast.success(res?.data?.message || "Status updated successfully!");
+            fetchProviders(); // Refresh the list
+        } catch (error) {
+            console.log("Internal server error", error);
+            toast.error(error.response.data.message || "Failed to update verification status.");
+        }
+    };
+
+
     React.useEffect(() => {
         fetchProviders();
     }, []);
@@ -172,8 +188,8 @@ function AllProvider() {
     const filteredData = providers.filter((item) => {
         const searchMatch = filters.search
             ? item.name?.toLowerCase().includes(filters.search.toLowerCase()) ||
-              item.email?.toLowerCase().includes(filters.search.toLowerCase()) ||
-              item.mobileNumber?.includes(filters.search)
+            item.email?.toLowerCase().includes(filters.search.toLowerCase()) ||
+            item.mobileNumber?.includes(filters.search)
             : true;
 
         const typeMatch = filters.type ? item.type === filters.type : true;
@@ -206,6 +222,7 @@ function AllProvider() {
         'Term',
         'Is Blocked',
         'Profile Approve',
+        'Architect Verified',
         'Chat Transition',
         'Action',
     ];
@@ -302,6 +319,14 @@ function AllProvider() {
                                     <option value="Rejected">Rejected</option>
                                 </CFormSelect>
                             </CTableDataCell>
+                            <CTableDataCell>
+                                <CFormSwitch
+                                    id={`architectSwitch-${item._id}`}
+                                    checked={item.isHelpuBuildVerified}
+                                    onChange={() => handleHelpuBuildVerify(item._id, item.isHelpuBuildVerified)}
+                                />
+                            </CTableDataCell>
+
                             <CTableDataCell>
                                 <CButton
                                     color="info"

@@ -402,7 +402,7 @@ function ArchitectProfile() {
                                     {/* Name */}
                                     {profile.name && (
                                         <h4 className='fw-bold archi-profile-name'>
-                                            {profile.name} <HiBadgeCheck />
+                                            {profile.name} {profile.isHelpuBuildVerified && <HiBadgeCheck />}
                                         </h4>
                                     )}
 

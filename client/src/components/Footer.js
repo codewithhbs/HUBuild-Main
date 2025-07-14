@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, Send } from 'lucide-react';
-import logo from './helpubuil-web-logo.jpeg';
+import logo from './help-u-bulid-logo-circle.png';
 import './footer.css';
 import { GetData } from '../utils/sessionStoreage';
 import axios from 'axios';

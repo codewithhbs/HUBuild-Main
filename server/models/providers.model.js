@@ -304,6 +304,10 @@ const ProviderProfileSchema = new mongoose.Schema({
     isDeleted: {
         type: Boolean,
         default: false
+    },
+    isHelpuBuildVerified: {
+        type: Boolean,
+        default: false
     }
 });
 
