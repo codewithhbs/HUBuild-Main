@@ -117,11 +117,24 @@ exports.CreateProvider = async (req, res) => {
 
         // Debug: Log the saved object
         console.log("Saved provider:", JSON.stringify(newProvider.toObject(), null, 2));
-
+        const AdminNum = process.env.Admin_Number
         const providerNumber = newProvider.mobileNumber;
         const message = `Hello,  
         Welcome to HelpUBuild! 🎉 We're excited to have you on board.`;
+        const AdminMessage = `🔔 New Consultant Registration Alert!
+
+A new consultant has just registered on the HelpUBuild platform. 🎉
+
+👤 Name: ${newProvider.name}  
+📧 Email: ${newProvider.email}  
+📱 Mobile: ${newProvider.mobileNumber} 
+
+Please review the account and proceed with the necessary onboarding steps.
+
+- HelpUBuild Team
+`
         await SendWhatsapp(providerNumber, message);
+        await SendWhatsapp(AdminNum, AdminMessage)
 
         // Send token for authentication
         sendToken(newProvider, res, 201, "Account Created successfully");
