@@ -123,7 +123,7 @@ exports.CreateProvider = async (req, res) => {
         Welcome to HelpUBuild! 🎉 We're excited to have you on board.`;
         const AdminMessage = `🔔 New Consultant Registration Alert!
 
-A new consultant has just registered on the HelpUBuild platform. 🎉
+A new consultant has just registered on the HelpUBuild. 🎉
 
 👤 Name: ${newProvider.name}  
 📧 Email: ${newProvider.email}  
