@@ -440,6 +440,13 @@ a {
   position: relative;
 }
 
+.profile-card .verified-badge{
+  position: absolute;
+  top: 2%;
+  left: 2%;
+  width: 70px;
+}
+
 .profile-card .verified-badge-profile{
   position: absolute;
   top: 10px;
