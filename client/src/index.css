@@ -435,3 +435,14 @@ a {
 .filter-border{
   border: 1px solid #e2e6ea !important;
 }
+
+.profile-card{
+  position: relative;
+}
+
+.profile-card .verified-badge-profile{
+  position: absolute;
+  top: 10px;
+  left: 1%;
+  width: 100px;
+}
