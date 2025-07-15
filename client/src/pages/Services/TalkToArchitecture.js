@@ -11,6 +11,7 @@ import Swal from "sweetalert2"
 import ModelOfPriceAndTime from "./ModelOfPriceAndTime"
 import CallLoader from "./CallLoader"
 import { HiBadgeCheck } from "react-icons/hi"
+import verifiedBadge from './verified1.jpg'
 
 function TalkToArchitect() {
   const [id, setId] = useState(null)
@@ -776,6 +777,8 @@ function TalkToArchitect() {
               {currentProviders &&
                 currentProviders.map((item, index) => (
                   <div className="profile-card" key={index}>
+                    
+                    
                     <div className="left-to-left">
                       <img
                         src={
@@ -790,7 +793,7 @@ function TalkToArchitect() {
                     </div>
                     <div className="left-section">
                       <h5 className="formarginzero">
-                        {item.name ? <Link to={`/architect-profile/${item._id}`}>{item.name}</Link> : "Not Available"} {item.isHelpuBuildVerified && <HiBadgeCheck />}
+                        {item.name ? <Link to={`/architect-profile/${item._id}`}>{item.name}</Link> : "Not Available"} 
                       </h5>
                       <p className="pricing formarginzero">{item?.unique_id ? `ID: ${item?.unique_id}` : ""}</p>
                       <p className="formarginzero">

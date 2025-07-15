@@ -10,6 +10,7 @@ import CallLoader from './CallLoader';
 import ReviewAdd from './ReviewAdd';
 import RatingSummary from './RatingSummary';
 import Swal from 'sweetalert2';
+import verifiedBadge from './verified1.jpg'
 // import { GetData } from '../../utils/sessionStoreage'
 
 function ArchitectProfile() {
@@ -389,7 +390,8 @@ function ArchitectProfile() {
                             </nav>
                         </div>
                     </div>
-                    <div className='container-fluid architecture-section-p rounded'>
+                    <div className='container-fluid architecture-section-p rounded profile-card'>
+                    {profile.isHelpuBuildVerified && <img src={verifiedBadge} className="verified-badge-profile" />}
                         <div className='row prfile-custom-card py-5 align-items-center'>
                             <div className='col-xl-4 col-lg-4 col-md-6 col-12'>
                                 <div className='a-profile-image text-center'>
