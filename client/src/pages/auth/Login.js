@@ -67,7 +67,7 @@ function Login() {
                                     <div className="card-body p-4 p-lg-5 text-black">
                                         <form>
                                             <div className="d-flex align-items-center mb-3 pb-1">
-                                                <span className="h1 fw-bold mb-0 text-white">Login</span>
+                                                <span className="h1 fw-bold mb-0 text-white">Login as a User</span>
                                             </div>
                                             <h5
                                                 className="fw-normal mb-3 pb-3 text-white"
