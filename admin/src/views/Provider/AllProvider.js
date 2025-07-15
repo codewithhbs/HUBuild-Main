@@ -83,7 +83,7 @@ function AllProvider() {
     const handleDelete = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`https://api.helpubuild.in/api/v1/delete-provider/${id}`);
+            await axios.delete(`https://api.helpubuild.in/api/v1/delete-consultant-permanent/${id}`);
             fetchProviders();
             toast.success('Provider deleted successfully!');
         } catch (error) {
