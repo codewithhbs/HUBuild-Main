@@ -777,7 +777,7 @@ function TalkToArchitect() {
               {currentProviders &&
                 currentProviders.map((item, index) => (
                   <div className="profile-card" key={index}>
-                    
+                    {item.isHelpuBuildVerified && <img src={verifiedBadge} className="verified-badge" />}
                     
                     <div className="left-to-left">
                       <img
