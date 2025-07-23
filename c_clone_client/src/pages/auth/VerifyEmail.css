@@ -1,0 +1,9 @@
+.otp-input {
+    border: 2px solid #ced4da;
+    /* border-radius: 8px; */
+    transition: border-color 0.2s ease;
+}
+.otp-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}

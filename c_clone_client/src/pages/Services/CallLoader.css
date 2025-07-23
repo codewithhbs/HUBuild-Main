@@ -1,0 +1,48 @@
+/* Main container */
+.call-loader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #121212;
+    color: #ffffff;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+  }
+  
+  /* Loader Animation */
+  .loader {
+    width: 60px;
+    height: 60px;
+    border: 6px solid rgba(255, 255, 255, 0.3);
+    border-top: 6px solid #00ffaa;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* Call Message */
+  .call-message {
+    font-size: 18px;
+    font-weight: bold;
+    animation: fadeIn 2s ease-in-out infinite alternate;
+  }
+  
+  @keyframes fadeIn {
+    0% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+  
+  /* Highlighted Text */
+  .highlight {
+    color: #00ffaa;
+    font-weight: bold;
+  }
+  

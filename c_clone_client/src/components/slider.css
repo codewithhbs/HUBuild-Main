@@ -1,0 +1,84 @@
+.new_banner{
+    padding-top: 20px;
+    background:#fff;
+    padding-bottom: 2px;
+}
+
+.icon_chat{
+    width: 70px;
+    height: 70px;
+}
+
+.bg-light{
+    background: #e2e6ea!important;
+}
+
+.mobile-view{
+    display: none;
+}
+
+@media screen and (max-width: 768px){
+    .icon_chat{
+        width: 60px;
+        height: 60px;
+    }
+    .fs-12{
+        font-size: 12px;
+        margin-right: 5px;
+    }
+}
+
+@media (max-width:1103px) {
+    .forHeight{
+        height: 153px;
+    }
+    
+}
+
+@media (max-width:767px) {
+    .forHeight{
+        height: 260px;
+    }
+
+    .why_choose_heading{
+        font-size: 22px;
+    }
+    
+}
+
+@media (max-width:789px) {
+    .forHeight{
+        height: 136px;
+    }
+    
+}
+
+@media (max-width:575px) {
+    .mobile-view {
+        display: block !important;
+        margin-top: -5%;
+    }
+
+}
+
+@media (max-width:425px) {
+    .forHeight {
+        height: 130px;
+    }
+    .fs-6 {
+        font-size: 12px !important;
+    }
+    .icon_chat {
+        width: 43px;
+        height: 43px;
+    }
+    .as_menu_wrapper {
+        padding: 0px 10px;
+    }
+}
+
+@media (max-width:373px) {
+    .forHeight {
+        height: 140px;
+    }
+}

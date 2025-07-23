@@ -1,0 +1,80 @@
+.service-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .service-inputs {
+    flex-grow: 1;
+    display: grid;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .input-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .form-control {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  
+  .form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+  
+  .form-check-input {
+    width: 18px;
+    height: 18px;
+    margin-top: 3px;
+  }
+  
+  .form-check-label {
+    font-size: 16px;
+    font-weight: 500;
+    margin-left: 8px;
+  }
+  
+  .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    padding: 10px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary:hover:not(:disabled) {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    transform: translateY(-1px);
+  }
+  
+  .btn-primary:disabled {
+    background-color: #ccc;
+    border-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  @media (max-width: 768px) {
+    .service-card {
+      margin-bottom: 20px;
+    }
+  }
+  
+  
+  input[readonly] {
+    cursor: not-allowed;
+    background-color: #f8f9fa;
+  }
+  
