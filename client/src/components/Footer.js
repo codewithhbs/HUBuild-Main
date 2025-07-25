@@ -69,7 +69,7 @@ const Footer = () => {
       setEmail('');
     } catch (error) {
       console.log("Internal server error", error);
-      toast.error('Something went wrong');
+      toast.error(error.response?.data?.message || "Failed to subscribe to newsletter");
     }
   };
 
