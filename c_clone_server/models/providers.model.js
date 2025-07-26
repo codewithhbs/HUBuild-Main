@@ -292,7 +292,23 @@ const ProviderProfileSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    chatRoomIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ChatAndPayment' }]
+    chatRoomIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ChatAndPayment' }],
+    termAndCondition: {
+        type: Boolean,
+        default: false
+    },
+    nda: {
+        type: Boolean,
+        default: false
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    isHelpuBuildVerified: {
+        type: Boolean,
+        default: false
+    }
 });
 
 // Password hashing

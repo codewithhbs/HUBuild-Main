@@ -29,7 +29,7 @@ const AddRechargeCoupon = () => {
 
     setLoading(true);
     try {
-      const res = await axios.post('https://api.helpubuild.in/api/v1/create_recharge_coupon', couponData);
+      const res = await axios.post('https://www.testapi.helpubuild.in/api/v1/create_recharge_coupon', couponData);
       toast.success(res.data.message || 'Coupon added successfully');
       setCouponData({ couponCode: '', discount: '' });
     } catch (error) {

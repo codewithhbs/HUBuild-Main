@@ -25,7 +25,7 @@ const EConsultantTerm = () => {
 
     setLoading(true);
     try {
-      const { data } = await axios.get(`https://api.helpubuild.in/api/v1/single_term/${termType}`);
+      const { data } = await axios.get(`https://www.testapi.helpubuild.in/api/v1/single_term/${termType}`);
       setText(data?.data?.text || '');
       setType(data?.data?.type || '');
       setId(data?.data?._id || null);
@@ -89,7 +89,7 @@ const EConsultantTerm = () => {
 
     setLoading(true);
     try {
-      await axios.put(`https://api.helpubuild.in/api/v1/update_term/${id}`, {
+      await axios.put(`https://www.testapi.helpubuild.in/api/v1/update_term/${id}`, {
         text: currentText,
         type: typse
       });

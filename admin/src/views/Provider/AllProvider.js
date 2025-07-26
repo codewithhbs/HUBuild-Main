@@ -43,7 +43,7 @@ function AllProvider() {
     const fetchProviders = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('https://api.helpubuild.in/api/v1/get-all-provider');
+            const { data } = await axios.get('https://www.testapi.helpubuild.in/api/v1/get-all-provider');
             setProviders(data.data.reverse() || []);
         } catch (error) {
             console.error('Error fetching provider:', error);
@@ -60,7 +60,7 @@ function AllProvider() {
         try {
             const updatedStatus = !currentStatus;
             const res = await axios.put(
-                `https://api.helpubuild.in/api/v1/update-provider-isbanned/${id}`,
+                `https://www.testapi.helpubuild.in/api/v1/update-provider-isbanned/${id}`,
                 { isBanned: updatedStatus }
             );
             fetchProviders();
@@ -83,7 +83,7 @@ function AllProvider() {
     const handleDelete = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`https://api.helpubuild.in/api/v1/delete-consultant-permanent/${id}`);
+            await axios.delete(`https://www.testapi.helpubuild.in/api/v1/delete-consultant-permanent/${id}`);
             fetchProviders();
             toast.success('Provider deleted successfully!');
         } catch (error) {
@@ -128,7 +128,7 @@ function AllProvider() {
 
         try {
             const res = await axios.put(
-                `https://api.helpubuild.in/api/v1/provider_verify/${providerId}`,
+                `https://www.testapi.helpubuild.in/api/v1/provider_verify/${providerId}`,
                 { accountVerified: status, verificationRejectReason }
             );
 
@@ -163,7 +163,7 @@ function AllProvider() {
         try {
             const updatedStatus = !currentStatus;
             const res = await axios.put(
-                `https://api.helpubuild.in/api/v1/verified-provider/${id}`,
+                `https://www.testapi.helpubuild.in/api/v1/verified-provider/${id}`,
                 { isHelpuBuildVerified: updatedStatus }
             );
             toast.success(res?.data?.message || "Status updated successfully!");

@@ -34,7 +34,7 @@ const Footer = () => {
 
   const getAllTermForFooter = async () => {
     try {
-      const { data } = await axios.get('https://testapi.helpubuild.in/api/v1/all_term');
+      const { data } = await axios.get('https://www.testapi.helpubuild.in/api/v1/all_term');
       console.log('All Terms for Footer:', data);
       if (data?.data?.length > 0) {
         const terms = data.data.map((item) => ({
@@ -64,7 +64,7 @@ const Footer = () => {
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('https://testapi.helpubuild.in/api/v1/create_newletter', { email });
+      const res = await axios.post('https://www.testapi.helpubuild.in/api/v1/create_newletter', { email });
       toast.success(res.data.message);
       setEmail('');
     } catch (error) {

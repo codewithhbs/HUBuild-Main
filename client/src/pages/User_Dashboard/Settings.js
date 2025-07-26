@@ -45,7 +45,7 @@ const Settings = () => {
       if (!token) return;
       setLoading(true);
       try {
-        const { data } = await axios.get(`https://api.helpubuild.in/api/v1/get-single-provider/${providerId}`);
+        const { data } = await axios.get(`https://www.testapi.helpubuild.in/api/v1/get-single-provider/${providerId}`);
         // console.log(data)
         setMyProfile(data.data);
         // setMobileNumber(data.data.mobileNumber)
@@ -113,7 +113,7 @@ const Settings = () => {
   // Function to send OTP
   const sendOtp = async () => {
     try {
-      const response = await axios.post('https://api.helpubuild.in/api/v1/otp_send_before_update', { mobileNumber });
+      const response = await axios.post('https://www.testapi.helpubuild.in/api/v1/otp_send_before_update', { mobileNumber });
       if (response.data.success) {
         setOtpSent(true);
         setTimeout(() => {
@@ -131,7 +131,7 @@ const Settings = () => {
   // Function to verify OTP
   const verifyOtp = async () => {
     try {
-      const response = await axios.post('https://api.helpubuild.in/api/v1/verify_otp_before_update', { mobileNumber, otp });
+      const response = await axios.post('https://www.testapi.helpubuild.in/api/v1/verify_otp_before_update', { mobileNumber, otp });
       if (response.data.success) {
         setIsOtpVerified(true);
         setActiveTab(3); // Open BankDetail after OTP verification

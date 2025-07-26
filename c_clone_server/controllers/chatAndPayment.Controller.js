@@ -28,12 +28,40 @@ exports.createChatWithNew = async (req, res) => {
         const room = `${userId}_${providerId}`
         const check = await ChatAndPayment.findOne({ room: room })
         if (check) {
+            if(check.userChatTempDeleted === true && check.providerChatTempDeleted === true){
+                check.userChatTempDeleted = false;
+                check.providerChatTempDeleted = false;
+                await check.save();
+                return res.status(201).json({
+                    success: true,
+                    message: 'New chat created successfully',
+                    data: check
+                })
+            }
             return res.status(400).json({
                 success: false,
                 message: 'Chat is already started. Check Your chat room.',
                 error: 'Chat is already started. Check Your chat room.'
             })
         }
+
+        const provider = await Provider.findById(providerId)
+        if (!provider) {
+            return res.status(400).json({
+                success: false,
+                message: 'Provider not found',
+                error: 'Provider not found'
+            })
+        }
+
+        if(provider?.isBanned === true){
+            return res.status(400).json({
+                success: false,
+                message: 'Provider is blocked',
+                error: 'Provider is blocked'
+            })
+        }
+
         const newChat = new ChatAndPayment({
             userId,
             providerId,
@@ -344,6 +372,7 @@ exports.deleteMessageFromRoom = async (req, res) => {
             //     });
             // } else {
             findChat.deleteByUser = true;
+            findChat.userChatTempDeleted = true;
             findChat.deletedDateByUser = new Date();
             await findChat.save();
             return res.status(200).json({
@@ -369,6 +398,7 @@ exports.deleteMessageFromRoom = async (req, res) => {
             //     });
             // } else {
             findChat.deleteByProvider = true;
+            findChat.providerChatTempDeleted = true;
             findChat.deletedDateByProvider = new Date();
             await findChat.save();
             return res.status(200).json({

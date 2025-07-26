@@ -3,12 +3,15 @@ const { uploadToCloudinary, deleteImageFromCloudinary, uploadImage } = require('
 
 exports.createBlog = async (req, res) => {
     try {
-        const { title, content, } = req.body;
+        const { title, content, smallDesc } = req.body;
         if (!title) {
             return res.status(400).json({ message: "Title is required" })
         }
         if (!content) {
             return res.status(400).json({ message: "Content is required" })
+        }
+        if (!smallDesc) {
+            return res.status(400).json({ message: "Small Description is required" })
         }
         if (!req.files) {
             return res.status(400).json({
@@ -32,6 +35,7 @@ exports.createBlog = async (req, res) => {
         const blog = new Blog({
             title,
             content,
+            smallDesc,
             image: {
                 url: Images.smallImage.imageUrl,
                 public_id: Images.smallImage.public_id
@@ -138,38 +142,40 @@ exports.updateBlog = async (req, res) => {
     try {
         const { id } = req.params;
         const blogs = await Blog.findById(id)
-        const {title, content} = req.body;
+        const { title, content, smallDesc } = req.body;
+        console.log("title, content, smallDesc",title, content, smallDesc)
         if (!blogs) {
             return res.status(400).json({
                 success: false,
                 message: "Blog not found",
             })
         }
-        if(title) blogs.title = title;
-        if(content) blogs.content = content;
-        if(req.files){
+        if (title) blogs.title = title;
+        if (content) blogs.content = content;
+        if (smallDesc) blogs.smallDesc = smallDesc;
+        if (req.files) {
             const { image, largeImage } = req.files;
-            if(image){
-                if(blogs?.image?.public_id){
+            if (image) {
+                if (blogs?.image?.public_id) {
                     await deleteImageFromCloudinary(blogs.image.public_id)
                 }
-                const {imageUrl,public_id} = await uploadToCloudinary(image[0].buffer)
-                blogs.image = {public_id, url:imageUrl}
+                const { imageUrl, public_id } = await uploadToCloudinary(image[0].buffer)
+                blogs.image = { public_id, url: imageUrl }
             }
-            if(largeImage){
-                if(blogs?.largeImage?.public_id){
+            if (largeImage) {
+                if (blogs?.largeImage?.public_id) {
                     await deleteImageFromCloudinary(blogs.largeImage.public_id)
                 }
                 // await deleteImageFromCloudinary(blogs?.largeImage?.public_id)
-                const {imageUrl,public_id} = await uploadToCloudinary(largeImage[0].buffer)
-                blogs.largeImage = {public_id, url:imageUrl}
+                const { imageUrl, public_id } = await uploadToCloudinary(largeImage[0].buffer)
+                blogs.largeImage = { public_id, url: imageUrl }
             }
         }
         await blogs.save()
         res.status(200).json({
             success: true,
             message: "Blog updated successfully",
-            data:blogs
+            data: blogs
         })
     } catch (error) {
         console.log("Internal server error in updating blog", error)

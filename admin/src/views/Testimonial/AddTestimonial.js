@@ -41,7 +41,7 @@ function AddTestimonial() {
 
         setLoading(true);
         try {
-            const res = await axios.post('https://api.helpubuild.in/api/v1/create-testimonial', payload, {
+            const res = await axios.post('https://www.testapi.helpubuild.in/api/v1/create-testimonial', payload, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             toast.success(res.data.message);

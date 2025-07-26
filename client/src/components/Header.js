@@ -21,7 +21,7 @@ const Header = () => {
   const [scrollValue, setScrollValue] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  
+
   const location = useLocation();
   const [active, setActive] = useState(location.pathname);
 
@@ -64,7 +64,7 @@ const Header = () => {
     const isAuthenticatedValue = GetData('islogin');
     const convertToBoolean = Boolean(isAuthenticatedValue);
     setFindToken(GetData('token'));
-    
+
     setSessionData(prevState => ({
       ...prevState,
       isAuthenticated: convertToBoolean
@@ -90,13 +90,13 @@ const Header = () => {
     const UserData = JSON.parse(Data);
 
     if (!UserData) {
-      return 
+      return
     }
 
     try {
       const url = UserData?.role === "provider"
-        ? `https://api.helpubuild.in/api/v1/get-chat-by-providerId/${UserData._id}`
-        : `https://api.helpubuild.in/api/v1/get-chat-by-userId/${UserData._id}`;
+        ? `https://www.testapi.helpubuild.in/api/v1/get-chat-by-providerId/${UserData._id}`
+        : `https://www.testapi.helpubuild.in/api/v1/get-chat-by-userId/${UserData._id}`;
 
       const { data } = await axios.get(url);
       const fullData = data.data;
@@ -131,7 +131,7 @@ const Header = () => {
     }
 
     try {
-      const url = `https://api.helpubuild.in/api/v1/mark-${UserData.role}-chats-as-read/${UserData._id}`;
+      const url = `https://www.testapi.helpubuild.in/api/v1/mark-${UserData.role}-chats-as-read/${UserData._id}`;
       await axios.put(url);
     } catch (error) {
       console.log("Internal server error", error);
@@ -159,7 +159,7 @@ const Header = () => {
             return;
           }
 
-          const res = await axios.post(`https://api.helpubuild.in/api/v1/buy_membership/${providerId}`);
+          const res = await axios.post(`https://www.testapi.helpubuild.in/api/v1/buy_membership/${providerId}`);
           const order = res.data.data.razorpayOrder;
           const amount = res.data.data.discountAmount;
           const providerData = res.data.data.provider;
@@ -172,7 +172,7 @@ const Header = () => {
               name: "Help U Build",
               description: "Buying Membership",
               order_id: order.id,
-              callback_url: "https://api.helpubuild.in/api/v1/membership_payment_verify",
+              callback_url: "https://www.testapi.helpubuild.in/api/v1/membership_payment_verify",
               prefill: {
                 name: providerData.name,
                 email: providerData.email,
@@ -210,9 +210,9 @@ const Header = () => {
         <div className="container-fluid">
           {/* Logo */}
           <Link className="navbar-brand hub-header__brand" to="/" onClick={handleLinkClick}>
-            <img 
-              src={logo || "/placeholder.svg"} 
-              alt="Help U Build" 
+            <img
+              src={logo || "/placeholder.svg"}
+              alt="Help U Build"
               className="hub-header__logo"
             />
           </Link>
@@ -286,8 +286,8 @@ const Header = () => {
               <li className="nav-item hub-header__nav-item hub-header__auth-item">
                 {findToken ? (
                   <Link
-                    to={sessionData?.user?.role === 'provider' 
-                      ? `/profile?role=${sessionData.role}` 
+                    to={sessionData?.user?.role === 'provider'
+                      ? `/profile?role=${sessionData.role}`
                       : `/user-profile`}
                     className="btn hub-header__profile-btn"
                     onClick={handleLinkClick}
@@ -296,32 +296,32 @@ const Header = () => {
                     Profile
                   </Link>
                 ) : (
-                <div className="dropdown">
-  <button
-    className="btn btn-primary dropdown-toggle custombutton"
-    type="button"
-    id="loginDropdown"
-    data-bs-toggle="dropdown"
-    aria-expanded="false"
-  >
-    Login
-  </button>
+                  <div className="dropdown">
+                    <button
+                      className="btn btn-primary dropdown-toggle custombutton"
+                      type="button"
+                      id="loginDropdown"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      Login
+                    </button>
 
-  <ul className="dropdown-menu" aria-labelledby="loginDropdown">
-    <li>
-      <a className="dropdown-item" href="/login">
-        <i className="fas fa-user me-2"></i>
-        Login as User
-      </a>
-    </li>
-    <li>
-      <a className="dropdown-item" href="/partner-login">
-        <i className="fas fa-handshake me-2"></i>
-        Login as Partner
-      </a>
-    </li>
-  </ul>
-</div>
+                    <ul className="dropdown-menu" aria-labelledby="loginDropdown">
+                      <li>
+                        <a className="dropdown-item" href="/login">
+                          <i className="fas fa-user me-2"></i>
+                          Login as User
+                        </a>
+                      </li>
+                      <li>
+                        <a className="dropdown-item" href="/partner-login">
+                          <i className="fas fa-handshake me-2"></i>
+                          Login as Partner
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
 
                 )}
               </li>

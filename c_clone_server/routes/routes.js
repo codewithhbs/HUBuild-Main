@@ -1,7 +1,7 @@
 const express = require('express');
 const { registeruser, getAllUsers, getSingleUserById, updateProfile, login, logout, deleteAccount, banUserToggle, verifyEmail, resendOtp, forgotPassword, getUserById, createPayment, PaymentVerify, getSingleUser, updateUserPassword, getTotalRechargeAmount, Changepassword, getDetailForVerification, updateUserProfileImage, getAllUser } = require('../controllers/user.Controller');
 const { protect } = require('../middlewares/Protect');
-const { CreateProvider, GetMyProfile, addPortfolio, getAllProvider, getSingleProvider, updateProvider, updateDocuments, updatePassword, updateAvailable, updateBankDetail, updateIsBanned, deleteprovider, accountVerification, getProviderStatus, sendOtpForUpdateDetail, verifyOtpForUpdateDetail, changeProviderNumber, verifyOtpForChangeNumber, updateProfileImage, changeProviderDeactiveStatus } = require('../controllers/provider.controller');
+const { CreateProvider, GetMyProfile, addPortfolio, getAllProvider, getSingleProvider, updateProvider, updateDocuments, updatePassword, updateAvailable, updateBankDetail, updateIsBanned, deleteprovider, accountVerification, getProviderStatus, sendOtpForUpdateDetail, verifyOtpForUpdateDetail, changeProviderNumber, verifyOtpForChangeNumber, updateProfileImage, changeProviderDeactiveStatus, helpubuildverified, deleteConsultantPermanent } = require('../controllers/provider.controller');
 const multer = require('multer');
 const { getAllChat } = require('../controllers/ChatController');
 const { createReview, getAllReview, getReviewByProviderId } = require('../controllers/review.Controller');
@@ -24,6 +24,7 @@ const { createNewsLetter, getAllNewsLetter, deleteNewsLetter, getSingleNewsLette
 const { createExpertise, getAllExpertise, getSingleExpertise, updateExpertise, deleteExpertise } = require('../controllers/expertise.controller');
 const { createTerm, getTerm, singleTerm, updateTerm } = require('../controllers/termAndCondition');
 const { createContact, getAllContacts, updateContact, deleteContact, addNote } = require('../controllers/contactController');
+const { createRechargeCoupon, getAllRechargeCoupons, getSingleRechargeCoupon, updateRechargeCoupon, deleteRechargeCoupon, checkCouponIsExist } = require('../controllers/rechargeCoupon.controller');
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 const router = express.Router();
@@ -95,7 +96,8 @@ router.post('/addPortfolio', protect, (req, res, next) => {
         }
         next();
     });
-}, addPortfolio)
+}, addPortfolio);
+router.put('/verified-provider/:id',helpubuildverified)
 router.get('/get-all-provider', getAllProvider)
 router.delete('/delete-provider/:id', deleteprovider)
 
@@ -193,6 +195,7 @@ router.get('/get-all-chat', getAllChat)
 router.delete('/delete_chat_bt_room/:chatRoomId', deleteChatByRoom)
 router.patch('/update-provider-deactive-status/:id', changeProviderDeactiveStatus)
 router.delete('/delete-messages-by-room/:chatRoomId', deleteMessageFromRoom)
+router.delete('/delete-consultant-permanent/:id', deleteConsultantPermanent)
 
 // recharge route here 
 router.post('/create-payment/:userId', createPayment);
@@ -308,5 +311,14 @@ router.delete('/delete-contact/:id', deleteContact);
 
 
 router.post('/create_call_for_free', createCallFreeModule)
+
+// recharge coupon routes 
+
+router.post('/create_recharge_coupon', createRechargeCoupon)
+router.get('/all_recharge_coupon', getAllRechargeCoupons)
+router.get('/recharge_coupon/:id', getSingleRechargeCoupon)
+router.put('/update_recharge_coupon/:id', updateRechargeCoupon)
+router.delete('/delete_recharge_coupon/:id', deleteRechargeCoupon)
+router.post('/check_coupon', checkCouponIsExist);
 
 module.exports = router;

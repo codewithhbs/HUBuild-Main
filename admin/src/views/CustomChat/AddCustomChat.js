@@ -69,7 +69,7 @@ const AddCustomChat = () => {
 
     const handleFetchProvider = async () => {
         try {
-            const { data } = await axios.get("https://api.helpubuild.in/api/v1/get-all-provider");
+            const { data } = await axios.get("https://www.testapi.helpubuild.in/api/v1/get-all-provider");
             const allData = data.data;
             const architects = allData.filter((item) => item.type === "Architect");
             const interiors = allData.filter((item) => item.type === "Interior");
@@ -83,7 +83,7 @@ const AddCustomChat = () => {
 
     const handleFetchUser = async () => {
         try {
-            const { data } = await axios.get("https://api.helpubuild.in/api/v1/get-all-user");
+            const { data } = await axios.get("https://www.testapi.helpubuild.in/api/v1/get-all-user");
             const allData = data.data;
             setUsers(allData);
         } catch (error) {
@@ -209,7 +209,7 @@ const AddCustomChat = () => {
 
         setLoading(true);
         try {
-            const res = await axios.post("https://api.helpubuild.in/api/v1/create_manual_chat_room", formData);
+            const res = await axios.post("https://www.testapi.helpubuild.in/api/v1/create_manual_chat_room", formData);
             toast.success("Chat room created successfully!");
 
             // Reset form

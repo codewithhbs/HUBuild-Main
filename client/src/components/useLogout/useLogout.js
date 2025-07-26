@@ -7,7 +7,7 @@ const useLogout = (id) => {
     const logout = async () => {
         try {
             // Call backend to clear the cookie
-            await axios.get(`https://api.helpubuild.in/api/v1/universal_logout/${id}`);
+            await axios.get(`https://www.testapi.helpubuild.in/api/v1/universal_logout/${id}`);
 
             // Clear localStorage
             localStorage.clear();

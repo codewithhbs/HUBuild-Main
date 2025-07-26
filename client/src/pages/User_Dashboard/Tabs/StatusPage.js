@@ -17,7 +17,7 @@ function StatusPage() {
     const handleFetchProvider = async () => {
         try {
             const { data } = await axios.get(
-                `https://api.helpubuild.in/api/v1/get-single-provider/${providerId}`
+                `https://www.testapi.helpubuild.in/api/v1/get-single-provider/${providerId}`
             );
             const allData = data.data;
             setStatuses({
@@ -42,7 +42,7 @@ function StatusPage() {
 
         try {
             const response = await axios.put(
-                `https://api.helpubuild.in/api/v1/update-available-status/${providerId}`,
+                `https://www.testapi.helpubuild.in/api/v1/update-available-status/${providerId}`,
                 { [statusType]: updatedStatus }
             );
             if (response.data.success) {

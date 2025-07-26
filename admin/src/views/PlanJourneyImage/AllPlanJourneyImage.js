@@ -22,7 +22,7 @@ function AllPlanJourneyImage() {
     const handleFetchBanner = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('https://api.helpubuild.in/api/v1/get-all-plan-journey-image');
+            const { data } = await axios.get('https://www.testapi.helpubuild.in/api/v1/get-all-plan-journey-image');
             setBanners(data.data || []); // Ensure default empty array
         } catch (error) {
             console.error('Error fetching images:', error);
@@ -38,7 +38,7 @@ function AllPlanJourneyImage() {
         // console.log("i am hit",currentStatus)
         try {
             const updatedStatus = !currentStatus;
-            await axios.put(`https://api.helpubuild.in/api/v1/update-plan-banner-status/${id}`, {
+            await axios.put(`https://www.testapi.helpubuild.in/api/v1/update-plan-banner-status/${id}`, {
                 active: updatedStatus,
             });
 
@@ -67,7 +67,7 @@ function AllPlanJourneyImage() {
     const handleDeleteBanner = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`https://api.helpubuild.in/api/v1/delete-plan-journey-image/${id}`);
+            await axios.delete(`https://www.testapi.helpubuild.in/api/v1/delete-plan-journey-image/${id}`);
             setBanners((prevBanners) => prevBanners.filter((banner) => banner._id !== id));
             toast.success('Image deleted successfully!');
         } catch (error) {

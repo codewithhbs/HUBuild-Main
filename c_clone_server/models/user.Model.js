@@ -76,19 +76,15 @@ const userSchema = new mongoose.Schema({
     },
     rechargeHistory: [
         {
-            amount: { type: Number },
-            time: { type: String },
-
-            transactionId: {
-                type: String
-            },
-            PaymentStatus: {
-                type: String,
-                default: 'pending'
-            },
-            paymentMethod: {
-                type: String
-            },
+            baseAmount: { type: Number }, // actual paid
+            bonusAmount: { type: Number }, // from coupon
+            totalCredited: { type: Number }, // base + bonus
+            time: { type: String }, // timestamp
+            transactionId: { type: String },
+            paymentStatus: { type: String, default: 'pending' },
+            paymentMethod: { type: String },
+            couponCode: { type: String, default: null },
+            couponDiscount: { type: Number, default: 0 }, // percentage
         },
     ],
     razorpayOrderId: {
@@ -114,6 +110,14 @@ const userSchema = new mongoose.Schema({
     loginStatus: {
         type: Boolean,
         default: true
+    },
+    rechargeCoupon: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'RechargeCoupon'
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
     },
     chatRoomIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ChatAndPayment' }]
 }, { timestamps: true });

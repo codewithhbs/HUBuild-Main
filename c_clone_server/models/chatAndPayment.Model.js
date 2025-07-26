@@ -92,7 +92,15 @@ const ChatAndPaymentSchema = new mongoose.Schema({
     isGroupChatEnded: {
         type: Boolean,
         default: false
-    }
+    },
+    userChatTempDeleted: {
+        type: Boolean,
+        default: false
+    },
+    providerChatTempDeleted: {
+        type: Boolean,
+        default: false
+    },
 }, { timestamps: true })
 
 const ChatAndPayment = mongoose.model('ChatAndPayment', ChatAndPaymentSchema)

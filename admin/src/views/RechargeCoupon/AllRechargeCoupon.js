@@ -21,7 +21,7 @@ const AllRechargeCoupon = () => {
   const fetchCoupons = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get('https://api.helpubuild.in/api/v1/all_recharge_coupon');
+      const { data } = await axios.get('https://www.testapi.helpubuild.in/api/v1/all_recharge_coupon');
       setCoupons(data.data.reverse() || []);
     } catch (error) {
       console.error('Error fetching coupons:', error);
@@ -34,7 +34,7 @@ const AllRechargeCoupon = () => {
   const deleteCoupon = async (id) => {
     setLoading(true);
     try {
-      await axios.delete(`https://api.helpubuild.in/api/v1/delete_recharge_coupon/${id}`);
+      await axios.delete(`https://www.testapi.helpubuild.in/api/v1/delete_recharge_coupon/${id}`);
       fetchCoupons();
       toast.success('Coupon deleted successfully!');
     } catch (error) {

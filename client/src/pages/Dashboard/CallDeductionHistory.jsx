@@ -18,7 +18,7 @@ const CallDeductionHistory = () => {
         setLoading(true);
         try {
             const userId = UserData._id;
-            const { data } = await axios.get(`https://api.helpubuild.in/api/v1/get-call-by-user/${userId}`)
+            const { data } = await axios.get(`https://www.testapi.helpubuild.in/api/v1/get-call-by-user/${userId}`)
             console.log("data.data", data.data)
             setData(data.data.reverse());
             setLoading(false);

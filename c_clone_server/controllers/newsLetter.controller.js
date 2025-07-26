@@ -10,6 +10,17 @@ exports.createNewsLetter = async (req, res) => {
                 message: "Email is required"
             })
         }
+
+	const existingNewsletter = await NewsLetter.findOne({ email });
+
+    if (existingNewsletter) {
+      return res.status(400).json({
+        success: false,
+        message: "Email already registered",
+      });
+    }
+
+
         const newsLetter = new NewsLetter({
             email: email
         })

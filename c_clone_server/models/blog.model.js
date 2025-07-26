@@ -29,6 +29,10 @@ const BlogSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    smallDesc: {
+        type: String,
+        required: true
+    },
     writer: {
         type: String,
         default: "Admin"
