@@ -22,7 +22,7 @@ const AllInquiry = () => {
     const fetchContacts = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('https://www.testapi.helpubuild.in/api/v1/get-contact');
+            const { data } = await axios.get('https://api.helpubuild.in/api/v1/get-contact');
             setContacts(data.data || []);
         } catch (error) {
             console.error('Error fetching contacts:', error);
@@ -40,7 +40,7 @@ const AllInquiry = () => {
     const handleUpdateStatus = async (id, status) => {
         setLoading(true);
         try {
-            const res = await axios.put(`https://www.testapi.helpubuild.in/api/v1/update-contact/${id}`, { status });
+            const res = await axios.put(`https://api.helpubuild.in/api/v1/update-contact/${id}`, { status });
             setContacts((prev) =>
                 prev.map((contact) =>
                     contact._id === id ? { ...contact, status } : contact
@@ -71,7 +71,7 @@ const AllInquiry = () => {
         if (note) {
             setLoading(true);
             try {
-                const res = await axios.put(`https://www.testapi.helpubuild.in/api/v1/add-note/${id}`, { note });
+                const res = await axios.put(`https://api.helpubuild.in/api/v1/add-note/${id}`, { note });
                 setContacts((prev) =>
                     prev.map((contact) =>
                         contact._id === id
@@ -95,7 +95,7 @@ const AllInquiry = () => {
     const handleDeleteContact = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`https://www.testapi.helpubuild.in/api/v1/delete-contact/${id}`);
+            await axios.delete(`https://api.helpubuild.in/api/v1/delete-contact/${id}`);
             setContacts((prev) => prev.filter((contact) => contact._id !== id));
             toast.success('Contact deleted successfully!');
         } catch (error) {

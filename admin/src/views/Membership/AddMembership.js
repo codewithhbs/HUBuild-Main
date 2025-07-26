@@ -25,7 +25,7 @@ const AddMembership = () => {
 
         setLoading(true);
         try {
-            const res = await axios.post('https://www.testapi.helpubuild.in/api/v1/create_membership', { planPrice });
+            const res = await axios.post('https://api.helpubuild.in/api/v1/create_membership', { planPrice });
             toast.success(res.data.message);
             setPlanPrice('');
         } catch (error) {

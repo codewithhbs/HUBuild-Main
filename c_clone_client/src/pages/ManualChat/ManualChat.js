@@ -29,7 +29,7 @@ import { Modal, Dropdown } from "react-bootstrap"
 import "bootstrap/dist/css/bootstrap.min.css"
 import CanvasDraw from "react-canvas-draw"
 
-const ENDPOINT = "https://www.testapi.helpubuild.in/"
+const ENDPOINT = "https://api.helpubuild.in/"
 const MAX_FILE_SIZE = 5 * 1024 * 1024
 
 const ManualChat = () => {

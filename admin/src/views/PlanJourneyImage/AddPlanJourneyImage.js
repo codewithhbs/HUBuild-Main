@@ -28,7 +28,7 @@ function AddPlanJourneyImage() {
 
         setLoading(true);
         try {
-            const res = await axios.post('https://www.testapi.helpubuild.in/api/v1/create-plan-journey-image', payload, {
+            const res = await axios.post('https://api.helpubuild.in/api/v1/create-plan-journey-image', payload, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             toast.success('Image added successfully!');

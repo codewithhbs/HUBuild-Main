@@ -74,7 +74,7 @@ const EditCustomChat = () => {
 
     const handleFetchSingleCustomChat = async () => {
         try {
-            const { data } = await axios.get(`https://www.testapi.helpubuild.in/api/v1/get-chat-by-id/${id}`);
+            const { data } = await axios.get(`https://api.helpubuild.in/api/v1/get-chat-by-id/${id}`);
             const chatData = data.data;
             setChatRoomData(chatData);
 
@@ -141,7 +141,7 @@ const EditCustomChat = () => {
     };
     const handleFetchProvider = async () => {
         try {
-            const { data } = await axios.get("https://www.testapi.helpubuild.in/api/v1/get-all-provider");
+            const { data } = await axios.get("https://api.helpubuild.in/api/v1/get-all-provider");
             const allData = data.data;
             const architects = allData.filter((item) => item.type === "Architect");
             const interiors = allData.filter((item) => item.type === "Interior");
@@ -269,7 +269,7 @@ const EditCustomChat = () => {
         setLoading(true);
         try {
             // Use the provided updateManualChatRoom endpoint
-            const res = await axios.put(`https://www.testapi.helpubuild.in/api/v1/manual-chat-room/${id}`, {
+            const res = await axios.put(`https://api.helpubuild.in/api/v1/manual-chat-room/${id}`, {
                 providerIds: formData.providerIds,
                 groupName: formData.groupName,
                 userId: formData.userId,

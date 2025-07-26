@@ -16,7 +16,7 @@ const Home = () => {
 
   const handleFetchTestimonial = async () => {
     try {
-      const { data } = await axios.get('https://www.testapi.helpubuild.in/api/v1/get-all-testimonial');
+      const { data } = await axios.get('https://api.helpubuild.in/api/v1/get-all-testimonial');
       setTestimonials(data.data)
     } catch (error) {
       console.log("Internal server errro", error)

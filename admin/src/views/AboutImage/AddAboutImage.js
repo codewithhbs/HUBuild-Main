@@ -28,7 +28,7 @@ function AddAboutImage() {
 
     setLoading(true);
     try {
-      const res = await axios.post('https://www.testapi.helpubuild.in/api/v1/create-about-image', payload, {
+      const res = await axios.post('https://api.helpubuild.in/api/v1/create-about-image', payload, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       toast.success('Image added successfully!');
