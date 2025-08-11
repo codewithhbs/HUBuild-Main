@@ -21,7 +21,7 @@ const EditAdminCoupon = () => {
     // Fetch admin coupon details
     const fetchCouponDetails = async () => {
         try {
-            const { data } = await axios.get(`https://api.helpubuild.in/api/v1/admin_coupon/${id}`);
+            const { data } = await axios.get(`https://api.dessobuild.com/api/v1/admin_coupon/${id}`);
             setCouponCode(data.data.couponCode);
             setDiscount(data.data.discount);
         } catch (error) {
@@ -45,7 +45,7 @@ const EditAdminCoupon = () => {
 
         setLoading(true);
         try {
-            const res = await axios.put(`https://api.helpubuild.in/api/v1/update_admin_coupon/${id}`, {
+            const res = await axios.put(`https://api.dessobuild.com/api/v1/update_admin_coupon/${id}`, {
                 couponCode,
                 discount
             });

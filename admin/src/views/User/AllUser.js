@@ -32,7 +32,7 @@ function AllUser() {
   const handleFetchUsers = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get('https://api.helpubuild.in/api/v1/users', {
+      const { data } = await axios.get('https://api.dessobuild.com/api/v1/users', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -53,7 +53,7 @@ function AllUser() {
   const handleUpdateActive = async (id, currentStatus) => {
     setLoading(true);
     try {
-      const res = await axios.put(`https://api.helpubuild.in/api/v1/user-ban/${id}`, {
+      const res = await axios.put(`https://api.dessobuild.com/api/v1/user-ban/${id}`, {
         isBanned: !currentStatus,
       });
       handleFetchUsers();
@@ -89,7 +89,7 @@ function AllUser() {
   const handleDeleteUser = async (id) => {
     setLoading(true);
     try {
-      await axios.delete(`https://api.helpubuild.in/api/v1/user-delete/${id}`);
+      await axios.delete(`https://api.dessobuild.com/api/v1/user-delete/${id}`);
       handleFetchUsers();
       toast.success('User deleted successfully!');
     } catch (error) {

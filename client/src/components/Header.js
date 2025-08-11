@@ -95,8 +95,8 @@ const Header = () => {
 
     try {
       const url = UserData?.role === "provider"
-        ? `https://api.helpubuild.in/api/v1/get-chat-by-providerId/${UserData._id}`
-        : `https://api.helpubuild.in/api/v1/get-chat-by-userId/${UserData._id}`;
+        ? `https://api.dessobuild.com/api/v1/get-chat-by-providerId/${UserData._id}`
+        : `https://api.dessobuild.com/api/v1/get-chat-by-userId/${UserData._id}`;
 
       const { data } = await axios.get(url);
       const fullData = data.data;
@@ -131,7 +131,7 @@ const Header = () => {
     }
 
     try {
-      const url = `https://api.helpubuild.in/api/v1/mark-${UserData.role}-chats-as-read/${UserData._id}`;
+      const url = `https://api.dessobuild.com/api/v1/mark-${UserData.role}-chats-as-read/${UserData._id}`;
       await axios.put(url);
     } catch (error) {
       console.log("Internal server error", error);
@@ -159,7 +159,7 @@ const Header = () => {
             return;
           }
 
-          const res = await axios.post(`https://api.helpubuild.in/api/v1/buy_membership/${providerId}`);
+          const res = await axios.post(`https://api.dessobuild.com/api/v1/buy_membership/${providerId}`);
           const order = res.data.data.razorpayOrder;
           const amount = res.data.data.discountAmount;
           const providerData = res.data.data.provider;
@@ -172,7 +172,7 @@ const Header = () => {
               name: "Help U Build",
               description: "Buying Membership",
               order_id: order.id,
-              callback_url: "https://api.helpubuild.in/api/v1/membership_payment_verify",
+              callback_url: "https://api.dessobuild.com/api/v1/membership_payment_verify",
               prefill: {
                 name: providerData.name,
                 email: providerData.email,
