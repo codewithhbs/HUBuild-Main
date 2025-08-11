@@ -28,7 +28,7 @@ function AddWorkDescriptionImage() {
 
         setLoading(true);
         try {
-            const res = await axios.post('https://api.helpubuild.in/api/v1/create-describe-work-image', payload, {
+            const res = await axios.post('https://api.dessobuild.com/api/v1/create-describe-work-image', payload, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             toast.success('Image added successfully!');

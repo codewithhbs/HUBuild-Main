@@ -14,7 +14,7 @@ function RechargeHistory() {
     const handleFetchUser = async () => {
         try {
             const UserId = UserData?._id;
-            const { data } = await axios.get(`https://api.helpubuild.in/api/v1/get-single-user/${UserId}`);
+            const { data } = await axios.get(`https://api.dessobuild.com/api/v1/get-single-user/${UserId}`);
             const history = data.data?.rechargeHistory;
             setRechargeHistory(history.reverse() || []);
         } catch (error) {

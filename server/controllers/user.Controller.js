@@ -928,7 +928,7 @@ exports.PaymentVerify = async (req, res) => {
             await findOrder.save();
 
             return res.redirect(
-                `https://helpubuild.in/payment-failure?error=Payment failed via ${method || 'unknown method'}&transactionId=${razorpay_payment_id}&amount=${failedAmount}&date=${currentTime}`
+                `https://www.dessobuild.com/payment-failure?error=Payment failed via ${method || 'unknown method'}&transactionId=${razorpay_payment_id}&amount=${failedAmount}&date=${currentTime}`
             );
         }
 
@@ -958,7 +958,7 @@ exports.PaymentVerify = async (req, res) => {
 
         // Save updated order
         await findOrder.save();
-       return res.redirect(`https://helpubuild.in/successfull-recharge?amount=${totalAmount}&transactionId=${razorpay_payment_id}&date=${currentTime}`)
+       return res.redirect(`https://www.dessobuild.com/successfull-recharge?amount=${totalAmount}&transactionId=${razorpay_payment_id}&date=${currentTime}`)
     } catch (error) {
         console.log('Internal server error', error);
         return res.status(500).json({
