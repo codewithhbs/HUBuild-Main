@@ -544,7 +544,7 @@ function TalkToInterior() {
           key: "rzp_live_bmq7YMRTuGvvfu",
           amount: amount * 100,
           currency: "INR",
-          name: "Help U Build",
+          name: "Desso Build",
           description: "Doing Recharge",
           order_id: order?.id || "",
           callback_url: "https://api.dessobuild.com/api/v1/verify-payment",

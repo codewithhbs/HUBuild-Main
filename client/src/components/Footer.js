@@ -79,7 +79,7 @@ const Footer = () => {
         <div className="footer-grid">
           {/* Company Info */}
           <div className="footer-widget">
-            <img src={logo} alt="Help U Build" className="footer-logo" />
+            <img src={logo} alt="Desso Build" className="footer-logo" />
             <ul className="footer-contact-list">
               <li className="footer-contact-item">
                 <MapPin className="footer-contact-icon" />
@@ -95,8 +95,8 @@ const Footer = () => {
               </li> */}
               <li className="footer-contact-item">
                 <Mail className="footer-contact-icon" />
-                <a style={{ color: 'white' }} href="mailto:info@helpubuild.in">
-                  info@helpubuild.in
+                <a style={{ color: 'white' }} href="mailto:info@dessobuild.com">
+                  info@dessobuild.com
                 </a>
               </li>
             </ul>
@@ -167,7 +167,7 @@ const Footer = () => {
 
         {/* Copyright */}
         <div className="footer-copyright">
-          <p>Copyright © {new Date().getFullYear()} Help U Build. All Rights Reserved.</p>
+          <p>Copyright © {new Date().getFullYear()} Desso Build. All Rights Reserved.</p>
         </div>
       </div>
     </footer>

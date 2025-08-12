@@ -169,7 +169,7 @@ const Header = () => {
               key: "rzp_live_bmq7YMRTuGvvfu",
               amount: amount * 100,
               currency: "INR",
-              name: "Help U Build",
+              name: "Desso Build",
               description: "Buying Membership",
               order_id: order.id,
               callback_url: "https://api.dessobuild.com/api/v1/membership_payment_verify",
@@ -212,7 +212,7 @@ const Header = () => {
           <Link className="navbar-brand hub-header__brand" to="/" onClick={handleLinkClick}>
             <img
               src={logo || "/placeholder.svg"}
-              alt="Help U Build"
+              alt="Desso Build"
               className="hub-header__logo"
             />
           </Link>

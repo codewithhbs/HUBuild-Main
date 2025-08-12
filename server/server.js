@@ -1063,7 +1063,7 @@ app.post('/Fetch-Current-Location', async (req, res) => {
 app.use('/api/v1', limiter, router);
 
 app.get('/', (req, res) => {
-    res.send('Welcome To Help U Build');
+    res.send('Welcome To Desso Build');
 });
 
 // Start server

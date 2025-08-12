@@ -135,8 +135,8 @@ const Contact = () => {
                                                     <div>
                                                         <h6 className="card-title fw-bold mb-2">Email Us</h6>
                                                         <p className="card-text mb-0">
-                                                            <a href="mailto:info@helpubuild.in" className="text-decoration-none">
-                                                                info@helpubuild.in
+                                                            <a href="mailto:info@dessobuild.com" className="text-decoration-none">
+                                                                info@dessobuild.com
                                                             </a>
                                                         </p>
                                                     </div>
