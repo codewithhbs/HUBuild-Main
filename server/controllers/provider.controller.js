@@ -120,10 +120,10 @@ exports.CreateProvider = async (req, res) => {
         const AdminNum = process.env.Admin_Number
         const providerNumber = newProvider.mobileNumber;
         const message = `Hello,  
-        Welcome to HelpUBuild! 🎉 We're excited to have you on board.`;
+        Welcome to Desso build! 🎉 We're excited to have you on board.`;
         const AdminMessage = `🔔 New Consultant Registration Alert!
 
-A new consultant has just registered on the HelpUBuild. 🎉
+A new consultant has just registered on the Desso build. 🎉
 
 👤 Name: ${newProvider.name}  
 📧 Email: ${newProvider.email}  
@@ -131,7 +131,7 @@ A new consultant has just registered on the HelpUBuild. 🎉
 
 Please review the account and proceed with the necessary onboarding steps.
 
-- HelpUBuild Team
+- Desso build Team
 `
         await SendWhatsapp(providerNumber, message);
         await SendWhatsapp(AdminNum, AdminMessage)

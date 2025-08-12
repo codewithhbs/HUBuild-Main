@@ -7,7 +7,7 @@ const Cancellation = () => {
       <p className="text-muted">Last Updated: 20 February 2025</p>
 
       <p>
-        At <strong>Help U Build</strong>, we strive to provide transparent and fair billing for our services. As our platform offers time-based consultations through chat and call with architects, interior designers, and Vastu experts, our policy is designed around usage-based charges.
+        At <strong>Desso Build</strong>, we strive to provide transparent and fair billing for our services. As our platform offers time-based consultations through chat and call with architects, interior designers, and Vastu experts, our policy is designed around usage-based charges.
       </p>
 
       <h3 className="mt-4">1. No Cancellations</h3>
@@ -51,8 +51,8 @@ const Cancellation = () => {
         For any questions or concerns regarding this Cancellation & Refund Policy, feel free to reach out:
       </p>
       <p>
-        <strong>Help U Build</strong><br />
-        Email: info@helpubuild.in<br />
+        <strong>Desso Build</strong><br />
+        Email: info@dessobuild.com<br />
         Phone:+91 9220441214
       </p>
     </div>

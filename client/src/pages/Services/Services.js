@@ -45,11 +45,11 @@ const Services = () => {
             <div class="col-lg-12 text-center">
               <h1 class="as_heading as_heading_center">
 
-                services at <span className="about_color">Help U Build</span>
+                services at <span className="about_color">Desso Build</span>
               </h1>
         
               <p class="as_font14 as_padderTop20 as_padderBottom20">
-                At Help U Build, we turn your visions into reality with expert
+                At Desso Build, we turn your visions into reality with expert
                 architecture, interior design, and vastu services. We blend
                 innovation with tradition to create spaces that reflect your
                 aspirations.

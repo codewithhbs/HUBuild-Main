@@ -23,7 +23,7 @@ function Basic_details() {
                     <div className="row">
                         <div className="col-md-10">
                             <div className="heading">
-                                <h3>Consultation With Experts : Help U Build</h3>
+                                <h3>Consultation With Experts : Desso Build</h3>
                             </div>
 
                             <div className="form-elements p-4 shadow-lg rounded">

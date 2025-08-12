@@ -48,7 +48,7 @@ const About = () => {
                         </div>
                         <div class="col-lg-6 col-md-6">
                             <div class="as_about_detail mt-5 pt-4" data-aos="fade-left">
-                                <h2 class="as_heading">Discover <span className="about_color">Help U Build</span></h2>
+                                <h2 class="as_heading">Discover <span className="about_color">Desso Build</span></h2>
                                 <h2 class="as_heading">What Do We Do?</h2>
                                 <div class="as_paragraph_wrapper">
                                     <p class="as_margin0 as_font14 as_padderBottom10">

@@ -7,7 +7,7 @@ const PrivacyPolicy = () => {
       <p className="text-muted">Last Updated: 20 feb 2025</p>
 
       <p>
-        Welcome to <strong>Help U Build</strong>. We are committed to protecting your privacy and ensuring that your personal information is handled in a safe and responsible manner. This Privacy Policy outlines how we collect, use, disclose, and safeguard your information when you use our services.
+        Welcome to <strong>Desso Build</strong>. We are committed to protecting your privacy and ensuring that your personal information is handled in a safe and responsible manner. This Privacy Policy outlines how we collect, use, disclose, and safeguard your information when you use our services.
       </p>
 
       <h3 className="mt-4">1. Information We Collect</h3>
@@ -39,7 +39,7 @@ const PrivacyPolicy = () => {
       <ul>
         <li>With our trusted architects, interior designers, and Vastu experts to facilitate consultations.</li>
         <li>With third-party service providers for operational support, under strict confidentiality agreements.</li>
-        <li>When required by law or to protect the rights and safety of Help U Build and its users.</li>
+        <li>When required by law or to protect the rights and safety of Desso Build and its users.</li>
       </ul>
 
       <h3 className="mt-4">4. Data Security</h3>
@@ -78,8 +78,8 @@ const PrivacyPolicy = () => {
         If you have any questions or concerns about this Privacy Policy, please contact us at:
       </p>
       <p>
-        <strong>Help U Build</strong><br />
-        Email: info@helpubuild.in<br />
+        <strong>Desso Build</strong><br />
+        Email: info@dessobuild.com<br />
         Phone: +91 9220441214
       </p>
     </div>
