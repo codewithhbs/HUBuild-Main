@@ -89,7 +89,7 @@ function AllUser() {
   const handleDeleteUser = async (id) => {
     setLoading(true);
     try {
-      await axios.delete(`https://api.dessobuild.com/api/v1/user-delete/${id}`);
+      await axios.delete(`https://api.dessobuild.com/api/v1/user-delete-parmanent/${id}`);
       handleFetchUsers();
       toast.success('User deleted successfully!');
     } catch (error) {
