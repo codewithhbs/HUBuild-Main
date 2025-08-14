@@ -80,22 +80,22 @@ const StepWizard = () => {
 
 
     const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    const keys = name.split(".");
+        const { name, value, type, checked } = e.target;
+        const keys = name.split(".");
 
-    setMemberData((prev) => {
-        const updated = { ...prev };
-        let current = updated;
+        setMemberData((prev) => {
+            const updated = { ...prev };
+            let current = updated;
 
-        for (let i = 0; i < keys.length - 1; i++) {
-            current = current[keys[i]];
-        }
+            for (let i = 0; i < keys.length - 1; i++) {
+                current = current[keys[i]];
+            }
 
-        // Use checked for checkboxes, value for other inputs
-        current[keys[keys.length - 1]] = type === 'checkbox' ? checked : value;
-        return { ...updated };
-    });
-};
+            // Use checked for checkboxes, value for other inputs
+            current[keys[keys.length - 1]] = type === 'checkbox' ? checked : value;
+            return { ...updated };
+        });
+    };
 
 
     const validatePhone = () => {
@@ -417,12 +417,13 @@ const StepWizard = () => {
                                         <>
                                             {couponDetail ? (
                                                 <div className="d-flex justify-content-center align-items-center">
-                                                    <span className="text-decoration-line-through text-muted me-2">₹{memberShip}</span>
-                                                    <span className="text-success">₹{discountedPrice}</span>
+                                                    <span className="text-decoration-line-through text-muted me-2">₹{Math.round(memberShip)}</span>
+                                                    <span className="text-success">₹{Math.round(discountedPrice)}</span>
                                                 </div>
                                             ) : (
-                                                <span className="text-success">₹{memberShip}</span>
+                                                <span className="text-success">₹{Math.round(memberShip)}</span>
                                             )}
+
                                         </>
                                     ) : (
                                         <div className="spinner-border text-primary" role="status">

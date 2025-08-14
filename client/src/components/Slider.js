@@ -57,7 +57,7 @@ const Slider = () => {
               <div className="card bg-light border-light hover-effect">
                 <div className="card-body forHeight text-center">
                   <img src={engineer} className="img-fluid icon_chat mb-2" alt="Chat Icon" />
-                  <h5 className="card-title fs-6 text-dark">Chat with Architect</h5>
+                  <h5 className="card-title fs-6 text-dark">Connect with Architect</h5>
                   {/* <p className="card-text d-none d-md-block text-muted">Learn more about our mission and values.</p> */}
                 </div>
               </div>
@@ -68,7 +68,7 @@ const Slider = () => {
               <div className="card bg-light border-light hover-effect w-100">
                 <div className="card-body forHeight text-center">
                   <img src={interior} className="img-fluid icon_chat mb-2" alt="Chat Icon" />
-                  <h5 className="card-title fs-6 text-dark">Chat with Interior Designer</h5>
+                  <h5 className="card-title fs-6 text-dark">Connect with Interior Designer</h5>
                   {/* <p className="card-text d-none d-md-block text-muted">Explore the services we offer to our clients.</p> */}
                 </div>
               </div>
@@ -79,7 +79,7 @@ const Slider = () => {
               <div className="card bg-light border-light hover-effect">
                 <div className="card-body forHeight text-center">
                   <img src={vastu} className="img-fluid icon_chat mb-2" alt="Chat Icon" />
-                  <h5 className="card-title fs-6 text-dark">Chat with Vastu Expert</h5>
+                  <h5 className="card-title fs-6 text-dark">Connect with Vastu Expert</h5>
                   {/* <p className="card-text d-none d-md-block  text-muted">Get in touch with us for any inquiries.</p> */}
                 </div>
               </div>
