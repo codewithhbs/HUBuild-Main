@@ -71,7 +71,7 @@ const PartnerLogin = () => {
                                 key: "rzp_live_bmq7YMRTuGvvfu",
                                 amount: amount * 100,
                                 currency: "INR",
-                                name: "Desso Build",
+                                name: "DessoBuild",
                                 description: "Buying Membership",
                                 order_id: order.id,
                                 // callback_url: "https://api.dessobuild.com/api/v1/membership_payment_verify",

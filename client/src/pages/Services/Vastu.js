@@ -542,7 +542,7 @@ function Vastu() {
           key: "rzp_live_bmq7YMRTuGvvfu",
           amount: amount * 100,
           currency: "INR",
-          name: "Desso Build",
+          name: "DessoBuild",
           description: "Doing Recharge",
           order_id: order?.id || "",
           callback_url: "https://api.dessobuild.com/api/v1/verify-payment",
@@ -602,13 +602,13 @@ function Vastu() {
                       )}
                       <div className="architectur-bar">
                         <div className="recharge-btn">
-                          {role === "user" ? (
+                          {/* {role === "user" ? (
                             <a onClick={handleOpenModel} className="medium-device-recharge">
                               Recharge
                             </a>
                           ) : (
                             <></>
-                          )}
+                          )} */}
                           {/* Enhanced Filter Button */}
                           <button
                             type="button"

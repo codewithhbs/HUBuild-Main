@@ -326,13 +326,13 @@ ProviderProfileSchema.pre("save", async function (next) {
 
   switch (this.type) {
     case "Architect":
-      prefix = "HUBA";
+      prefix = "DBA";
       break;
     case "Interior":
-      prefix = "HUBI";
+      prefix = "DBI";
       break;
     case "Vastu":
-      prefix = "HUBV";
+      prefix = "DBV";
       break;
     default:
       return next(new Error("Invalid type for ID prefix."));
