@@ -84,7 +84,7 @@ function Blog_Page() {
                                 {post.title}
                               </Link>
                             </h4>
-                            <p className="as_font14 as_margin0 two-line-clamp">{post.content}</p>
+                            <p className="as_font14 as_margin0 two-line-clamp">{post.smallDesc}</p>
                           </div>
                         </div>
                       </Link>

@@ -15,9 +15,9 @@ const quickLinks = [
 ];
 
 const serviceLinks = [
-  { to: '/talk-to-architect', text: 'Talk to Architect' },
-  { to: '/talk-to-interior', text: 'Talk to Interior Designer' },
-  { to: '/vastu', text: 'Talk to Vastu Experts' },
+  { to: '/talk-to-architect', text: 'Connect with Architect' },
+  { to: '/talk-to-interior', text: 'Connect with Interior Designer' },
+  { to: '/vastu', text: 'Connect with Vastu Experts' },
 ];
 
 const Footer = () => {
@@ -48,6 +48,10 @@ const Footer = () => {
                   ? 'Cancellation & Refund Policy'
                   : item.type === 'term'
                     ? 'Terms & Conditions'
+                  : item.type === 'consultant nda'
+                    ? 'Consultant NDA'
+                  : item.type === 'consultant term'
+                    ? 'Consultant T&C'
                     : item.type.charAt(0).toUpperCase() + item.type.slice(1),
         }));
         setLegalLinks(terms);

@@ -198,9 +198,9 @@ const Header = () => {
 
   const navigationItems = [
     { path: "/", label: "Home" },
-    { path: "/talk-to-architect", label: "Talk to Architect" },
-    { path: "/talk-to-interior", label: "Talk to Interior Designer" },
-    { path: "/Vastu", label: "Talk to Vastu Expert" },
+    { path: "/talk-to-architect", label: "Connect with Architect" },
+    { path: "/talk-to-interior", label: "Connect with Interior Designer" },
+    { path: "/Vastu", label: "Connect with Vastu Expert" },
     { path: "/contact", label: "Contact" }
   ];
 
