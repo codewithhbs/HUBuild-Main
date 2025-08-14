@@ -185,7 +185,7 @@ const StepWizard = () => {
                     key: "rzp_live_bmq7YMRTuGvvfu",
                     amount: amount * 100,
                     currency: "INR",
-                    name: "Desso Build",
+                    name: "DessoBuild",
                     description: "Buying Membership",
                     order_id: order.id,
                     // callback_url: "https://api.dessobuild.com/api/v1/membership_payment_verify",
@@ -335,7 +335,7 @@ const StepWizard = () => {
                 <div className="row">
                     {["name", "email", "mobileNumber"].map((field, index) => (
                         <div key={index} className="col-lg-6 mb-3">
-                            <label className="form-label">{field.charAt(0).toUpperCase() + field.slice(1)}</label>
+                            <label className="form-label">{field === 'mobileNumber' ? 'Mobile Number' : field.charAt(0).toUpperCase() + field.slice(1)}</label>
                             <input type="text" name={field} value={memberData[field]} onChange={handleChange} className="form-control" />
                         </div>
                     ))}

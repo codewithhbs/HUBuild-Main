@@ -7,7 +7,7 @@ const Disclaimer = () => {
       <p className="text-muted">Last Updated: 20 February 2025</p>
 
       <p>
-        Welcome to <strong>Desso Build</strong>. By using our platform, you agree to the terms outlined in this disclaimer.
+        Welcome to <strong>DessoBuild</strong>. By using our platform, you agree to the terms outlined in this disclaimer.
       </p>
 
       <h3 className="mt-4">1. Confidentiality and Privacy</h3>
@@ -17,17 +17,17 @@ const Disclaimer = () => {
 
       <h3 className="mt-4">2. Recorded Sessions</h3>
       <p>
-        All chat and call sessions on <strong>Desso Build</strong> are recorded for quality assurance, security, and dispute resolution purposes. By using our services, you consent to these recordings.
+        All chat and call sessions on <strong>DessoBuild</strong> are recorded for quality assurance, security, and dispute resolution purposes. By using our services, you consent to these recordings.
       </p>
 
       <h3 className="mt-4">3. Professional Advice Disclaimer</h3>
       <p>
-        While our platform connects you with experienced architects, interior designers, and Vastu experts, the advice provided during sessions should not replace formal consultations or legal advice. <strong>Desso Build</strong> is not liable for any decisions made based on the information received during these sessions.
+        While our platform connects you with experienced architects, interior designers, and Vastu experts, the advice provided during sessions should not replace formal consultations or legal advice. <strong>DessoBuild</strong> is not liable for any decisions made based on the information received during these sessions.
       </p>
 
       <h3 className="mt-4">4. Platform Responsibility</h3>
       <p>
-        <strong>Desso Build</strong> acts as a facilitator, connecting users with professionals. We are not responsible for the conduct, advice, or services provided by the experts beyond our platform.
+        <strong>DessoBuild</strong> acts as a facilitator, connecting users with professionals. We are not responsible for the conduct, advice, or services provided by the experts beyond our platform.
       </p>
 
       <h3 className="mt-4">5. User Responsibility</h3>
@@ -37,7 +37,7 @@ const Disclaimer = () => {
 
       <h3 className="mt-4">6. Changes to Disclaimer</h3>
       <p>
-        <strong>Desso Build</strong> reserves the right to modify this disclaimer at any time. Continued use of our platform constitutes acceptance of any changes.
+        <strong>DessoBuild</strong> reserves the right to modify this disclaimer at any time. Continued use of our platform constitutes acceptance of any changes.
       </p>
 
       <h3 className="mt-4">7. Contact Us</h3>
@@ -45,7 +45,7 @@ const Disclaimer = () => {
         For any questions regarding this disclaimer, please reach out to us:
       </p>
       <p>
-      <strong>Desso Build</strong><br />
+      <strong>DessoBuild</strong><br />
         Email: info@dessobuild.com<br />
         Phone: +91 9220441214
       </p>

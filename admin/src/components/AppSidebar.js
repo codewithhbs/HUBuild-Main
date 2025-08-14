@@ -38,7 +38,7 @@ const AppSidebar = () => {
     >
       <CSidebarHeader className="border-bottom">
         <CSidebarBrand to="/">
-          <h1>Desso Build</h1>
+          <h1>DessoBuild</h1>
           {/* <img customClassName="sidebar-brand-narrow" src={small} alt="Logo" height={32} /> */}
           {/* <CIcon customClassName="sidebar-brand-full" icon={logo} height={32} /> */}
           {/* <CIcon customClassName="sidebar-brand-narrow" icon={small} height={32} /> */}

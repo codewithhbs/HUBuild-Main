@@ -787,12 +787,13 @@ exports.createPayment = async (req, res) => {
         // console.log("i create payment start")
         const { userId } = req.params;
         const { price, couponCode } = req.body;
-        if (!couponCode || typeof couponCode !== 'string') {
-            return res.status(400).json({
-                success: false,
-                message: 'Coupon code is required and must be a string',
-            });
-        }
+        // if (!couponCode || typeof couponCode !== 'string') {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: 'Coupon code is required and must be a string',
+        //     });
+        // }
+        console.log("price",price)
         const rechargeCoupon = await RechargeCoupon.findOne({ couponCode: couponCode.trim() });
         if (!rechargeCoupon) {
             return res.status(400).json({

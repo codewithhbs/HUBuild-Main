@@ -52,7 +52,7 @@
 }
 
 .hub-header__logo {
-    height: 50px;
+    height: 60px;
     width: auto;
     max-width: 200px;
     object-fit: contain;
@@ -423,9 +423,9 @@ html {
 }
 
 /* Loading animation for logo */
-.hub-header__logo {
+/* .hub-header__logo {
     animation: logoFloat 3s ease-in-out infinite;
-}
+} */
 
 @keyframes logoFloat {
 

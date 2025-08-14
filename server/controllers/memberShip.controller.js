@@ -265,10 +265,11 @@ exports.buyMemberShip = async (req, res) => {
 
         // Razorpay Order Options
         const razorpayOptions = {
-            amount: finalAmount * 100, // Convert to paise
+            amount: Math.round(finalAmount * 100), // Convert to paise and round to integer
             currency: 'INR',
             payment_capture: 1,
         };
+
 
         const razorpayOrder = await razorpayInstance.orders.create(razorpayOptions);
         if (!razorpayOrder) {

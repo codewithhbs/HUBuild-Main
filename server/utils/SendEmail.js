@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 require('dotenv').config()
 
 const sendEmail = async (options) => {
-        // console.log(options)
+        console.log("process.env.EMAIL_PASSWORD",process.env.EMAIL_PASSWORD)
     try {
 
 

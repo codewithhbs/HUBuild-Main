@@ -7,8 +7,7 @@ import toast from 'react-hot-toast';
 function AddAboutImage() {
   const [loading, setLoading] = React.useState(false);
   const [bannerFile, setBannerFile] = React.useState(null);
-  const [formData, setFormData] = React.useState({
-  });
+  const [formData, setFormData] = React.useState({});
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
