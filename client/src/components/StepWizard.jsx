@@ -182,7 +182,7 @@ const StepWizard = () => {
             const providerData = res.data.data.provider;
             if (order) {
                 const options = {
-                    key: "rzp_live_bmq7YMRTuGvvfu",
+                    key: "rzp_test_cz0vBQnDwFMthJ",
                     amount: amount * 100,
                     currency: "INR",
                     name: "DessoBuild",

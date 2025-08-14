@@ -14,6 +14,7 @@ const SendWhatsapp = async (number, message) => {
 
     try {
         const response = await axios.get(`${baseUrl}?${params.toString()}`);
+        console.log("response.data",response.data)
         return response.data; // Return only the response data
     } catch (error) {
         console.error("Internal server error:", error);
