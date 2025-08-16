@@ -41,7 +41,7 @@ function Withdraw({ data }) {
   const visiblePages = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
 
   return (
-    <div className="container wallet-list mt-4">
+    <div className="wallet-list mt-4">
       <div className="table-container">
         <div className="table-responsive"> {/* Added this div for responsiveness */}
           <table className="table table-bordered table-striped custom-table">

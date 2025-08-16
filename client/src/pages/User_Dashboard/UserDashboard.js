@@ -912,12 +912,12 @@ const UserDashboard = () => {
         )}
 
         {activeTab === "Withdraw" && (
-          <div className="w-100 py-4 mt-5 mb-3">
-            <a href="#withdraw" className='foraligncenter'>
+          <div id='Withdraw' className="w-100 py-4 mt-5 mb-3">
+            <h2 className='foraligncenter'>
               <i className="fas fa-user-cog text-dark me-2" />
               Withdraw History
 
-            </a>
+            </h2>
 
             <Withdraw data={myProfile} />
 
