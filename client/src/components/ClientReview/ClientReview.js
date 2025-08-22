@@ -25,6 +25,7 @@ const ClientReview = () => {
 
             if (response.data.success) {
                 toast.success("Thank you! Your feedback has been submitted.");
+                window.location.href = "/";
             } else {
                 toast.error(response.data.message || "Failed to send feedback");
             }
