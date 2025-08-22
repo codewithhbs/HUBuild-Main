@@ -203,12 +203,22 @@ exports.call_status = async (req, res) => {
             const ProviderName = findedProvider?.fullName || "Consultant";
 
             // Construct review URL with query params
-             const reviewUrl = `https://dessobuild.com/review?providerId=${encodeURIComponent(providerId)}&userId=${encodeURIComponent(userId)}`;
+            const reviewUrl = `https://dessobuild.com/review?providerId=${encodeURIComponent(providerId)}&userId=${encodeURIComponent(userId)}`;
 
             // Professional message
-            const message = `Hello ${UserName},\n\nThank you for using our service. Your call with ${ProviderName} has ended.\n\nWe value your feedback! Please take a moment to share your review here:\n${reviewUrl}\n\nYour input helps us improve and serve you better.\n\n– Team DessoBuild`;
+            const message = `Hello ${UserName},
+
+Thank you for using our service. Your call with ${ProviderName} has ended.
+
+We value your feedback! Please take a moment to share your review here:
+${reviewUrl}
+
+Your input helps us improve and serve you better.
+
+– Team DessoBuild`;
 
             await SendWhatsapp(findUser?.PhoneNumber, message);
+
         }
 
 
