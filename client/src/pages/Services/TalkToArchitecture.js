@@ -10,7 +10,6 @@ import { Modal, Button, Form } from "react-bootstrap"
 import Swal from "sweetalert2"
 import ModelOfPriceAndTime from "./ModelOfPriceAndTime"
 import CallLoader from "./CallLoader"
-import { HiBadgeCheck } from "react-icons/hi"
 import verifiedBadge from './verified1.jpg'
 import './Services.css'
 

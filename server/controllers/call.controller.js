@@ -138,6 +138,7 @@ exports.createCall = async (req, res) => {
 exports.call_status = async (req, res) => {
     try {
         const callStatusQuery = req.query;
+        console.log("callStatusQuery",callStatusQuery)
 	console.log("query",req.query)
         if (!callStatusQuery.from_number || !callStatusQuery.to_number) {
             return res.status(400).json({
