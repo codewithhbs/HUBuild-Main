@@ -67,7 +67,11 @@ const CallHistorySchema = new Schema({
     to_number_status: {
         type: String
     },
-
+    callFrom: {
+        type: String,
+        enum: ['paid', 'free'],
+        default: 'paid'
+    },
 }, {
     timestamps: true
 });
