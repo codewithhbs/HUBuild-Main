@@ -309,7 +309,8 @@
     }
 
     .hub-header__collapse.show {
-        right: 120px;
+        /* right: 120px; */
+        left: 0% !important;
     }
 
     .hub-header__nav {
