@@ -812,8 +812,7 @@ exports.sendFeedback = async (req, res) => {
         const providerName = findProvider.name;
         const userNumber = findUser.PhoneNumber;
         const providerNumber = findProvider.mobileNumber;
-        // const Admin_Number = process.env.ADMIN_NUMBER;
-        const Admin_Number = 9079036042;
+        const Admin_Number = process.env.ADMIN_NUMBER;
 
         const message = `📣 Feedback Received
 
