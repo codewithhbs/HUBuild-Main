@@ -20,10 +20,8 @@ const ChatDemo = () => {
     // State Management - keeping all the original logic
     const [showModal, setShowModal] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
-
     const [isFetchingChatStatus, setIsFetchingChatStatus] = useState(false);
-
-
+    const [isAskActive, setIsAskActive] = useState(false)
     const [message, setMessage] = useState("")
     const [messages, setMessages] = useState([])
     const [socketId, setSocketId] = useState("")
@@ -45,7 +43,6 @@ const ChatDemo = () => {
     const navigate = useNavigate()
     const location = useLocation()
     const [chatStart, setChatStart] = useState(false)
-
     const [isChatOnGoing, setIsChatOnGoing] = useState(false)
     const [showPrompt, setShowPrompt] = useState(false)
     const [nextPath, setNextPath] = useState(null)
@@ -215,7 +212,6 @@ const ChatDemo = () => {
         [userData],
     );
 
-
     useEffect(() => {
         if (selectedUserId && selectedProviderId) {
             const room = `${selectedUserId}_${selectedProviderId}`;
@@ -271,9 +267,7 @@ const ChatDemo = () => {
                     } else {
                         toast.error(response?.message || "Failed to join chat")
                         setIsChatBoxActive(false)
-                        // setIsActive(response.status)
                         setIsChatStarted(false)
-                        // toast.success(response.message)
                         setIsChatOnGoing(false)
                     }
                 },
@@ -289,7 +283,7 @@ const ChatDemo = () => {
                 role: userData?.role,
                 room: `${selectedUserId}_${selectedProviderId}`,
             })
-            // res()
+            setIsAskActive(true)
             setIsChatStarted(false)
             setIsChatBoxActive(false)
             setIsActive(false)
@@ -300,6 +294,30 @@ const ChatDemo = () => {
             console.error("Error ending chat:", error)
         }
     }, [socket, selectedUserId, selectedProviderId, userData, fetchChatHistory])
+
+    // Handle satisfaction response
+    const handleSatisfactionResponse = useCallback(async (satisfied) => {
+        if (userData?.role === "user") {
+            try {
+                const response = await axios.post(`${ENDPOINT}api/v1/send-feedback-to-admin`, {
+                    UserId: selectedUserId,
+                    providerId: selectedProviderId,
+                    satisfied: satisfied,
+                });
+                if (response.data.success) {
+                    toast.success("Feedback sent successfully");
+                } else {
+                    toast.error(response.data.message || "Failed to send feedback");
+                }
+            } catch (error) {
+                toast.error("Failed to send feedback");
+                console.error("Error sending feedback:", error);
+            }
+        }
+        
+        setIsAskActive(false); // Close the satisfaction popup
+        window.close(); // Attempt to close the browser tab
+    }, [selectedUserId, selectedProviderId, userData]);
 
     // Navigation handling
     useEffect(() => {
@@ -385,7 +403,6 @@ const ChatDemo = () => {
     }
 
     // Socket event listeners
-    // Socket event listeners with proper endChat reference
     useEffect(() => {
         socket.on("connect", () => {
             setSocketId(socket.id)
@@ -466,15 +483,11 @@ const ChatDemo = () => {
             }
         })
 
-        // Fixed provider_disconnected handler
         socket.on("provider_disconnected", (data) => {
             toast.success(data.message)
-
-            // Call the endChat function if chat was started
             if (isChatStarted) {
                 endChat();
             } else {
-                // Otherwise just update the UI states
                 setIsProviderConnected(false)
                 setIsAbleToJoinChat(false)
                 setIsChatStarted(false)
@@ -496,7 +509,7 @@ const ChatDemo = () => {
             socket.off("inactivity_notice")
             socket.off("provider_disconnected")
         }
-    }, [id, socket, userData, endChat, isChatStarted]) // Make sure to include endChat in the dependency array
+    }, [id, socket, userData, endChat, isChatStarted])
 
     // Handle chat timeout
     useEffect(() => {
@@ -519,11 +532,10 @@ const ChatDemo = () => {
             return false
         }
 
-        // Prohibited patterns
         const prohibitedPatterns = [
-            /\b\d{10}\b/, // Phone number pattern
-            /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/, // Email pattern
-            /18\+|\bsex\b|\bxxx\b|\bcall\b|\bphone\b|\bmobile|\bteliphone\b|\bnudes\b|\bporn\b|\bsex\scall\b|\btext\b|\bwhatsapp\b|\bskype\b|\btelegram\b|\bfacetime\b|\bvideo\schat\b|\bdial\snumber\b|\bmessage\b/i, // Keywords related to 18+ content and phone connections
+            /\b\d{10}\b/,
+            /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/,
+            /18\+|\bsex\b|\bxxx\b|\bcall\b|\bphone\b|\bmobile|\bteliphone\b|\bnudes\b|\bporn\b|\bsex\scall\b|\btext\b|\bwhatsapp\b|\bskype\b|\btelegram\b|\bfacetime\b|\bvideo\schat\b|\bdial\snumber\b|\bmessage\b/i,
         ]
 
         return !prohibitedPatterns.some((pattern) => pattern.test(messageText))
@@ -788,32 +800,24 @@ const ChatDemo = () => {
 
                                         {role === "user" ? (
                                             isChatStarted ? (
-                                                // <li>
                                                 <button className="btn btn-danger" onClick={endChat}>
                                                     End Chat
                                                 </button>
-                                                // </li>
                                             ) : (
-                                                // <li>
                                                 <button className="btn btn-success" onClick={handleStartChat}>
-                                                   {chatStart ? "Chat Starting..." : "Start Chat"}
+                                                    {chatStart ? "Chat Starting..." : "Start Chat"}
                                                 </button>
-                                                // </li>
                                             )
                                         ) : (
                                             isAbleToJoinChat &&
                                             (isChatStarted ? (
-                                                // <li>
                                                 <button className="btn btn-danger" onClick={endChat}>
                                                     End Chat
                                                 </button>
-                                                // </li>
                                             ) : (
-                                                // <li>
                                                 <button className="btn btn-success" onClick={handleStartChat}>
                                                     {chatStart ? "Chat Starting..." : "Start Chat"}
                                                 </button>
-                                                // </li>
                                             ))
                                         )}
 
@@ -834,36 +838,6 @@ const ChatDemo = () => {
                                                             <MdDelete className="me-2" /> Delete Chat
                                                         </button>
                                                     </li>
-                                                    {/* {role === "user" ? (
-                                                        isChatStarted ? (
-                                                            <li>
-                                                                <button className="dropdown-item text-danger" onClick={endChat}>
-                                                                    End Chat
-                                                                </button>
-                                                            </li>
-                                                        ) : (
-                                                            <li>
-                                                                <button className="dropdown-item text-success" onClick={handleStartChat}>
-                                                                    Start Chat
-                                                                </button>
-                                                            </li>
-                                                        )
-                                                    ) : (
-                                                        isAbleToJoinChat &&
-                                                        (isChatStarted ? (
-                                                            <li>
-                                                                <button className="dropdown-item text-danger" onClick={endChat}>
-                                                                    End Chat
-                                                                </button>
-                                                            </li>
-                                                        ) : (
-                                                            <li>
-                                                                <button className="dropdown-item text-success" onClick={handleStartChat}>
-                                                                    Start Chat
-                                                                </button>
-                                                            </li>
-                                                        ))
-                                                    )} */}
                                                 </ul>
                                             </div>
                                         </div>
@@ -1019,6 +993,32 @@ const ChatDemo = () => {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Satisfaction Feedback Modal (Only for Users) */}
+            {isAskActive && userData?.role === "user" && (
+                <Modal
+                    show={isAskActive}
+                    onHide={() => {}} // Prevent closing by clicking outside
+                    backdrop="static" // Prevent closing by clicking backdrop
+                    keyboard={false} // Prevent closing with ESC key
+                    centered
+                >
+                    <Modal.Header>
+                        <Modal.Title>Feedback</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <p>Are you satisfied with the consultant's service? Would you like to take their service again?</p>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="success" onClick={() => handleSatisfactionResponse(true)}>
+                            Yes
+                        </Button>
+                        <Button variant="danger" onClick={() => handleSatisfactionResponse(false)}>
+                            No
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             )}
         </div>
     )

@@ -77,7 +77,8 @@ const Dashboard = () => {
       const { data } = await axios.get('https://api.dessobuild.com/api/v1/total-recharge-amount');
       setAllRecharge(data.data);
     } catch (error) {
-      toast.error('Failed to load recharge amount');
+      // toast.error('Failed to load recharge amount');
+      console.log("Internal server error while fetching recharge amount", error);
     }
   };
 

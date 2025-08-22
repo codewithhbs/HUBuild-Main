@@ -24,6 +24,9 @@ function ArchitectProfile() {
     const [open, setOpen] = useState(false)
     const [user, setUser] = useState(null)
     const [time, setTime] = useState('0')
+
+    const [isAskActive, setIsAskActive] = useState(false)
+
     // console.log("UserData",UserData)
     const [VenderType, setVenderType] = useState('');
     const [ratingCounts, setRatingCounts] = useState({
@@ -391,7 +394,7 @@ function ArchitectProfile() {
                         </div>
                     </div>
                     <div className='container-fluid architecture-section-p rounded profile-card'>
-                    {profile.isHelpuBuildVerified && <img src={verifiedBadge} className="verified-badge-profile" />}
+                        {profile.isHelpuBuildVerified && <img src={verifiedBadge} className="verified-badge-profile" />}
                         <div className='row prfile-custom-card py-5 align-items-center'>
                             <div className='col-xl-4 col-lg-4 col-md-6 col-12'>
                                 <div className='a-profile-image text-center'>
