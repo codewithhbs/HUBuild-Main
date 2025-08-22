@@ -117,7 +117,7 @@ exports.CreateProvider = async (req, res) => {
 
         // Debug: Log the saved object
         console.log("Saved provider:", JSON.stringify(newProvider.toObject(), null, 2));
-        const AdminNum = process.env.Admin_Number || 9079036042
+        const AdminNum = process.env.Admin_Number
         const providerNumber = newProvider.mobileNumber;
         const message = `Hello,  
         Welcome to DessoBuild! 🎉 We're excited to have you on board.`;
