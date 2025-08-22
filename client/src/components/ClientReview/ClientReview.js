@@ -18,7 +18,7 @@ const ClientReview = () => {
     // Handle review submission
     const handleSendReview = async () => {
         try {
-            const response = await axios.post(`https://dessobuild.com/api/v1/send-feedback-to-admin`, {
+            const response = await axios.post(`https://api.dessobuild.com/api/v1/send-feedback-to-admin`, {
                 UserId: userId,
                 providerId: providerId,
             });
