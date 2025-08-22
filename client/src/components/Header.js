@@ -307,7 +307,7 @@ const Header = () => {
                       Login
                     </button>
 
-                    <ul className="dropdown-menu" aria-labelledby="loginDropdown">
+                    <ul className="dropdown-menu for-position-right" aria-labelledby="loginDropdown">
                       <li>
                         <a className="dropdown-item" href="/login">
                           <i className="fas fa-user me-2"></i>
