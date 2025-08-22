@@ -4,7 +4,7 @@ const SendWhatsapp = async (number, message) => {
     console.log("number, message",number, message)
     const apiKey = "9c9673c00d8649c380acc43fd55eb743";
     const baseUrl = "https://api.iconicsolution.co.in/wapp/v2/api/send";
-
+     
     // Construct query parameters
     const params = new URLSearchParams({
         apikey: apiKey,
