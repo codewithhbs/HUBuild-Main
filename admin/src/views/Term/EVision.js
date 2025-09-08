@@ -89,7 +89,7 @@ const EVision = () => {
 
     setLoading(true);
     try {
-      await axios.put(`http://localhost:5000/api/v1/update_term/${id}`, {
+      await axios.put(`https://api.dessobuild.com/api/v1/update_term/${id}`, {
         text: currentText,
         type: typse
       });
