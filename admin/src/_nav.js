@@ -86,6 +86,11 @@ const _nav = [
       },
       {
         component: CNavItem,
+        name: 'Our Vision',
+        to: '/term/edit_our-vision?type=vision',
+      },
+      {
+        component: CNavItem,
         name: 'All Expertise',
         to: '/expertise/all_expertise',
       },
