@@ -40,6 +40,7 @@ import EConsultantTerm from './views/Term/EConsultantTerm'
 import AllRechargeCoupon from './views/RechargeCoupon/AllRechargeCoupon'
 import AddRechargeCoupon from './views/RechargeCoupon/AddRechargeCoupon'
 import EditRechargeCoupon from './views/RechargeCoupon/EditRechargeCoupon'
+import EVision from './views/Term/EVision'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
@@ -239,16 +240,17 @@ const routes = [
   { path: '/term/edit_disclamier', name: 'Edit Disclaimer', element: EDisc },
   { path: '/term/edit_refund', name: 'Edit Cancellation and refund', element: ERefund },
   { path: '/term/edit_consultant_nda', name: 'Edit Consultant NDA', element: EConsultantNDA },
-  { path: '/term/edit_consultant_term', name: 'Edit Consultant Term', element: EConsultantTerm },
+  { path: '/term/edit_consultant_term', name: 'Edit Consultant T&C', element: EConsultantTerm },
+  { path: '/term/edit_our-vision', name: 'Edit Our Vision', element: EVision },
 
   { path: '/call/all_call', name: 'All Call', element: AllCallHistory },
 
   { path: '/project/all_project', name: 'All Project', element: AllCustomChat },
   { path: '/project/add_project', name: 'Add Project', element: AddCustomChat },
   { path: '/project/edit_project/:id', name: 'Edit Project', element: EditCustomChat },
-  
+
   { path: '/inquiry/all_inquiry', name: 'All Inquiry', element: AllInquiry },
-  
+
     { path: '/recharge_coupon/all_recharge_coupon', name: 'All Recharge Coupon', element: AllRechargeCoupon },
     { path: '/recharge_coupon/add_recharge_coupon', name: 'Add Recharge Coupon', element: AddRechargeCoupon },
     { path: '/recharge_coupon/edit_recharge_coupon/:id', name: 'Edit Recharge Coupon', element: EditRechargeCoupon },

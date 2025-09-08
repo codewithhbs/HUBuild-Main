@@ -48,11 +48,13 @@ const Footer = () => {
                   ? 'Cancellation & Refund Policy'
                   : item.type === 'term'
                     ? 'Terms & Conditions'
-                  : item.type === 'consultant nda'
-                    ? 'Consultant NDA'
-                  : item.type === 'consultant term'
-                    ? 'Consultant T&C'
-                    : item.type.charAt(0).toUpperCase() + item.type.slice(1),
+                    : item.type === 'consultant nda'
+                      ? 'Consultant NDA'
+                      : item.type === 'consultant term'
+                        ? 'Consultant T&C'
+                        : item.type === 'vision'
+                          ? 'Our Vision'
+                          : item.type.charAt(0).toUpperCase() + item.type.slice(1),
         }));
         setLegalLinks(terms);
       }
