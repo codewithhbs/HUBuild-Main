@@ -22,7 +22,7 @@ const AllCallHistory = () => {
   const handleFetchCalls = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get('https://testapi.dessobuild.com/api/v1/get-call-by-admin');
+      const { data } = await axios.get('https://api.dessobuild.com/api/v1/get-call-by-admin');
       setCalls(data.data.reverse() || []);
     } catch (error) {
       console.error('Error fetching call history:', error);
@@ -35,7 +35,7 @@ const AllCallHistory = () => {
   const handleDeleteCall = async (id) => {
     setLoading(true);
     try {
-      await axios.delete(`https://testapi.dessobuild.com/api/v1/delete-call-by-admin/${id}`);
+      await axios.delete(`https://api.dessobuild.com/api/v1/delete-call-by-admin/${id}`);
       setCalls((prevCalls) => prevCalls.filter((call) => call._id !== id));
       toast.success('Call history deleted successfully!');
     } catch (error) {

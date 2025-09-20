@@ -55,7 +55,7 @@ function ArchitectProfile() {
         setLoading(true);
         try {
             const { data } = await axios.get(
-                `https://testapi.dessobuild.com/api/v1/get-service-by-provider/${providerId}/${selectedCategory}`
+                `https://api.dessobuild.com/api/v1/get-service-by-provider/${providerId}/${selectedCategory}`
             );
 
             const serviceData = data.data.find(
@@ -78,7 +78,7 @@ function ArchitectProfile() {
         setLoading(true);
         try {
             const { data } = await axios.get(
-                `https://testapi.dessobuild.com/api/v1/get-user-by-id/${UserData?._id}`
+                `https://api.dessobuild.com/api/v1/get-user-by-id/${UserData?._id}`
             );
 
             setUser(data.data)
@@ -91,7 +91,7 @@ function ArchitectProfile() {
 
     const fetchProviderData = async function (id) {
         try {
-            const response = await axios.post(`https://testapi.dessobuild.com/api/v1/provider_status/${id}`);
+            const response = await axios.post(`https://api.dessobuild.com/api/v1/provider_status/${id}`);
             return response.data;
         } catch (error) {
             console.error("Error fetching provider data:", error.message);
@@ -146,7 +146,7 @@ function ArchitectProfile() {
                 userId: UserData._id,
             }
             try {
-                const res = await axios.post('https://testapi.dessobuild.com/api/v1/create-chat', newForm)
+                const res = await axios.post('https://api.dessobuild.com/api/v1/create-chat', newForm)
                 window.location.href = '/chat'
             } catch (error) {
                 console.log("Internal server error", error)
@@ -174,7 +174,7 @@ function ArchitectProfile() {
     const fetchProfile = async (id) => {
         setProfileLoading(true)
         try {
-            const { data } = await axios.get(`https://testapi.dessobuild.com/api/v1/get-single-provider/${id}`);
+            const { data } = await axios.get(`https://api.dessobuild.com/api/v1/get-single-provider/${id}`);
             setProfile(data.data);
             setVenderType(data.data.type)
             setProfileLoading(false);
@@ -191,7 +191,7 @@ function ArchitectProfile() {
     const handleFetchReview = async () => {
         try {
             const { data } = await axios.get(
-                `https://testapi.dessobuild.com/api/v1/get-review-by-providerId/${id}`
+                `https://api.dessobuild.com/api/v1/get-review-by-providerId/${id}`
             );
             console.log("Reviews fetched:", data.data);
             setReviews(data.data);
@@ -296,7 +296,7 @@ function ArchitectProfile() {
         }
 
         try {
-            const res = await axios.post('https://testapi.dessobuild.com/api/v1/create-call', {
+            const res = await axios.post('https://api.dessobuild.com/api/v1/create-call', {
                 userId: UserData._id,
                 providerId: id,
                 UserWallet: UserData?.walletAmount,

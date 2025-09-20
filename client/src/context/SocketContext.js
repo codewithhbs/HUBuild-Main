@@ -6,7 +6,7 @@ const SocketContext = createContext();
 
 export const useSocket = () => useContext(SocketContext);
 
-const ENDPOINT = 'https://testapi.dessobuild.com';
+const ENDPOINT = 'https://api.dessobuild.com';
 
 export const SocketProvider = ({ children }) => {
     const socket = useMemo(() => io(ENDPOINT, {

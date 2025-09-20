@@ -40,7 +40,7 @@ const Dashboard = () => {
 
   const handleFetchUser = async () => {
     try {
-      const { data } = await axios.get('https://testapi.dessobuild.com/api/v1/users', {
+      const { data } = await axios.get('https://api.dessobuild.com/api/v1/users', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       setAllUserCount(data.data.length);
@@ -51,7 +51,7 @@ const Dashboard = () => {
 
   const fetchProviders = async () => {
     try {
-      const { data } = await axios.get('https://testapi.dessobuild.com/api/v1/get-all-provider');
+      const { data } = await axios.get('https://api.dessobuild.com/api/v1/get-all-provider');
       const allData = data.data;
       setAllProviderCount({
         Vastu: allData.filter(provider => provider.type === 'Vastu').length,
@@ -65,7 +65,7 @@ const Dashboard = () => {
 
   const handleFetchChat = async () => {
     try {
-      const { data } = await axios.get('https://testapi.dessobuild.com/api/v1/get-all-chat-record');
+      const { data } = await axios.get('https://api.dessobuild.com/api/v1/get-all-chat-record');
       setAllChatCount(data.data.length);
     } catch (error) {
       toast.error('Failed to load chat records');
@@ -74,7 +74,7 @@ const Dashboard = () => {
 
   const handleFetchRecharge = async () => {
     try {
-      const { data } = await axios.get('https://testapi.dessobuild.com/api/v1/total-recharge-amount');
+      const { data } = await axios.get('https://api.dessobuild.com/api/v1/total-recharge-amount');
       setAllRecharge(data.data);
     } catch (error) {
       toast.error('Failed to load recharge amount');
@@ -83,7 +83,7 @@ const Dashboard = () => {
 
   const handleFetchWithdraw = async () => {
     try {
-      const { data } = await axios.get('https://testapi.dessobuild.com/api/v1/total-withdraw-and-commission');
+      const { data } = await axios.get('https://api.dessobuild.com/api/v1/total-withdraw-and-commission');
       setAllWithdraw({
         request: data.totalWithdrawAmount,
         commission: data.totalCommission

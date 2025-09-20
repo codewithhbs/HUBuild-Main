@@ -40,7 +40,7 @@ function EditBlogs() {
 
     const handleFetchBlog = async () => {
         try {
-            const { data } = await axios.get(`https://testapi.dessobuild.com/api/v1/get-single-blog/${id}`);
+            const { data } = await axios.get(`https://api.dessobuild.com/api/v1/get-single-blog/${id}`);
             const allData = data.data;
             setFormData({
                 title: allData.title,
@@ -83,7 +83,7 @@ function EditBlogs() {
 
         setLoading(true);
         try {
-            const res = await axios.put(`https://testapi.dessobuild.com/api/v1/update-blog/${id}`, payload, {
+            const res = await axios.put(`https://api.dessobuild.com/api/v1/update-blog/${id}`, payload, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             toast.success(res.data.message);
