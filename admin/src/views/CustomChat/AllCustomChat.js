@@ -25,7 +25,7 @@ const AllCustomChat = () => {
     const handleFetchBanner = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('https://api.dessobuild.com/api/v1/get-all-chat-record');
+            const { data } = await axios.get('https://testapi.dessobuild.com/api/v1/get-all-chat-record');
             const filterData = data.data.filter((item) => item.isManualChat === true);
             setBanners(filterData.reverse() || []);
         } catch (error) {
@@ -38,7 +38,7 @@ const AllCustomChat = () => {
 
     const handleFetchChat = async (chatRoomId) => {
         try {
-            const { data } = await axios.get(`https://api.dessobuild.com/api/v1/get-group-chat-by-id/${chatRoomId}`);
+            const { data } = await axios.get(`https://testapi.dessobuild.com/api/v1/get-group-chat-by-id/${chatRoomId}`);
             setSelectedChat(data.data[0]);
             setShowChatModal(true);
         } catch (error) {
@@ -51,11 +51,11 @@ const AllCustomChat = () => {
         const updatedField = !isChatEnded;
         try {
             const { data } = await axios.put(
-                `https://api.dessobuild.com/api/v1/update_manual_chat_ended/${id}`,
+                `https://testapi.dessobuild.com/api/v1/update_manual_chat_ended/${id}`,
                 { isGroupChatEnded: updatedField }
             );
             handleFetchBanner();
-            toast.success(data.message);
+            toast.success(`Project is ${updatedField ? 'Closed' : "Reopend"}`);
         } catch (error) {
             console.log("Internal server error", error);
         }
@@ -64,7 +64,7 @@ const AllCustomChat = () => {
     const handleDeleteBanner = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`https://api.dessobuild.com/api/v1/delete-chat-room/${id}`);
+            await axios.delete(`https://testapi.dessobuild.com/api/v1/delete-chat-room/${id}`);
             handleFetchBanner();
             toast.success('Chat room deleted successfully!');
         } catch (error) {

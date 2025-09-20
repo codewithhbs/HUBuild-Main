@@ -10,8 +10,8 @@ import { Modal, Button, Form } from "react-bootstrap"
 import Swal from "sweetalert2"
 import ModelOfPriceAndTime from "./ModelOfPriceAndTime"
 import CallLoader from "./CallLoader"
+import { HiBadgeCheck } from "react-icons/hi"
 import verifiedBadge from './verified1.jpg'
-import './Services.css'
 
 function TalkToArchitect() {
   const [id, setId] = useState(null)
@@ -88,7 +88,7 @@ function TalkToArchitect() {
   const handleFetchUser = async () => {
     try {
       const UserId = UserData?._id
-      const { data } = await axios.get(`https://api.dessobuild.com/api/v1/get-single-user/${UserId}`)
+      const { data } = await axios.get(`https://testapi.dessobuild.com/api/v1/get-single-user/${UserId}`)
       const formattedAmount = data.data.walletAmount.toFixed(2)
       setUser(data?.data)
       setWalletAmount(formattedAmount)
@@ -105,7 +105,7 @@ function TalkToArchitect() {
 
   const handleFetchProvider = async () => {
     try {
-      const { data } = await axios.get("https://api.dessobuild.com/api/v1/get-all-provider")
+      const { data } = await axios.get("https://testapi.dessobuild.com/api/v1/get-all-provider")
       const allData = data.data.filter((item) => item.type === "Architect")
       const shownProvider = allData.filter((item) => item.accountVerified === "Verified")
       const filterByDeactivate = shownProvider.filter((item) => item.isDeactived === false)
@@ -128,7 +128,7 @@ function TalkToArchitect() {
     const handleFetchProviderAllService = async () => {
       try {
         setLoading(true)
-        const all = await axios.get("https://api.dessobuild.com/api/v1/get-all-provider-service")
+        const all = await axios.get("https://testapi.dessobuild.com/api/v1/get-all-provider-service")
         const allData = all.data.data
         const filterData = allData.filter((item) => item.category === "Residential")
         setAllProviderService(filterData)
@@ -147,7 +147,7 @@ function TalkToArchitect() {
     try {
       // Fetch services for the selected category
       const { data } = await axios.get(
-        `https://api.dessobuild.com/api/v1/get-service-by-provider/${providerId}/Residential`,
+        `https://testapi.dessobuild.com/api/v1/get-service-by-provider/${providerId}/Residential`,
       )
       // Find the service data for the selected category
       const serviceData = data.data.find((service) => service.category === "Residential")
@@ -253,7 +253,7 @@ function TalkToArchitect() {
 
   const fetchProviderData = async (id) => {
     try {
-      const response = await axios.post(`https://api.dessobuild.com/api/v1/provider_status/${id}`)
+      const response = await axios.post(`https://testapi.dessobuild.com/api/v1/provider_status/${id}`)
       return response.data
     } catch (error) {
       console.error("Error fetching provider data:", error.message)
@@ -306,7 +306,7 @@ function TalkToArchitect() {
     }
 
     try {
-      const res = await axios.post("https://api.dessobuild.com/api/v1/create-call", {
+      const res = await axios.post("https://testapi.dessobuild.com/api/v1/create-call", {
         userId: UserData._id,
         providerId: id,
         UserWallet: UserData?.walletAmount,
@@ -502,7 +502,7 @@ function TalkToArchitect() {
         providerId: providerId._id,
       }
       try {
-        const res = await axios.post("https://api.dessobuild.com/api/v1/create-chat", newForm)
+        const res = await axios.post("https://testapi.dessobuild.com/api/v1/create-chat", newForm)
         window.location.href = "/chat"
       } catch (error) {
         console.error("Internal server error", error)
@@ -533,7 +533,7 @@ function TalkToArchitect() {
       }
 
       const UserId = UserData?._id
-      const res = await axios.post(`https://api.dessobuild.com/api/v1/create-payment/${UserId}`, {
+      const res = await axios.post(`https://testapi.dessobuild.com/api/v1/create-payment/${UserId}`, {
         price: amount,
       })
       console.log("Order", res.data.data)
@@ -547,7 +547,7 @@ function TalkToArchitect() {
           name: "DessoBuild",
           description: "Doing Recharge",
           order_id: order?.id || "",
-          callback_url: "https://api.dessobuild.com/api/v1/verify-payment",
+          callback_url: "https://testapi.dessobuild.com/api/v1/verify-payment",
           prefill: {
             name: UserData?.name,
             email: UserData?.email,
@@ -604,13 +604,13 @@ function TalkToArchitect() {
                       )}
                       <div className="architectur-bar">
                         <div className="recharge-btn">
-                          {role === "user" ? (
+                          {/* {role === "user" ? (
                             <a onClick={handleOpenModel} className="medium-device-recharge">
                               Recharge
                             </a>
                           ) : (
                             <></>
-                          )}
+                          )} */}
                           {/* Enhanced Filter Button */}
                           <button
                             type="button"

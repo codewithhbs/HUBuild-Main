@@ -1,5 +1,5 @@
 const express = require('express');
-const { registeruser, getAllUsers, getSingleUserById, updateProfile, login, logout, deleteAccount, banUserToggle, verifyEmail, resendOtp, forgotPassword, getUserById, createPayment, PaymentVerify, getSingleUser, updateUserPassword, getTotalRechargeAmount, Changepassword, getDetailForVerification, updateUserProfileImage, getAllUser, deleteUserPermanentAccount } = require('../controllers/user.Controller');
+const { registeruser, getAllUsers, getSingleUserById, updateProfile, login, logout, deleteAccount, banUserToggle, verifyEmail, resendOtp, forgotPassword, getUserById, createPayment, PaymentVerify, getSingleUser, updateUserPassword, getTotalRechargeAmount, Changepassword, getDetailForVerification, updateUserProfileImage, getAllUser } = require('../controllers/user.Controller');
 const { protect } = require('../middlewares/Protect');
 const { CreateProvider, GetMyProfile, addPortfolio, getAllProvider, getSingleProvider, updateProvider, updateDocuments, updatePassword, updateAvailable, updateBankDetail, updateIsBanned, deleteprovider, accountVerification, getProviderStatus, sendOtpForUpdateDetail, verifyOtpForUpdateDetail, changeProviderNumber, verifyOtpForChangeNumber, updateProfileImage, changeProviderDeactiveStatus, helpubuildverified, deleteConsultantPermanent } = require('../controllers/provider.controller');
 const multer = require('multer');
@@ -12,7 +12,7 @@ const { createAboutImage, getAllAboutImage, deleteAboutImage, updateAboutActiveS
 const { createTestimonial, getAllTestimonial, getsingleTestimonial, deleteTestimonial, updateTestimonial, updateTestimonialActiveStatus } = require('../controllers/testimonial.controller');
 const { createBlog, getAllBlog, getSingleBlog, updateBlog, deleteBlog } = require('../controllers/blog.controller');
 const { createBlogComment, getAllComments, getBlogCommentByBlogId, deleteBlogComment } = require('../controllers/blogCommont.controller');
-const { createChatWithNew, getAllChatRecord, getChatByProviderid, getChatByUserid, getChatById, markAllChatsAsRead, markUserChatsAsRead, markProviderChatsAsRead, deleteChatRoom, getchatByRoom, deleteChatByRoom, deleteMessageFromRoom, createManualChatRoom, addOrUpdateProvidersInChat, getCustomChatById, getManualChatByProviderId, getManualChatBuUserId, updateGroupChatISEnded, getGroupChatById, updateManualChatRoom, sendFeedback } = require('../controllers/chatAndPayment.Controller');
+const { createChatWithNew, getAllChatRecord, getChatByProviderid, getChatByUserid, getChatById, markAllChatsAsRead, markUserChatsAsRead, markProviderChatsAsRead, deleteChatRoom, getchatByRoom, deleteChatByRoom, deleteMessageFromRoom, createManualChatRoom, addOrUpdateProvidersInChat, getCustomChatById, getManualChatByProviderId, getManualChatBuUserId, updateGroupChatISEnded, getGroupChatById, updateManualChatRoom, updateGroupName } = require('../controllers/chatAndPayment.Controller');
 const { createWithdrawal, updateWithdrawStatus, deleteWithdrawRequest, getWithdrawalsByProviderId, getAllWithdrawals, getTotalWithdrawAndCommission } = require('../controllers/withdraw.controller');
 const { createCommission, updateCommission, getSingleCommission, getAllCommissions, deleteCommission } = require('../controllers/commission.controller');
 const { createProviderService, getAllProviderService, getProviderServiceById, updateProviderService, deleteProviderService, findbyProvider } = require('../controllers/providerService.controller');
@@ -111,7 +111,6 @@ router.get('/users', getAllUsers);
 // router.get('/user/:id', getSingleUserById);
 router.get('/get-single-user/:id', getSingleUser)
 router.delete('/user-delete/:userId', deleteAccount);
-router.delete('/user-delete-parmanent/:userId', deleteUserPermanentAccount);
 router.put('/user-ban/:userId', banUserToggle);
 router.get('/get-all-user', getAllUser)
 
@@ -285,7 +284,7 @@ router.delete('/delete_expertise/:id', deleteExpertise)
 router.post('/create_term', createTerm)
 router.get('/all_term', getTerm)
 router.get('/single_term/:type', singleTerm)
-router.put('/update_term/:id', updateTerm)
+router.put('/update_term/:id', updateTerm)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 
 // create manual chat room with multiple vendor and user 
 
@@ -296,11 +295,9 @@ router.put('/add_members_to_manual_chat_room/:id', addOrUpdateProvidersInChat)
 router.get('/get_manual_chat_by_userId/:userId', getManualChatBuUserId)
 router.get('/get_manual_chat_by_providerId/:providerId', getManualChatByProviderId)
 router.put('/update_manual_chat_ended/:id', updateGroupChatISEnded)
+router.put('/update_group_name/:id', updateGroupName)
 
 // call for free module 
-
-
-
 
 router.post('/create-contact', createContact);
 router.get('/get-contact', getAllContacts);
@@ -321,7 +318,5 @@ router.get('/recharge_coupon/:id', getSingleRechargeCoupon)
 router.put('/update_recharge_coupon/:id', updateRechargeCoupon)
 router.delete('/delete_recharge_coupon/:id', deleteRechargeCoupon)
 router.post('/check_coupon', checkCouponIsExist);
-
-router.post('/send-feedback-to-admin', sendFeedback)
 
 module.exports = router;

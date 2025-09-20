@@ -16,7 +16,7 @@ export const isTokenValid = async () => {
     }
 
     // Verify user still exists via backend
-    const response = await axios.get(`https://api.dessobuild.com/api/v1/verify-user/${decoded.id._id}`, {
+    const response = await axios.get(`https://testapi.dessobuild.com/api/v1/verify-user/${decoded.id._id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

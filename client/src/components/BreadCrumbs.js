@@ -9,10 +9,10 @@ const BreadCrumbs = ({path,title}) => {
                     <div class="col-lg-12 text-center">
                         <h1>{title}</h1> 
 
-                        <ul class="breadcrumb"> 
+                        {/* <ul class="breadcrumb"> 
                             <li><a href="/">Home</a></li>
                             <li>{path}</li>
-                        </ul>
+                        </ul> */}
                     </div>
                 </div>
             </div>

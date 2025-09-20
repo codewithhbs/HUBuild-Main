@@ -147,7 +147,7 @@ const UploadMultipleImages = async (req, res, next) => {
 const uploadToCloudinary = (fileBuffer) => {
     return new Promise((resolve, reject) => {
         const stream = Cloudinary.uploader.upload_stream(
-            { folder: process.env.CLOUDINARY_FOLDER_NAME },
+            { folder: process.env.CLOUDINARY_FOLDER_NAME, resource_type: 'auto' },
             (error, result) => {
                 if (result) {
                     resolve({ public_id: result.public_id, imageUrl: result.secure_url });

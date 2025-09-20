@@ -22,7 +22,7 @@ function AllWorkDescriptionImage() {
     const handleFetchBanner = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('https://api.dessobuild.com/api/v1/get-all-describe-work-image');
+            const { data } = await axios.get('https://testapi.dessobuild.com/api/v1/get-all-describe-work-image');
             setBanners(data.data || []); // Ensure default empty array
         } catch (error) {
             console.error('Error fetching banners:', error);
@@ -38,7 +38,7 @@ function AllWorkDescriptionImage() {
         // console.log("i am hit",currentStatus)
         try {
             const updatedStatus = !currentStatus;
-            await axios.put(`https://api.dessobuild.com/api/v1/update-work-banner-status/${id}`, {
+            await axios.put(`https://testapi.dessobuild.com/api/v1/update-work-banner-status/${id}`, {
                 active: updatedStatus,
             });
 
@@ -67,7 +67,7 @@ function AllWorkDescriptionImage() {
     const handleDeleteBanner = async (id) => {
         setLoading(true);
         try {
-            await axios.delete(`https://api.dessobuild.com/api/v1/delete-describe-work-image/${id}`);
+            await axios.delete(`https://testapi.dessobuild.com/api/v1/delete-describe-work-image/${id}`);
             setBanners((prevBanners) => prevBanners.filter((banner) => banner._id !== id));
             toast.success('Banner deleted successfully!');
         } catch (error) {

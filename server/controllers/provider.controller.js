@@ -1130,11 +1130,11 @@ exports.helpubuildverified = async (req, res) => {
     }
 };
 
-exports.deleteConsultantPermanent = async (req, res) => {
+exports.deleteConsultantPermanent = async (req,res) => {
     try {
-        const { id } = req.params;
+        const {id} = req.params;
         const findProvider = await providersModel.findByIdAndDelete(id)
-        if (!findProvider) {
+        if(!findProvider){
             return res.status(400).json({
                 success: false,
                 message: 'No consultant found'
@@ -1145,7 +1145,7 @@ exports.deleteConsultantPermanent = async (req, res) => {
             message: 'Consultant Deleted'
         })
     } catch (error) {
-        console.log("Internal server error", error)
+        console.log("Internal server error",error)
         res.status(500).json({
             success: false,
             message: 'Internal sever error',

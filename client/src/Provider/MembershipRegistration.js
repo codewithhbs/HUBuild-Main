@@ -40,7 +40,7 @@ function MembershipRegistration() {
     const fetchCurrentLocation = async () => {
         if (!coords) return;
         try {
-            const res = await axios.post('https://api.dessobuild.com/Fetch-Current-Location', {
+            const res = await axios.post('https://testapi.dessobuild.com/Fetch-Current-Location', {
                 lat: coords.latitude,
                 lng: coords.longitude
             });
@@ -142,7 +142,7 @@ function MembershipRegistration() {
         if (!validatePhone() || !validateAge()) return;
         setLoading(true);
         try {
-            const res = await axios.post('https://api.dessobuild.com/api/v1/register-provider', makeFormData());
+            const res = await axios.post('https://testapi.dessobuild.com/api/v1/register-provider', makeFormData());
 
             // toast.success(res.data.message);
             Swal.fire({
@@ -189,10 +189,10 @@ function MembershipRegistration() {
                                                         <div className="d-flex flex-row mb-4">
                                                             <i className="fas fa-user fa-lg me-3 fa-fw lable-icon" />
                                                             <div className="form-outline flex-fill mb-0">
-                                                                <label className="form-label text-white" htmlFor="name">
+                                                                <label className="form-label text-white" htmlFor="name" aria-required >
                                                                     Name
                                                                 </label>
-                                                                <input
+                                                                <inputm
                                                                     onChange={handleChange}
                                                                     name="name"
                                                                     value={memberData.name}

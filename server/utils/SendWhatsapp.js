@@ -1,10 +1,9 @@
 const axios = require('axios');
 
 const SendWhatsapp = async (number, message) => {
-    console.log("number, message",number, message)
     const apiKey = "9c9673c00d8649c380acc43fd55eb743";
     const baseUrl = "https://api.iconicsolution.co.in/wapp/v2/api/send";
-     
+
     // Construct query parameters
     const params = new URLSearchParams({
         apikey: apiKey,
@@ -14,7 +13,6 @@ const SendWhatsapp = async (number, message) => {
 
     try {
         const response = await axios.get(`${baseUrl}?${params.toString()}`);
-        console.log("response.data",response.data)
         return response.data; // Return only the response data
     } catch (error) {
         console.error("Internal server error:", error);

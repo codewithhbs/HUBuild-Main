@@ -13,3 +13,13 @@
     }
     
 }
+
+.v2CallActiveBtn{
+    background-color: #059b38 ;
+    color:white
+}
+
+.v2CallDeactiveBtn{
+    background-color:red;
+    color:white
+}

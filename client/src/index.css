@@ -453,3 +453,25 @@ a {
   left: 1%;
   width: 100px;
 }
+
+.canvas-container{
+  width: 100% !important;
+  /* height: auto !important; */
+}
+
+.forwidthfullcanvas{
+  width: 100% !important;
+}
+
+.canvas-flex{
+  display: flex;
+}
+
+.tool-height{
+  height:'100%';
+}
+
+.forwidthcanva{
+  width: 100% !important;
+  height: 100% !important;
+}
