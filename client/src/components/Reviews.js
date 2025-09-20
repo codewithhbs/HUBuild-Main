@@ -11,7 +11,7 @@ const Reviews = () => {
 
   const fetchReviews = async () => {
     try {
-      const { data } = await axios.get('https://api.dessobuild.com/api/v1/get-all-testimonial');
+      const { data } = await axios.get('https://testapi.dessobuild.com/api/v1/get-all-testimonial');
       setReview(data.data);
     } catch (error) {
       console.log("Internal server error in getting reviews");

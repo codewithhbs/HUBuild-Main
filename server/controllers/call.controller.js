@@ -3,11 +3,10 @@ const Provider = require('../models/providers.model');
 require('dotenv').config();
 const axios = require('axios');
 const CallHistory = require('../models/CallHistory');
-const SendWhatsapp = require('../utils/SendWhatsapp');
 
 exports.createCall = async (req, res) => {
     try {
-        const { providerId, userId, UserWallet, ProviderProfileMin, max_duration_allowed, callFrom } = req.body;
+        const { providerId, userId, UserWallet, ProviderProfileMin, max_duration_allowed } = req.body;
         if (!providerId || !userId) {
             return res.status(400).json({
                 success: false,
@@ -84,7 +83,7 @@ exports.createCall = async (req, res) => {
             {
                 from_number: userNumber,
                 to_number: providerNumber,
-                callback_url: "https://api.dessobuild.com/api/v1/call_status-call",
+                callback_url: "https://testapi.dessobuild.com/api/v1/call_status-call",
                 callback_method: "POST",
                 max_duration: max_duration_allowed
             },
@@ -107,7 +106,6 @@ exports.createCall = async (req, res) => {
             callStatus: callData.call_status,
             UserWallet: UserWallet,
             max_duration_allowed: max_duration_allowed,
-            callFrom
         })
 
         // provider.is_on_call = true;
@@ -140,8 +138,7 @@ exports.createCall = async (req, res) => {
 exports.call_status = async (req, res) => {
     try {
         const callStatusQuery = req.query;
-        // console.log("callStatusQuery",callStatusQuery)
-        console.log("query", req.query)
+	console.log("query",req.query)
         if (!callStatusQuery.from_number || !callStatusQuery.to_number) {
             return res.status(400).json({
                 success: false,
@@ -196,30 +193,6 @@ exports.call_status = async (req, res) => {
         console.log("talkTimeInSeconds", talkTimeInSeconds);
         console.log("Formatted talkTimeInMinutes", talkTimeFormatted);
 
-        const callFrom = findHistory?.callFrom
-
-        if (callFrom === 'paid') {
-            const UserName = findUser?.FullName || "User";
-            const ProviderName = findedProvider?.fullName || "Consultant";
-
-            // Construct review URL with query params
-            const reviewUrl = `https://dessobuild.com/review?providerId=${encodeURIComponent(providerId)}&userId=${encodeURIComponent(userId)}`;
-
-            // Professional message
-            const message = `Hello ${UserName},
-
-Thank you for using our service. Your call with ${ProviderName} has ended.
-
-We value your feedback! Please take a moment to share your review here:
-${reviewUrl}
-
-Your input helps us improve and serve you better.
-
-– Team DessoBuild`;
-
-            await SendWhatsapp(findUser?.PhoneNumber, message);
-
-        }
 
 
         // Handle FAILED status
@@ -455,7 +428,7 @@ exports.createCallFreeModule = async (req, res) => {
             {
                 from_number: callFrom,
                 to_number: callTo,
-                // callback_url: "https://api.dessobuild.com/api/v1/call_status-call",
+                // callback_url: "https://testapi.dessobuild.com/api/v1/call_status-call",
                 // callback_method: "POST",
                 // max_duration: max_duration_allowed
             },

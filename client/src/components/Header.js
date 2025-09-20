@@ -95,8 +95,8 @@ const Header = () => {
 
     try {
       const url = UserData?.role === "provider"
-        ? `https://api.dessobuild.com/api/v1/get-chat-by-providerId/${UserData._id}`
-        : `https://api.dessobuild.com/api/v1/get-chat-by-userId/${UserData._id}`;
+        ? `https://testapi.dessobuild.com/api/v1/get-chat-by-providerId/${UserData._id}`
+        : `https://testapi.dessobuild.com/api/v1/get-chat-by-userId/${UserData._id}`;
 
       const { data } = await axios.get(url);
       const fullData = data.data;
@@ -131,7 +131,7 @@ const Header = () => {
     }
 
     try {
-      const url = `https://api.dessobuild.com/api/v1/mark-${UserData.role}-chats-as-read/${UserData._id}`;
+      const url = `https://testapi.dessobuild.com/api/v1/mark-${UserData.role}-chats-as-read/${UserData._id}`;
       await axios.put(url);
     } catch (error) {
       console.log("Internal server error", error);
@@ -159,7 +159,7 @@ const Header = () => {
             return;
           }
 
-          const res = await axios.post(`https://api.dessobuild.com/api/v1/buy_membership/${providerId}`);
+          const res = await axios.post(`https://testapi.dessobuild.com/api/v1/buy_membership/${providerId}`);
           const order = res.data.data.razorpayOrder;
           const amount = res.data.data.discountAmount;
           const providerData = res.data.data.provider;
@@ -169,10 +169,10 @@ const Header = () => {
               key: "rzp_live_bmq7YMRTuGvvfu",
               amount: amount * 100,
               currency: "INR",
-              name: "Desso Build",
+              name: "DessoBuild",
               description: "Buying Membership",
               order_id: order.id,
-              callback_url: "https://api.dessobuild.com/api/v1/membership_payment_verify",
+              callback_url: "https://testapi.dessobuild.com/api/v1/membership_payment_verify",
               prefill: {
                 name: providerData.name,
                 email: providerData.email,
@@ -198,9 +198,9 @@ const Header = () => {
 
   const navigationItems = [
     { path: "/", label: "Home" },
-    { path: "/talk-to-architect", label: "Connect with Architect" },
-    { path: "/talk-to-interior", label: "Connect with Interior Designer" },
-    { path: "/Vastu", label: "Connect with Vastu Expert" },
+    { path: "/talk-to-architect", label: "Connect With Architect" },
+    { path: "/talk-to-interior", label: "Connect With Interior Designer" },
+    { path: "/Vastu", label: "Connect With Vastu Expert" },
     { path: "/contact", label: "Contact" }
   ];
 
@@ -212,7 +212,7 @@ const Header = () => {
           <Link className="navbar-brand hub-header__brand" to="/" onClick={handleLinkClick}>
             <img
               src={logo || "/placeholder.svg"}
-              alt="Desso Build"
+              alt="DessoBuild"
               className="hub-header__logo"
             />
           </Link>
@@ -270,17 +270,17 @@ const Header = () => {
               )}
 
               {/* Live Projects Link */}
-              {/* {findToken && (
+              {findToken && (
                 <li className="nav-item hub-header__nav-item">
                   <Link
-                    to="/manual-chat"
-                    className={`nav-link hub-header__nav-link ${active === "/manual-chat" ? 'hub-header__nav-link--active' : ''}`}
+                    to="/live-projects"
+                    className={`nav-link hub-header__nav-link ${active === "/live-projects" ? 'hub-header__nav-link--active' : ''}`}
                     onClick={handleLinkClick}
                   >
                     Live Projects
                   </Link>
                 </li>
-              )} */}
+              )}
 
               {/* Auth Section */}
               <li className="nav-item hub-header__nav-item hub-header__auth-item">
@@ -307,7 +307,7 @@ const Header = () => {
                       Login
                     </button>
 
-                    <ul className="dropdown-menu for-position-right" aria-labelledby="loginDropdown">
+                    <ul className="dropdown-menu" aria-labelledby="loginDropdown">
                       <li>
                         <a className="dropdown-item" href="/login">
                           <i className="fas fa-user me-2"></i>
@@ -317,7 +317,7 @@ const Header = () => {
                       <li>
                         <a className="dropdown-item" href="/partner-login">
                           <i className="fas fa-handshake me-2"></i>
-                          Login as Partner
+                          Login as Consultant
                         </a>
                       </li>
                     </ul>

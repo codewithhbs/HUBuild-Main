@@ -52,7 +52,7 @@ function Register() {
         }
 
         try {
-            const res = await axios.post('https://api.dessobuild.com/api/v1/register', formData)
+            const res = await axios.post('https://testapi.dessobuild.com/api/v1/register', formData)
 
             toast.success(res.data.message)
             console.log("res.data", res.data.data)
@@ -186,7 +186,7 @@ function Register() {
                                                             <div data-mdb-input-init=""
                                                                 className="form-outline flex-fill mb-0" >
                                                                 <label className="form-label text-white" htmlFor="form3Example4cd">
-                                                                    Confirm password
+                                                                    Re-enter password
                                                                 </label>
                                                                 <input
                                                                     onChange={handleChange}
@@ -227,7 +227,7 @@ function Register() {
                                                 <div style={{ display: 'flex' }} className="justify-content-center mx-5 mb-3 mb-lg-4">
                                                     <button
                                                         type="submit"
-                                                        className="btn btn-primary btn-lg mt-4 as_btn"
+                                                        className="btn btn-primary btn-lg mt-4 yellow-bg-color"
                                                         disabled={loading}
                                                     >
                                                         {loading ? (

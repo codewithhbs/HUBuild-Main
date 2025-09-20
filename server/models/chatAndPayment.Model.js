@@ -12,10 +12,10 @@ const ChatAndPaymentSchema = new mongoose.Schema({
         // required: true
     },
     providerIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Provider' }],
-    room: { 
-        type: String, 
+    room: {
+        type: String,
         // required: true, 
-        index: true 
+        index: true
     },
     amount: {
         type: Number
@@ -44,29 +44,29 @@ const ChatAndPaymentSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-   messages: [
-      {
-        sender: { type: String, required: true },
-        text: { type: String },
-        file: {
-          name: { type: String },
-          type: { type: String },
-          content: { type: String },
+    messages: [
+        {
+            sender: { type: String, required: true },
+            text: { type: String },
+            file: {
+                name: { type: String },
+                type: { type: String },
+                content: { type: String },
+            },
+            senderName: { type: String },
+            senderRole: { type: String },
+            replyTo: {
+                messageId: { type: String },
+                text: { type: String },
+                senderName: { type: String },
+                senderRole: { type: String },
+                isFile: { type: Boolean, default: false },
+                isAudio: { type: Boolean, default: false }, // New field to indicate audio
+                timestamp: { type: Date },
+            },
+            isAudio: { type: Boolean, default: false }, // New field at message level
+            timestamp: { type: Date, default: Date.now },
         },
-        // Enhanced sender information storage
-        senderName: { type: String }, // Store sender's display name
-        senderRole: { type: String }, // Store sender's role (user/provider)
-        // Enhanced reply support with complete sender info
-        replyTo: {
-          messageId: { type: String }, // Reference to original message
-          text: { type: String }, // Original message text
-          senderName: { type: String }, // Original sender name
-          senderRole: { type: String }, // Original sender role
-          isFile: { type: Boolean, default: false }, // Whether original was a file
-          timestamp: { type: Date }, // Original message timestamp
-        },
-        timestamp: { type: Date, default: Date.now },
-      },
     ],
     deleteByUser: {
         type: Boolean,
@@ -102,6 +102,13 @@ const ChatAndPaymentSchema = new mongoose.Schema({
         default: false
     },
 }, { timestamps: true })
+
+// ✅ Compound index: room + _id (useful for pagination)
+ChatAndPaymentSchema.index({ room: 1, _id: -1 })
+
+// You can also add this if you query mostly by userId or providerId
+ChatAndPaymentSchema.index({ userId: 1 })
+ChatAndPaymentSchema.index({ providerId: 1 })
 
 const ChatAndPayment = mongoose.model('ChatAndPayment', ChatAndPaymentSchema)
 module.exports = ChatAndPayment

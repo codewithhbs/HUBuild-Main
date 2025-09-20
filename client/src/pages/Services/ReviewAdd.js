@@ -32,7 +32,7 @@ const ReviewAdd = ({ user_id, provider_id }) => {
         
         setLoading(true);
         try {
-            await axios.post('https://api.dessobuild.com/api/v1/create-rating', formData);
+            await axios.post('https://testapi.dessobuild.com/api/v1/create-rating', formData);
             toast.success("Review added successfully!");
             setFormData({ provider_id, rating: 0, review: '', user_id });
             window.location.reload();

@@ -265,11 +265,10 @@ exports.buyMemberShip = async (req, res) => {
 
         // Razorpay Order Options
         const razorpayOptions = {
-            amount: Math.round(finalAmount * 100), // Convert to paise and round to integer
+            amount: Math.round(finalAmount * 100), // Convert to paise
             currency: 'INR',
             payment_capture: 1,
         };
-
 
         const razorpayOrder = await razorpayInstance.orders.create(razorpayOptions);
         if (!razorpayOrder) {
@@ -353,14 +352,14 @@ exports.membershipPaymentVerify = async (req, res) => {
         if (status !== 'captured') {
 
             return res.redirect(
-                `https://www.dessobuild.com/payment-failure?error=Payment failed via ${method || 'unknown method'}&transactionId=${razorpay_payment_id}&amount=${failedAmount}&date=${currentTime}`
+                `https://test.dessobuild.com/payment-failure?error=Payment failed via ${method || 'unknown method'}&transactionId=${razorpay_payment_id}&amount=${failedAmount}&date=${currentTime}`
             );
         }
         findProvider.isMember = true;
         findProvider.PaymentStatus = 'success';
         await findProvider.save();
         // return res.redirect(
-        //     `https://www.dessobuild.com/successfull-recharge?amount=${amount}&transactionId=${razorpay_payment_id}&date=${currentTime}`
+        //     `https://test.dessobuild.com/successfull-recharge?amount=${amount}&transactionId=${razorpay_payment_id}&date=${currentTime}`
         // );
         await sendToken(findProvider, res, 201, 'Payment done');
 

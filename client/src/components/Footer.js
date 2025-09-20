@@ -8,16 +8,16 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 
 const quickLinks = [
-  { to: '/member-registration', text: 'Become A Partner', key: 'partner' },
+  { to: '/member-registration', text: 'Become A Consultant', key: 'partner' },
   { to: '/about', text: 'About Us' },
   { to: '/blog', text: 'Blog' },
   { to: '/contact', text: 'Contact Us' },
 ];
 
 const serviceLinks = [
-  { to: '/talk-to-architect', text: 'Connect with Architect' },
-  { to: '/talk-to-interior', text: 'Connect with Interior Designer' },
-  { to: '/vastu', text: 'Connect with Vastu Experts' },
+  { to: '/talk-to-architect', text: 'Talk to Architect' },
+  { to: '/talk-to-interior', text: 'Talk to Interior Designer' },
+  { to: '/vastu', text: 'Talk to Vastu Experts' },
 ];
 
 const Footer = () => {
@@ -34,7 +34,7 @@ const Footer = () => {
 
   const getAllTermForFooter = async () => {
     try {
-      const { data } = await axios.get('https://api.dessobuild.com/api/v1/all_term');
+      const { data } = await axios.get('https://testapi.dessobuild.com/api/v1/all_term');
       console.log('All Terms for Footer:', data);
       if (data?.data?.length > 0) {
         const terms = data.data.map((item) => ({
@@ -48,13 +48,13 @@ const Footer = () => {
                   ? 'Cancellation & Refund Policy'
                   : item.type === 'term'
                     ? 'Terms & Conditions'
-                    : item.type === 'consultant nda'
-                      ? 'Consultant NDA'
-                      : item.type === 'consultant term'
-                        ? 'Consultant T&C'
-                        : item.type === 'vision'
-                          ? 'Our Vision'
-                          : item.type.charAt(0).toUpperCase() + item.type.slice(1),
+                  : item.type === 'vision'
+                    ? 'Our Vision'
+                  : item.type === 'consultant nda'
+                    ? 'Consultant NDA'
+                  : item.type === 'consultant term'
+                    ? 'Consultant T&C'
+                    : item.type.charAt(0).toUpperCase() + item.type.slice(1),
         }));
         setLegalLinks(terms);
       }
@@ -70,7 +70,7 @@ const Footer = () => {
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('https://api.dessobuild.com/api/v1/create_newletter', { email });
+      const res = await axios.post('https://testapi.dessobuild.com/api/v1/create_newletter', { email });
       toast.success(res.data.message);
       setEmail('');
     } catch (error) {
@@ -87,24 +87,19 @@ const Footer = () => {
           <div className="footer-widget">
             <img src={logo} alt="DessoBuild" className="footer-logo" />
             <ul className="footer-contact-list">
-              <li className="footer-contact-item">
-                <MapPin className="footer-contact-icon" />
-                <p style={{ color: 'white' }}>
-                  E-520A, 3rd Floor, Sector 7, Dwarka, New Delhi- 110075
-                </p>
-              </li>
-              {/* <li className="footer-contact-item">
-                <Phone className="footer-contact-icon" />
-                <a style={{ color: 'white' }} href="tel:+919220441214">
-                  +91 9220441214
-                </a>
-              </li> */}
-              <li className="footer-contact-item">
-                <Mail className="footer-contact-icon" />
-                <a style={{ color: 'white' }} href="mailto:info@dessobuild.com">
-                  info@dessobuild.com
-                </a>
-              </li>
+               <li className="footer-contact-item">
+  <MapPin className="footer-contact-icon" size={22} />
+  <p style={{ color: 'white' }}>
+    E-520A, 3rd Floor, Sector 7, Dwarka, New Delhi- 110075
+  </p>
+</li>
+{/* ... */}
+<li className="footer-contact-item">
+  <Mail className="footer-contact-icon" size={22} />
+  <a style={{ color: 'white' }} href="mailto:info@dessobuild.com">
+    info@dessobuild.com
+  </a>
+</li>
             </ul>
           </div>
 

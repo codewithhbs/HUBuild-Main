@@ -41,7 +41,7 @@ const StepWizard = () => {
 
     const handleFetchmembership = async () => {
         try {
-            const { data } = await axios.get("https://api.dessobuild.com/api/v1/get_all_membership");
+            const { data } = await axios.get("https://testapi.dessobuild.com/api/v1/get_all_membership");
             setMemberShip(data.data[0].planPrice);
         } catch (error) {
             console.log("Internal server error", error)
@@ -53,7 +53,7 @@ const StepWizard = () => {
 
     const fetchCurrentLocation = async () => {
         try {
-            const res = await axios.post("https://api.dessobuild.com/Fetch-Current-Location", {
+            const res = await axios.post("https://testapi.dessobuild.com/Fetch-Current-Location", {
                 lat: coords.latitude,
                 lng: coords.longitude,
             });
@@ -80,22 +80,22 @@ const StepWizard = () => {
 
 
     const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        const keys = name.split(".");
+    const { name, value, type, checked } = e.target;
+    const keys = name.split(".");
 
-        setMemberData((prev) => {
-            const updated = { ...prev };
-            let current = updated;
+    setMemberData((prev) => {
+        const updated = { ...prev };
+        let current = updated;
 
-            for (let i = 0; i < keys.length - 1; i++) {
-                current = current[keys[i]];
-            }
+        for (let i = 0; i < keys.length - 1; i++) {
+            current = current[keys[i]];
+        }
 
-            // Use checked for checkboxes, value for other inputs
-            current[keys[keys.length - 1]] = type === 'checkbox' ? checked : value;
-            return { ...updated };
-        });
-    };
+        // Use checked for checkboxes, value for other inputs
+        current[keys[keys.length - 1]] = type === 'checkbox' ? checked : value;
+        return { ...updated };
+    });
+};
 
 
     const validatePhone = () => {
@@ -164,7 +164,7 @@ const StepWizard = () => {
                 toast.error("Failed to load Razorpay SDK. Please check your connection.");
                 return;
             }
-            const res = await axios.post(`https://api.dessobuild.com/api/v1/buy_membership/${providerId}`, {
+            const res = await axios.post(`https://testapi.dessobuild.com/api/v1/buy_membership/${providerId}`, {
                 couponCode: memberData.couponCode,
             });
             const message = res.data?.message;
@@ -188,11 +188,11 @@ const StepWizard = () => {
                     name: "DessoBuild",
                     description: "Buying Membership",
                     order_id: order.id,
-                    // callback_url: "https://api.dessobuild.com/api/v1/membership_payment_verify",
+                    // callback_url: "https://testapi.dessobuild.com/api/v1/membership_payment_verify",
                     handler: async function (response) {
                         // This runs on successful payment
                         try {
-                            const { data } = await axios.post("https://api.dessobuild.com/api/v1/membership_payment_verify", {
+                            const { data } = await axios.post("https://testapi.dessobuild.com/api/v1/membership_payment_verify", {
                                 razorpay_payment_id: response.razorpay_payment_id,
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_signature: response.razorpay_signature,
@@ -238,7 +238,7 @@ const StepWizard = () => {
         setLoading(true);
 
         try {
-            const res = await axios.post("https://api.dessobuild.com/api/v1/register-provider", memberData);
+            const res = await axios.post("https://testapi.dessobuild.com/api/v1/register-provider", memberData);
 
             await handlePayment(res.data.user._id);
         } catch (error) {
@@ -271,7 +271,7 @@ const StepWizard = () => {
 
 
         try {
-            const res = await axios.post("https://api.dessobuild.com/api/v1/check_coupon_code", {
+            const res = await axios.post("https://testapi.dessobuild.com/api/v1/check_coupon_code", {
                 couponCode: couponToCheck,
             });
 
@@ -336,6 +336,7 @@ const StepWizard = () => {
                     {["name", "email", "mobileNumber"].map((field, index) => (
                         <div key={index} className="col-lg-6 mb-3">
                             <label className="form-label">{field === 'mobileNumber' ? 'Mobile Number' : field.charAt(0).toUpperCase() + field.slice(1)}</label>
+                            {/* <label className="form-label">{field.charAt(0).toUpperCase() + field.slice(1)}</label> */}
                             <input type="text" name={field} value={memberData[field]} onChange={handleChange} className="form-control" />
                         </div>
                     ))}
@@ -423,7 +424,6 @@ const StepWizard = () => {
                                             ) : (
                                                 <span className="text-success">₹{Math.round(memberShip)}</span>
                                             )}
-
                                         </>
                                     ) : (
                                         <div className="spinner-border text-primary" role="status">

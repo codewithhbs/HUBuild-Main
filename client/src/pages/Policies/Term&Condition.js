@@ -12,7 +12,7 @@ const TermCondition = () => {
   useEffect(() => {
     const fetchTerm = async () => {
       try {
-        const { data } = await axios.get(`https://api.dessobuild.com/api/v1/single_term/${termType}`);
+        const { data } = await axios.get(`https://testapi.dessobuild.com/api/v1/single_term/${termType}`);
         setTerm(data?.data);
         window.scrollTo(0, 0); // Scroll to top when termType changes
       } catch (error) {

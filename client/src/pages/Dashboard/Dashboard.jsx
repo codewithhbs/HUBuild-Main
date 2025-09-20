@@ -33,9 +33,6 @@ function Dashboard() {
   const [couponLoading, setCouponLoading] = useState(false)
   const [couponError, setCouponError] = useState("")
 
-  // console.log("UserData", UserData)
-  // console.log("userid", userId)
-
   const GetMyProfile = async () => {
     if (!token) {
       console.error("Token is missing")
@@ -43,10 +40,8 @@ function Dashboard() {
     }
     setLoading(true)
     try {
-      const { data } = await axios.get(`https://api.dessobuild.com/api/v1/get-single-user/${userId}`)
-      // console.log("data: ", data.data)
+      const { data } = await axios.get(`https://testapi.dessobuild.com/api/v1/get-single-user/${userId}`)
       setMyProfile(data.data)
-      // console.log("object", data)
       const formattedAmount = data.data.walletAmount.toFixed(2)
       setWalletAmount(formattedAmount)
       setLoading(false)
@@ -72,7 +67,7 @@ function Dashboard() {
     const formData = new FormData()
     formData.append("ProfileImage", blob)
     try {
-      const res = await axios.put(`https://api.dessobuild.com/api/v1/update_user_profile_image/${userId}`, formData)
+      const res = await axios.put(`https://testapi.dessobuild.com/api/v1/update_user_profile_image/${userId}`, formData)
       if (res.data.success) {
         setProfileLoading(false)
         toast.success("Image updated successfully")
@@ -89,19 +84,17 @@ function Dashboard() {
 
   const handleOpenModel = async () => {
     if (!token) {
-      // return toast.error('Login First!');
       return Swal.fire({
         title: "Error!",
         text: "Login First!",
-        icon: "error", // use lowercase
+        icon: "error",
         confirmButtonText: "Okay",
       })
     } else if (UserData?.role === "provider") {
-      // return toast.error(`You are a provider. You don't have access.`);
       return Swal.fire({
         title: "Error!",
         text: `You are a provider. You don't have access.`,
-        icon: "error", // use lowercase
+        icon: "error",
         confirmButtonText: "Okay",
       })
     }
@@ -142,7 +135,7 @@ function Dashboard() {
     setCouponError("")
 
     try {
-      const res = await axios.post("https://api.dessobuild.com/api/v1/check_coupon", {
+      const res = await axios.post("https://testapi.dessobuild.com/api/v1/check_coupon", {
         couponCode: couponCode.trim(),
       })
 
@@ -167,16 +160,13 @@ function Dashboard() {
 
   const handleMakePayment = async () => {
     if (!amount || amount <= 0) {
-      // return toast.error('Please enter a valid amount');
       return Swal.fire({
         title: "Error!",
         text: "Please enter a valid amount",
-        icon: "error", // use lowercase
+        icon: "error",
         confirmButtonText: "Okay",
       })
     }
-    // toast.success(`Proceeding with payment of ₹${amount}`);
-    // handleCloseModel();
 
     try {
       const scriptLoaded = await loadRazorpayScript()
@@ -196,9 +186,8 @@ function Dashboard() {
         requestBody.couponCode = appliedCoupon
       }
 
-      const res = await axios.post(`https://api.dessobuild.com/api/v1/create-payment/${UserId}`, requestBody)
+      const res = await axios.post(`https://testapi.dessobuild.com/api/v1/create-payment/${UserId}`, requestBody)
 
-      // console.log("Order", res.data.data)
       const order = res.data.data.razorpayOrder
       if (order) {
         const options = {
@@ -208,7 +197,7 @@ function Dashboard() {
           name: "DessoBuild",
           description: "Doing Recharge",
           order_id: order?.id || "",
-          callback_url: "https://api.dessobuild.com/api/v1/verify-payment",
+          callback_url: "https://testapi.dessobuild.com/api/v1/verify-payment",
           prefill: {
             name: UserData?.name,
             email: UserData?.email,
@@ -223,20 +212,14 @@ function Dashboard() {
       }
     } catch (error) {
       console.log("Internal server error", error)
-      // toast.error(error?.response?.data?.message || 'Failed to Reacharge. Please try again.');
       Swal.fire({
         title: "Error!",
         text: error?.response?.data?.message || "Failed to Reacharge. Please try again.",
-        icon: "error", // use lowercase
+        icon: "error",
         confirmButtonText: "Okay",
       })
     }
   }
-
-  // const handleLogout = () => {
-  //   localStorage.clear()
-  //   window.location.href = '/'
-  // }
 
   const handleLogout = useLogout(userId)
 
@@ -252,7 +235,7 @@ function Dashboard() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axios.delete(`https://api.dessobuild.com/api/v1/user-delete/${id}`)
+          const res = await axios.delete(`https://testapi.dessobuild.com/api/v1/user-delete/${id}`)
           if (res.data.success) {
             Swal.fire("Deleted!", "Your account has been deleted.", "success")
             localStorage.clear()
@@ -287,191 +270,125 @@ function Dashboard() {
   }
 
   if (loading || !myProfile) {
-    return
-    ;<div
-      className="d-flex flex-column justify-content-center align-items-center bg-light"
-      style={{ height: "100dvh", textAlign: "center" }}
-    >
-      <div
-        className="spinner-border"
-        role="status"
-        style={{
-          width: "3rem",
-          height: "3rem",
-          borderColor: "#eab936",
-          borderRightColor: "transparent",
-        }}
-      >
-        <span className="visually-hidden">Loading...</span>
+    return (
+      <div className="forDisplayFlex justify-content-center align-items-center min-vh-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
       </div>
-      <h5 className="fw-semibold mb-1 mt-4" style={{ color: "#eab936" }}>
-        Fetching Your Profile...
-      </h5>
-      <small className="text-muted">Please wait while we prepare your Profile.</small>
-    </div>
+    )
   }
 
   return (
     <>
-      <div className="userdashboard-body-bg">
-        <div className="w-100 px-2 mx-auto py-5 h-100">
-          <div className="row d-flex justify-content-center align-items-center h-100">
-            <div className="col col-xl-12">
-              <div className="card profile-card-header" style={{ borderRadius: 15 }}>
-                <div className="card-body p-4">
-                  <div className="d-flex justify-content-between">
+      <div className='userdashboard-body-bg' style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+        <div className="container-fluid py-4 px-3 px-md-4">
+          {/* Profile Header Card */}
+          <div className="card shadow-lg border-0 mb-4" style={{ borderRadius: '15px' }}>
+            <div className="card-body p-4">
+              <div className="row align-items-center">
+                <div className="col-md-8">
+                  <div className="forDisplayFlex forjustify align-items-center">
+                    <div className="position-relative for-margin-right">
+                      <label htmlFor="profile-upload" className="cursor-pointer">
+                        <img
+                          src={
+                            myProfile?.ProfileImage?.imageUrl ||
+                            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                              myProfile.name || "User",
+                            )}&background=random`
+                          }
+                          alt="avatar"
+                          className="rounded-circle object-cover"
+                          style={{ width: '100px', height: '100px', cursor: 'pointer', border: '3px solid #042F66' }}
+                        />
+                      </label>
+                      <input
+                        type="file"
+                        id="profile-upload"
+                        style={{ display: "none" }}
+                        accept="image/*"
+                        onChange={handleFileChange}
+                      />
+                      {myProfile?.isVerified && (
+                        <span className="position-absolute top-0 end-0 badge bg-success rounded-pill p-1">
+                          <i className="fas fa-check-circle me-1"></i>Verified
+                        </span>
+                      )}
+                      {showCropper && selectedImage && (
+                        <CropperModal
+                          imageSrc={selectedImage}
+                          onClose={() => setShowCropper(false)}
+                          onCropComplete={handleCropComplete}
+                          profileLoading={profileLoading}
+                        />
+                      )}
+                    </div>
                     <div>
-                      <div style={{ alignItems: "center", display: "flex" }} className=" mb-2">
-                        <a>
-                          <div style={{ position: "relative" }}>
-                            <label htmlFor="profile-upload">
-                              <img
-                                src={
-                                  myProfile?.ProfileImage?.imageUrl ||
-                                  `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                    myProfile.name || "User",
-                                  )}&background=random`
-                                }
-                                alt="avatar"
-                                className="img-fluid object-cover rounded-circle me-3"
-                                style={{
-                                  width: "80px",
-                                  height: "80px",
-                                  display: "flex",
-                                }}
-                              />
-                            </label>
-                            <input
-                              type="file"
-                              id="profile-upload"
-                              style={{ display: "none" }}
-                              accept="image/*"
-                              onChange={handleFileChange}
-                            />
-                            {myProfile?.isVerified && (
-                              <span
-                                className="badge "
-                                style={{
-                                  position: "absolute",
-                                  top: -11,
-                                  left: 52,
-                                  background: "white",
-                                  borderRadius: "50%",
-                                  // border: '1px solid black', // Uncomment if you need this
-                                  padding: 5,
-                                  boxShadow: "1px 1px 10px #dcdcdc",
-                                }}
-                              >
-                                <i style={{ color: "#ff6100" }} class="ri-vip-crown-fill"></i>
-                                {/* <img style={{ width: '80px' }} src={crown || "/placeholder.svg"} alt="" /> */}
-                              </span>
-                            )}
-                            {showCropper && selectedImage && (
-                              <CropperModal
-                                imageSrc={selectedImage}
-                                onClose={() => setShowCropper(false)}
-                                onCropComplete={handleCropComplete}
-                                profileLoading={profileLoading}
-                              />
-                            )}
-                          </div>
-                        </a>
-                        <h3 className="p-0 m-0">{myProfile.name}</h3>
-                      </div>
-                      <p className="small mb-0">
-                        {/* <i className="fas fa-star fa-lg text-warning" />{" "} */}
-                        {`${myProfile.email}`}
+                      <h3 className="mb-1 text-dark fw-bold for-text-center">{myProfile.name}</h3>
+                      <p className="text-muted mb-2">
+                        <span className="me-2">{myProfile.email}</span>
                         <span className="mx-2">|</span>
-                        {`${myProfile.PhoneNumber}`}
+                        <span>{myProfile.PhoneNumber}</span>
                       </p>
                     </div>
-                    <div
-                      style={{ display: "flex" }}
-                      className=" flex-column gap-2 align-items-center justify-content-center"
-                    >
-                      <div style={{ display: "flex" }} className="architectur-bar">
-                        <div className="available-balance medium-device-balance">
-                          {" "}
-                          Available balance: <main class="balance-avail"> ₹ {walletAmount} </main>
-                        </div>
-                      </div>
-                      <a onClick={handleOpenModel} className="profileRecharge">
-                        Recharge
-                      </a>
-                    </div>
                   </div>
-                  <hr className="my-4" />
-                  <div className="featured-list d-flex justify-content-start align-items-center">
-                    <p
-                      onClick={() => setActiveTab("settings")}
-                      style={{ fontWeight: "700" }}
-                      className="formarginbottommore text-uppercase marginrightmore"
+                </div>
+                <div className="col-md-4 mt-3 mt-md-0">
+                  <div className="forDisplayFlex flex-column gap-3">
+                    <div style={{display:'flex'}} className="align-items-center justify-content-between bg-light p-3 rounded">
+                      <span className="text-dark fw-medium">Available Balance:</span>
+                      <span className="text-success fw-bold fs-5">₹{walletAmount}</span>
+                    </div>
+                    
+                    <button 
+                      onClick={handleOpenModel} 
+                      className="btn btn-primary"
+                      style={{ backgroundColor: '#042F66', borderColor: '#042F66' }}
                     >
-                      <i className="fas fa-cog me-2" />{" "}
-                      <span
-                        style={{ cursor: "pointer" }}
-                        className={`cursor-pointer ${
-                          activeTab === "settings" ? "text-danger fw-bold text-decoration-underline" : ""
-                        }`}
-                      >
-                        settings
-                      </span>
-                      {/* <span className="ms-3 me-4">|</span> */}
-                    </p>
-                    {/* <p
-                      style={{ fontWeight: '700' }}
-                      className="formarginbottommore text-uppercase marginrightmore"
-                    >
-                      <i className="fas fa-cog me-2" />{' '}
-                      <a
-                        href='manual-chat'
-                        style={{ cursor: 'pointer' }}
-                        className={`cursor-pointer ${activeTab === 'settings'
-                          ? 'text-danger fw-bold text-decoration-underline'
-                          : ''
-                          }`}
-                      >
-                        Manual Chat
-                      </a>
-                                      </p> */}
-                    <button
-                      type="button"
-                      className="formarginbottommore btn logout_btn mx-2 btn-sm btn-floating"
-                      title="Delete Account"
-                      onClick={() => handleDeleteAccount(userId)}
-                    >
-                      Delete Account <i className="fas fa-trash text-body"></i>
-                    </button>
-                    <button
-                      type="button"
-                      className="btn logout_btn mx-2 btn-sm btn-floating"
-                      title="Logout"
-                      onClick={() => handleLogout()}
-                    >
-                      Logout <i className="fas fa-sign-out-alt text-body"></i>
+                      <i className="fas fa-wallet me-2"></i> Recharge Wallet
                     </button>
                   </div>
                 </div>
               </div>
+              
+              <hr className="my-4" />
+              
+              {/* Action Buttons */}
+              <div className="forDisplayFlex flex-wrap gap-2">
+                <button
+                  className="btn btn-outline-danger btn-sm"
+                  onClick={() => handleDeleteAccount(userId)}
+                >
+                  <i className="fas fa-trash me-1"></i> Delete Account
+                </button>
+                <button
+                  className="btn btn-outline-secondary btn-sm"
+                  onClick={() => handleLogout()}
+                >
+                  <i className="fas fa-sign-out-alt me-1"></i> Logout
+                </button>
+              </div>
             </div>
           </div>
+
+          {/* Settings Tab */}
           {activeTab === "settings" && (
-            <>
-              <div className="w-100 py-4 mt-5 mb-3">
-                <h2 className="foraligncenter">
-                  <i className="fas fa-user-cog text-dark me-2" />
-                  My Settings
-                </h2>
-                {/* Settings Form */}
+            <div className="card shadow-sm border-0">
+              <div className="card-body">
+                <h4 className="card-title text-primary mb-4" style={{ color: '#042F66' }}>
+                  <i className="fas fa-cog me-2"></i>Account Settings
+                </h4>
                 <Settings data={myProfile} />
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>
 
+      {/* Recharge Modal */}
       <Modal show={showModal} onHide={handleCloseModel} centered>
-        <Modal.Header closeButton>
+        <Modal.Header closeButton style={{ backgroundColor: '#042F66', color: 'white' }}>
           <Modal.Title>Recharge Wallet</Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -487,9 +404,14 @@ function Dashboard() {
               />
             </Form.Group>
 
-            <div className="d-flex justify-content-around my-3">
+            <div className="forDisplayFlex justify-content-around my-3">
               {[100, 300, 500].map((preset) => (
-                <Button key={preset} variant="outline-primary" onClick={() => handlePresetAmount(preset)}>
+                <Button 
+                  key={preset} 
+                  variant="outline-primary" 
+                  onClick={() => handlePresetAmount(preset)}
+                  style={{ color: '#042F66', borderColor: '#042F66' }}
+                >
                   ₹{preset}
                 </Button>
               ))}
@@ -498,7 +420,7 @@ function Dashboard() {
             {/* Coupon Section */}
             <Form.Group className="mb-3">
               <Form.Label>Coupon Code (Optional)</Form.Label>
-              <div className="d-flex gap-2">
+              <div className="forDisplayFlex gap-2">
                 <Form.Control
                   type="text"
                   placeholder="Enter coupon code"
@@ -539,7 +461,7 @@ function Dashboard() {
             Close
           </Button>
           <Button
-            style={{ backgroundColor: "#E9BB37", border: "1px solid #E9BB37" }}
+            style={{ backgroundColor: "#042F66", borderColor: "#042F66" }}
             variant="primary"
             onClick={handleMakePayment}
           >

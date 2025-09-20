@@ -7,7 +7,8 @@ import toast from 'react-hot-toast';
 function AddAboutImage() {
   const [loading, setLoading] = React.useState(false);
   const [bannerFile, setBannerFile] = React.useState(null);
-  const [formData, setFormData] = React.useState({});
+  const [formData, setFormData] = React.useState({
+  });
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -27,7 +28,7 @@ function AddAboutImage() {
 
     setLoading(true);
     try {
-      const res = await axios.post('https://api.dessobuild.com/api/v1/create-about-image', payload, {
+      const res = await axios.post('https://testapi.dessobuild.com/api/v1/create-about-image', payload, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       toast.success('Image added successfully!');
