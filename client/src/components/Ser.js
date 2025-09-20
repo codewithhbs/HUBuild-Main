@@ -8,7 +8,7 @@ const Ser = () => {
     const [image, setImage] = useState([])
     const fetchImage = async () => {
         try {
-            const { data } = await axios.get('https://testapi.dessobuild.com/api/v1/get-all-plan-journey-image')
+            const { data } = await axios.get('https://api.dessobuild.com/api/v1/get-all-plan-journey-image')
             const allData = data.data;
             const filterData = allData.filter((item) => item.active === true)
             setImage(filterData)

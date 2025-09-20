@@ -40,7 +40,7 @@ function Dashboard() {
     }
     setLoading(true)
     try {
-      const { data } = await axios.get(`https://testapi.dessobuild.com/api/v1/get-single-user/${userId}`)
+      const { data } = await axios.get(`https://api.dessobuild.com/api/v1/get-single-user/${userId}`)
       setMyProfile(data.data)
       const formattedAmount = data.data.walletAmount.toFixed(2)
       setWalletAmount(formattedAmount)
@@ -67,7 +67,7 @@ function Dashboard() {
     const formData = new FormData()
     formData.append("ProfileImage", blob)
     try {
-      const res = await axios.put(`https://testapi.dessobuild.com/api/v1/update_user_profile_image/${userId}`, formData)
+      const res = await axios.put(`https://api.dessobuild.com/api/v1/update_user_profile_image/${userId}`, formData)
       if (res.data.success) {
         setProfileLoading(false)
         toast.success("Image updated successfully")
@@ -135,7 +135,7 @@ function Dashboard() {
     setCouponError("")
 
     try {
-      const res = await axios.post("https://testapi.dessobuild.com/api/v1/check_coupon", {
+      const res = await axios.post("https://api.dessobuild.com/api/v1/check_coupon", {
         couponCode: couponCode.trim(),
       })
 
@@ -186,7 +186,7 @@ function Dashboard() {
         requestBody.couponCode = appliedCoupon
       }
 
-      const res = await axios.post(`https://testapi.dessobuild.com/api/v1/create-payment/${UserId}`, requestBody)
+      const res = await axios.post(`https://api.dessobuild.com/api/v1/create-payment/${UserId}`, requestBody)
 
       const order = res.data.data.razorpayOrder
       if (order) {
@@ -197,7 +197,7 @@ function Dashboard() {
           name: "DessoBuild",
           description: "Doing Recharge",
           order_id: order?.id || "",
-          callback_url: "https://testapi.dessobuild.com/api/v1/verify-payment",
+          callback_url: "https://api.dessobuild.com/api/v1/verify-payment",
           prefill: {
             name: UserData?.name,
             email: UserData?.email,
@@ -235,7 +235,7 @@ function Dashboard() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axios.delete(`https://testapi.dessobuild.com/api/v1/user-delete/${id}`)
+          const res = await axios.delete(`https://api.dessobuild.com/api/v1/user-delete/${id}`)
           if (res.data.success) {
             Swal.fire("Deleted!", "Your account has been deleted.", "success")
             localStorage.clear()

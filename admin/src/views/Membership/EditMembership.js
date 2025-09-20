@@ -21,7 +21,7 @@ const EditMembership = () => {
     // Fetch membership details
     const fetchMembership = async () => {
         try {
-            const { data } = await axios.get(`https://testapi.dessobuild.com/api/v1/get_single_membership/${id}`);
+            const { data } = await axios.get(`https://api.dessobuild.com/api/v1/get_single_membership/${id}`);
             setPlanPrice(data.data.planPrice);
         } catch (error) {
             console.error('Error fetching membership:', error);
@@ -44,7 +44,7 @@ const EditMembership = () => {
 
         setLoading(true);
         try {
-            const res = await axios.put(`https://testapi.dessobuild.com/api/v1/update_membership/${id}`, { planPrice });
+            const res = await axios.put(`https://api.dessobuild.com/api/v1/update_membership/${id}`, { planPrice });
             toast.success(res.data.message);
         } catch (error) {
             console.error('Error updating membership:', error);

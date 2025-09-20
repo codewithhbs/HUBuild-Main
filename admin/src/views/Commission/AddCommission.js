@@ -22,7 +22,7 @@ const AddCommission = () => {
 
         setLoading(true);
         try {
-            const res = await axios.post('https://testapi.dessobuild.com/api/v1/create-commission', {
+            const res = await axios.post('https://api.dessobuild.com/api/v1/create-commission', {
                 commissionPercent,
             });
             toast.success(res.data.message || 'Commission added successfully');

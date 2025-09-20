@@ -18,7 +18,7 @@ const EditExpertise = () => {
   // Fetch expertise details
   const fetchExpertiseDetails = async () => {
     try {
-      const { data } = await axios.get(`https://testapi.dessobuild.com/api/v1/single_expertise/${id}`);
+      const { data } = await axios.get(`https://api.dessobuild.com/api/v1/single_expertise/${id}`);
       setExpertise(data.data.expertise);
     } catch (error) {
       console.error('Error fetching expertise details:', error);
@@ -41,7 +41,7 @@ const EditExpertise = () => {
 
     setLoading(true);
     try {
-      const res = await axios.put(`https://testapi.dessobuild.com/api/v1/update_expertise/${id}`, { expertise });
+      const res = await axios.put(`https://api.dessobuild.com/api/v1/update_expertise/${id}`, { expertise });
       toast.success(res.data.message);
     } catch (error) {
       console.error('Error updating expertise:', error);

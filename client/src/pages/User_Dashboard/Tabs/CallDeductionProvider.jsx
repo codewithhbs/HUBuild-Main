@@ -18,7 +18,7 @@ const CallDeductionProvider = () => {
         setLoading(true);
         try {
             const userId = UserData._id;
-            const { data } = await axios.get(`https://testapi.dessobuild.com/api/v1/get-call-by-provider/${userId}`)
+            const { data } = await axios.get(`https://api.dessobuild.com/api/v1/get-call-by-provider/${userId}`)
             setData(data.data.reverse());
             setLoading(false);
         } catch (error) {

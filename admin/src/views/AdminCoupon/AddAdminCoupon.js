@@ -26,7 +26,7 @@ const AddAdminCoupon = () => {
 
         setLoading(true);
         try {
-            const res = await axios.post('https://testapi.dessobuild.com/api/v1/create_admin_coupon', couponData);
+            const res = await axios.post('https://api.dessobuild.com/api/v1/create_admin_coupon', couponData);
             toast.success(res.data.message);
             setCouponData({ couponCode: '', discount: '' });
         } catch (error) {
