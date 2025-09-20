@@ -25,7 +25,7 @@
 /* Base Styles */
 .modern-chat-container {
     font-family: var(--font-sans);
-    height: 85vh;
+    height: 100vh;
     background-color: var(--background-light);
     color: var(--text-primary);
 }
@@ -489,18 +489,22 @@
     .modern-chat-container .row,
     .modern-chat-container .col-md-4,
     .modern-chat-container .col-md-8 {
-        height: 93%;
+        height: 100%;
     }
 
     .chat-list-container,
     .chat-window-container {
-        height: 100vh;
+        height: 11vh;
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
-        z-index: 10;
-        margin-top: 65px;
+        z-index: 99999999;
+        /* margin-top: 65px; */
+    }
+
+    .hub-header--fixed .hub-header__navbar {
+        padding: 0.30rem 0;
     }
 
     .chat-list-item {
@@ -508,7 +512,7 @@
     }
 
     .avatar {
-        width: 2.5rem;
+        width: 3.5rem;
         height: 2.5rem;
     }
 

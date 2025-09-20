@@ -19,7 +19,7 @@ const UploadGallery = ({ isShow, token }) => {
         setUploading(true);
 
         try {
-            await axios.post('https://api.dessobuild.com/api/v1/addPortfolio?type=Gallery', formData, {
+            await axios.post('https://testapi.dessobuild.com/api/v1/addPortfolio?type=Gallery', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${token}`,

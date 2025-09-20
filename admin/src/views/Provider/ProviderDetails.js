@@ -118,7 +118,7 @@ function ProviderDetails() {
         const promises = categories.map(async (category) => {
           try {
             const { data } = await axios.get(
-              `https://api.dessobuild.com/api/v1/get-service-by-provider/${provider._id}/${category}`
+              `https://testapi.dessobuild.com/api/v1/get-service-by-provider/${provider._id}/${category}`
             );
             const serviceData = data.data.find((service) => service.category === category);
             if (serviceData) {

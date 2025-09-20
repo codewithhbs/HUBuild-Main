@@ -6,12 +6,18 @@ const SocketContext = createContext();
 
 export const useSocket = () => useContext(SocketContext);
 
-const ENDPOINT = 'https://api.dessobuild.com';
+const ENDPOINT = 'https://testapi.dessobuild.com';
 
 export const SocketProvider = ({ children }) => {
     const socket = useMemo(() => io(ENDPOINT, {
         autoConnect: false,
         transports: ['websocket'],
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        timeout: 20000,
+        pingTimeout: 30000,
+        pingInterval: 25000,
     }), []);
 
     useEffect(() => {
@@ -22,7 +28,7 @@ export const SocketProvider = ({ children }) => {
 
         socket.connect();
 
-        socket.on('connection', () => {
+        socket.on('connect', () => {
             console.log('✅ Socket connected:', socket.id);
 
             if (userData) {
@@ -34,8 +40,12 @@ export const SocketProvider = ({ children }) => {
             }
         });
 
-        socket.on('disconnect', () => {
-            console.log('❌ Socket disconnected');
+        socket.on('disconnect', (reason) => {
+            console.log('❌ Socket disconnected:', reason);
+        });
+
+        socket.on('connect_error', (err) => {
+            console.error('⚠️ Socket connect_error:', err?.message);
         });
 
         return () => {

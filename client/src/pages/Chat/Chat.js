@@ -4,7 +4,7 @@ import './Chat.css';
 import { MdAttachment } from "react-icons/md";
 import ScrollToBottom from 'react-scroll-to-bottom';
 
-const ENDPOINT = 'https://api.dessobuild.com/';
+const ENDPOINT = 'https://testapi.dessobuild.com/';
 
 const Chat = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);

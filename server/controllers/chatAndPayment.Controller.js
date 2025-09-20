@@ -28,6 +28,7 @@ exports.createChatWithNew = async (req, res) => {
         const room = `${userId}_${providerId}`
         const check = await ChatAndPayment.findOne({ room: room })
         if (check) {
+            console.log("i am in checking",check.userChatTempDeleted, check.providerChatTempDeleted)
             if (check.userChatTempDeleted === true && check.providerChatTempDeleted === true) {
                 check.userChatTempDeleted = false;
                 check.providerChatTempDeleted = false;
@@ -786,56 +787,36 @@ exports.updateManualChatRoom = async (req, res) => {
     }
 };
 
-exports.sendFeedback = async (req, res) => {
+exports.updateGroupName = async (req, res) => {
     try {
-        const { providerId, UserId } = req.body;
-
-        console.log("data", req.body)
-
-        const findProvider = await Provider.findById(providerId);
-        if (!findProvider) {
-            return res.status(404).json({
+        const { id } = req.params;
+        const { groupName } = req.body;
+        if (!groupName) {
+            return res.status(400).json({
                 success: false,
-                message: 'Provider not found',
+                message: 'Group name is required',
             });
         }
-
-        const findUser = await User.findById(UserId);
-        if (!findUser) {
+        const chat = await ChatAndPayment.findById(id);
+        if (!chat) {
             return res.status(404).json({
                 success: false,
-                message: 'User not found',
+                message: 'Chat not found',
             });
         }
-
-        const userName = findUser.name;
-        const providerName = findProvider.name;
-        const userNumber = findUser.PhoneNumber;
-        const providerNumber = findProvider.mobileNumber;
-        const Admin_Number = 9220441214;
-
-        const message = `📣 Feedback Received
-
-✅ User *${userName}* (Phone No: ${userNumber}) has expressed satisfaction with the service consultant by *${providerName}* (Phone No: ${providerNumber}).
-
-🕐 Timestamp: ${new Date().toLocaleString()}
-
-Please review the feedback or take any necessary actions.`;
-
-        // Assuming SendWhatsapp takes (number, message)
-        await SendWhatsapp(Admin_Number, message);
-
-        res.status(200).json({
+        chat.groupName = groupName;
+        const updatedChat = await chat.save();
+        return res.status(200).json({
             success: true,
-            message: 'Feedback sent to admin successfully.',
+            message: 'Group name updated successfully',
+            data: updatedChat
         });
-
     } catch (error) {
-        console.log("Internal server error", error);
-        res.status(500).json({
+        console.error("Error updating group name:", error);
+        return res.status(500).json({
             success: false,
-            message: "Internal server error",
+            message: "An error occurred while updating the group name.",
             error: error.message
         });
     }
-};
+}

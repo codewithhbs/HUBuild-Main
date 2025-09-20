@@ -23,7 +23,7 @@ export const Documents = () => {
     const fetchProvider = async () => {
       try {
         const { data } = await axios.get(
-          `https://api.dessobuild.com/api/v1/get-single-provider/${UserId}`
+          `https://testapi.dessobuild.com/api/v1/get-single-provider/${UserId}`
         );
         const providerData = data.data;
         setUploadedImages({
@@ -64,7 +64,7 @@ export const Documents = () => {
     setLoading(true);
     try {
       const res = await axios.put(
-        `https://api.dessobuild.com/api/v1/update-provider-documents/${UserId}`,
+        `https://testapi.dessobuild.com/api/v1/update-provider-documents/${UserId}`,
         formData,
         {
           headers: {
