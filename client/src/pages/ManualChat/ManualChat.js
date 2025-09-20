@@ -39,7 +39,7 @@ import CanvasDraw from "react-canvas-draw"
 import { Pencil, Hand, Eye } from "lucide-react"
 import VoiceRecorder from "./VoiceRecorder" // Adjust the path as needed
 
-const ENDPOINT = "https://testapi.dessobuild.com/"
+const ENDPOINT = "https://api.dessobuild.com/"
 const MAX_FILE_SIZE = 5 * 1024 * 1024
 
 const useAdjustedMousePosition = (containerRef, zoomLevel, panOffset) => {

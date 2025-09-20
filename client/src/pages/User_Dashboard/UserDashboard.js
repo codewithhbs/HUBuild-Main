@@ -55,7 +55,7 @@ const UserDashboard = () => {
     if (!token) return;
     setLoading(true);
     try {
-      const { data } = await axios.get(`https://testapi.dessobuild.com/api/v1/get-single-provider/${providerId}`);
+      const { data } = await axios.get(`https://api.dessobuild.com/api/v1/get-single-provider/${providerId}`);
       setMyProfile(data.data);
       setMobileNumber(data.data.mobileNumber)
       const formattedAmount = data.data.walletAmount.toFixed(2);
@@ -73,7 +73,7 @@ const UserDashboard = () => {
   const handleFetchProvider = async () => {
     try {
       const { data } = await axios.get(
-        `https://testapi.dessobuild.com/api/v1/get-single-provider/${providerId}`
+        `https://api.dessobuild.com/api/v1/get-single-provider/${providerId}`
       );
       const allData = data.data;
       setStatuses({
@@ -93,7 +93,7 @@ const UserDashboard = () => {
 
     try {
       const response = await axios.put(
-        `https://testapi.dessobuild.com/api/v1/update-available-status/${providerId}`,
+        `https://api.dessobuild.com/api/v1/update-available-status/${providerId}`,
         { [statusType]: updatedStatus }
       );
       if (response.data.success) {
@@ -152,7 +152,7 @@ const UserDashboard = () => {
     setUploading(true);
 
     try {
-      const response = await axios.post('https://testapi.dessobuild.com/api/v1/addPortfolio?type=Portfolio', formData, {
+      const response = await axios.post('https://api.dessobuild.com/api/v1/addPortfolio?type=Portfolio', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
@@ -175,7 +175,7 @@ const UserDashboard = () => {
 
   const handleIsDeactived = async (id, isDeactived) => {
     try {
-      const res = await axios.patch(`https://testapi.dessobuild.com/api/v1/update-provider-deactive-status/${id}`)
+      const res = await axios.patch(`https://api.dessobuild.com/api/v1/update-provider-deactive-status/${id}`)
       if (res.data.success) {
         toast.success(res.data.message);
         window.location.reload()
@@ -197,7 +197,7 @@ const UserDashboard = () => {
     const formData = new FormData();
     formData.append('photo', blob);
     try {
-      const res = await axios.put(`https://testapi.dessobuild.com/api/v1/update_provider_profile_image/${providerId}`, formData)
+      const res = await axios.put(`https://api.dessobuild.com/api/v1/update_provider_profile_image/${providerId}`, formData)
       if (res.data.success) {
         setProfileLoading(false)
         toast.success('Image updated successfully');
@@ -226,7 +226,7 @@ const UserDashboard = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await axios.delete(`https://testapi.dessobuild.com/api/v1/delete-provider/${id}`)
+          const res = await axios.delete(`https://api.dessobuild.com/api/v1/delete-provider/${id}`)
           if (res.data.success) {
             localStorage.clear()
             window.location.href = '/'
@@ -247,7 +247,7 @@ const UserDashboard = () => {
 
   const handleFetchCommission = async () => {
     try {
-      const { data } = await axios.get('https://testapi.dessobuild.com/api/v1/get-all-commision')
+      const { data } = await axios.get('https://api.dessobuild.com/api/v1/get-all-commision')
       const commissiondata = data.data
       setCommissionPercent(commissiondata[0]?.commissionPercent)
     } catch (error) {
@@ -293,7 +293,7 @@ const UserDashboard = () => {
     }
 
     try {
-      const response = await axios.post("https://testapi.dessobuild.com/api/v1/create-withdraw-request", {
+      const response = await axios.post("https://api.dessobuild.com/api/v1/create-withdraw-request", {
         provider: myProfile._id,
         amount: parseFloat(amount),
         commission,
@@ -333,7 +333,7 @@ const UserDashboard = () => {
 
   const sendOtp = async () => {
     try {
-      const response = await axios.post('https://testapi.dessobuild.com/api/v1/otp_send_before_update', { mobileNumber });
+      const response = await axios.post('https://api.dessobuild.com/api/v1/otp_send_before_update', { mobileNumber });
       if (response.data.success) {
         setOtpSent(true);
         setTimeout(() => {
@@ -350,7 +350,7 @@ const UserDashboard = () => {
 
   const verifyOtp = async () => {
     try {
-      const response = await axios.post('https://testapi.dessobuild.com/api/v1/verify_otp_before_update', { mobileNumber, otp });
+      const response = await axios.post('https://api.dessobuild.com/api/v1/verify_otp_before_update', { mobileNumber, otp });
       if (response.data.success) {
         setIsOtpVerified(true);
         setActiveTab(3);

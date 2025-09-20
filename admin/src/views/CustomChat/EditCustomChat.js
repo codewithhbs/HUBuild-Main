@@ -77,7 +77,7 @@ const EditCustomChat = () => {
 
   const handleFetchSingleCustomChat = async () => {
     try {
-      const { data } = await axios.get(`https://testapi.dessobuild.com/api/v1/get-chat-by-id/${id}`)
+      const { data } = await axios.get(`https://api.dessobuild.com/api/v1/get-chat-by-id/${id}`)
       const chatData = data.data
       setChatRoomData(chatData)
       // Handle both array of IDs and array of objects
@@ -143,7 +143,7 @@ const EditCustomChat = () => {
 
   const handleFetchProvider = async () => {
     try {
-      const { data } = await axios.get("https://testapi.dessobuild.com/api/v1/get-all-provider")
+      const { data } = await axios.get("https://api.dessobuild.com/api/v1/get-all-provider")
       const allData = data.data
       const architects = allData.filter((item) => item.type === "Architect")
       const interiors = allData.filter((item) => item.type === "Interior")
@@ -264,7 +264,7 @@ const EditCustomChat = () => {
     setLoading(true)
     try {
       // Use the provided updateManualChatRoom endpoint
-      const res = await axios.put(`https://testapi.dessobuild.com/api/v1/manual-chat-room/${id}`, {
+      const res = await axios.put(`https://api.dessobuild.com/api/v1/manual-chat-room/${id}`, {
         providerIds: formData.providerIds,
         groupName: formData.groupName,
         userId: formData.userId,

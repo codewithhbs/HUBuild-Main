@@ -43,7 +43,7 @@ const PartnerLogin = () => {
 
         e.preventDefault()
         try {
-            const { data } = await axios.post('https://testapi.dessobuild.com/api/v1/login', logindata, {
+            const { data } = await axios.post('https://api.dessobuild.com/api/v1/login', logindata, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*`',
@@ -62,7 +62,7 @@ const PartnerLogin = () => {
                             toast.error("Failed to load Razorpay SDK. Please check your connection.");
                             return;
                         }
-                        const res = await axios.post(`https://testapi.dessobuild.com/api/v1/buy_membership/${providerId}`);
+                        const res = await axios.post(`https://api.dessobuild.com/api/v1/buy_membership/${providerId}`);
                         const order = res.data.data.razorpayOrder;
                         const amount = res.data.data.discountAmount;
                         const providerData = res.data.data.provider;
@@ -74,11 +74,11 @@ const PartnerLogin = () => {
                                 name: "DessoBuild",
                                 description: "Buying Membership",
                                 order_id: order.id,
-                                // callback_url: "https://testapi.dessobuild.com/api/v1/membership_payment_verify",
+                                // callback_url: "https://api.dessobuild.com/api/v1/membership_payment_verify",
                                 handler: async function (response) {
                                     // This runs on successful payment
                                     try {
-                                        const { data } = await axios.post("https://testapi.dessobuild.com/api/v1/membership_payment_verify", {
+                                        const { data } = await axios.post("https://api.dessobuild.com/api/v1/membership_payment_verify", {
                                             razorpay_payment_id: response.razorpay_payment_id,
                                             razorpay_order_id: response.razorpay_order_id,
                                             razorpay_signature: response.razorpay_signature,

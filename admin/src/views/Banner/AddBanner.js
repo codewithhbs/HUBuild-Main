@@ -37,7 +37,7 @@ function AddBanner() {
 
         setLoading(true);
         try {
-            const res = await axios.post('https://testapi.dessobuild.com/api/v1/create-banner', payload, {
+            const res = await axios.post('https://api.dessobuild.com/api/v1/create-banner', payload, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             toast.success('Banner added successfully!');

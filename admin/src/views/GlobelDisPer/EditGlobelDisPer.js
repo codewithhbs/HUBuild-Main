@@ -17,7 +17,7 @@ const EditGlobelDisPer = () => {
     // Fetch global discount details
     const fetchDiscountDetails = async () => {
         try {
-            const { data } = await axios.get(`https://testapi.dessobuild.com/api/v1/globel_discount/${id}`);
+            const { data } = await axios.get(`https://api.dessobuild.com/api/v1/globel_discount/${id}`);
             setDiscountPercent(data.data.discountPercent);
         } catch (error) {
             console.error('Error fetching discount details:', error);
@@ -40,7 +40,7 @@ const EditGlobelDisPer = () => {
 
         setLoading(true);
         try {
-            const res = await axios.put(`https://testapi.dessobuild.com/api/v1/update_globel_discount/${id}`, {
+            const res = await axios.put(`https://api.dessobuild.com/api/v1/update_globel_discount/${id}`, {
                 discountPercent
             });
             toast.success(res.data.message);

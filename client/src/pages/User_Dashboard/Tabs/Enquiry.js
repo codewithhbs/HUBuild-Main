@@ -14,7 +14,7 @@ const Enquiry = () => {
   // Fetch Enquiry Data
   const fetchEnquiryData = async () => {
     try {
-      const { data } = await axios.get(`https://testapi.dessobuild.com/api/v1/get-chat-by-providerId/${UserId}`);
+      const { data } = await axios.get(`https://api.dessobuild.com/api/v1/get-chat-by-providerId/${UserId}`);
       setEnquiries(data.data);
     } catch (error) {
       console.log('Error fetching enquiry data:', error);
