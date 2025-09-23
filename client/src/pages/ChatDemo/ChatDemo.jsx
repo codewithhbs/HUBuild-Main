@@ -155,10 +155,10 @@ const ChatDemo = () => {
 
             const { data } = await axios.get(url)
             console.log("data.data", data.data)
-            // const filterData = userData?.role === "provider"
-            //     ? data.data.filter(item => item.providerChatTempDeleted === false)
-            //     : data.data.filter(item => item.userChatTempDeleted === false)
-            const filterData = data.data
+            const filterData = userData?.role === "provider"
+                ? data.data.filter(item => item.providerChatTempDeleted === false)
+                : data.data.filter(item => item.userChatTempDeleted === false)
+            // const filterData = data.data
             console.log("filterData", filterData)
             setProviderChat(filterData.reverse()) // Show latest chats first
         } catch (error) {
@@ -206,6 +206,7 @@ const ChatDemo = () => {
 
                 const userId = chatData?.userId?._id;
                 const providerId = chatData?.providerId?._id;
+                console.log("chatData.messages",chatData)
 
                 setMessages(chatData.messages || []);
                 setSelectedUserId(userId);

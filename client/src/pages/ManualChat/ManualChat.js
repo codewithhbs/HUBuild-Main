@@ -199,6 +199,8 @@ const ManualChat = () => {
   const [isChatEnded, setIsChatEnded] = useState(false)
   const [downloadUrl, setDownloadUrl] = useState(null)
 
+  const [sendAnotationImage, setSendAnotationImage] = useState(false)
+
   const [isDraggingOver, setIsDraggingOver] = useState(false)
 
   // Add state for dynamic canvas dimensions
@@ -441,6 +443,11 @@ const ManualChat = () => {
           annotationHistoryIndexRef.current = nextIndex
           setAnnotationHistoryIndex(nextIndex)
         }
+
+        if(nextIndex === 1) {
+          setSendAnotationImage(true)
+        }
+        
         console.log("New history length:", capped.length, "index:", nextIndex)
         return capped
       })
@@ -2108,33 +2115,33 @@ const ManualChat = () => {
   }
 
   // Download URL effect
-  useEffect(() => {
-    if (!selectedImage?.content) return
+//   useEffect(() => {
+//   if (!selectedImage?.content) return
 
-    let url
-    if (typeof selectedImage.content === "string" && selectedImage.content.startsWith("data:image")) {
-      url = selectedImage.content
-    } else if (Array.isArray(selectedImage.content)) {
-      const byteArray = new Uint8Array(selectedImage.content)
-      const blob = new Blob([byteArray], { type: selectedImage.type || "image/jpeg" })
-      url = URL.createObjectURL(blob)
-    }
+//   let url
+//   if (typeof selectedImage.content === "string" && selectedImage.content.startsWith("data:image")) {
+//     url = selectedImage.content  // For base64 data URLs
+//   } else if (Array.isArray(selectedImage.content)) {
+//     const byteArray = new Uint8Array(selectedImage.content)
+//     const blob = new Blob([byteArray], { type: selectedImage.type || "image/jpeg" })
+//     url = URL.createObjectURL(blob)  // For byte arrays
+//   }
 
-    setDownloadUrl(url)
+//   setDownloadUrl(url)  // If neither condition matches, url is undefined, so downloadUrl becomes null/undefined
 
-    return () => {
-      if (url?.startsWith("blob:")) URL.revokeObjectURL(url)
-    }
-  }, [selectedImage])
+//   return () => {
+//     if (url?.startsWith("blob:")) URL.revokeObjectURL(url)
+//   }
+// }, [selectedImage])
 
   // Enhanced download function
   const handleBase64Download = () => {
     try {
       const base64Data = downloadUrl
       if (!base64Data || typeof base64Data !== "string" || !base64Data.startsWith("data:")) {
-        console.error("Invalid base64 data")
-        return
-      }
+      console.error("Invalid base64 data")  // This error logs in console
+      return
+    }
 
       const parts = base64Data.split(",")
       const byteString = atob(parts[1])
@@ -2164,6 +2171,79 @@ const ManualChat = () => {
       console.error("Error during base64 download:", error)
     }
   }
+
+const handleDownload = async () => {
+  try {
+    let blob;
+    let fileName = selectedImage?.name || "image.jpg";
+    const content = selectedImage?.content;
+
+    if (!content) {
+      throw new Error("No image content available");
+    }
+
+    if (typeof content === "string" && content.startsWith("data:image")) {
+      // Handle base64
+      const parts = content.split(",");
+      const byteString = atob(parts[1]);
+      const mimeString = parts[0].split(":")[1].split(";")[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      blob = new Blob([ia], { type: mimeString });
+    } else if (Array.isArray(content)) {
+      // Handle byte array
+      const byteArray = new Uint8Array(content);
+      blob = new Blob([byteArray], { type: selectedImage.type || "image/jpeg" });
+    } else if (typeof content === "string" && content.startsWith("http")) {
+      // Handle remote URL
+      const response = await fetch(content);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.statusText}`);
+      }
+      blob = await response.blob();
+      // Optional: Extract filename from URL if not provided
+      const urlParts = content.split('/');
+      fileName = urlParts[urlParts.length - 1] || fileName;
+    } else {
+      throw new Error("Unsupported image format");
+    }
+
+    // Check for File System Access API support (modern browsers like Chrome/Edge)
+    if ('showSaveFilePicker' in window) {
+      // Use File System Access API to show "Save As" dialog
+      const options = {
+        suggestedName: fileName,
+        types: [{
+          description: 'Image Files',
+          accept: { [blob.type]: [`.${fileName.split('.').pop()}`] },
+        }],
+      };
+      const fileHandle = await window.showSaveFilePicker(options);
+      const writable = await fileHandle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+    } else {
+      // Fallback: Browser download (may go to default downloads folder)
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+    }
+
+    // Only show success if we reach here
+    toast.success("Image downloaded!");
+  } catch (error) {
+    console.error("Download error:", error);
+    toast.error(`Failed to download: ${error.message}. Check if the URL is accessible.`);
+  }
+};
 
   const id = userData?._id || ""
   const role = userData?.role || ""
@@ -3203,7 +3283,7 @@ const ManualChat = () => {
 
                           <button
                             className="btn btn-outline-light btn-sm align-items-center gap-1"
-                            onClick={handleBase64Download}
+                            onClick={handleDownload}
                           >
                             <MdAttachment size={isMobileView ? 26 : 18} />
                             <span className="d-none d-lg-inline">Download</span>
@@ -3213,7 +3293,8 @@ const ManualChat = () => {
                             <button
                               onClick={handleSendAnnotation}
                               className="btn btn-success btn-sm align-items-center gap-1"
-                              disabled={loading}
+                              // disabled={sendAnotationImage && loading}
+                              disabled={!sendAnotationImage}
                             >
                               <MdSend size={isMobileView ? 24 : 18} />
                               {loading ? (

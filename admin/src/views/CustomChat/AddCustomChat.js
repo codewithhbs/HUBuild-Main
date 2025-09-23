@@ -406,7 +406,7 @@ const AddCustomChat = () => {
                             <CCardBody>
                                 <CRow>
                                     <CCol md={6}>
-                                        <CFormLabel htmlFor="paymentStatus">Payment Status</CFormLabel>
+                                        <CFormLabel htmlFor="paymentStatus">Payment Status*</CFormLabel>
                                         <CFormSelect
                                             id="paymentStatus"
                                             value={formData.PaymentStatus}
@@ -424,7 +424,7 @@ const AddCustomChat = () => {
                                             placeholder="Enter service type"
                                             value={formData.service}
                                             onChange={(e) => handleInputChange('service', e.target.value)}
-                                            required={formData.PaymentStatus === 'paid'}
+                                            // required={formData.PaymentStatus === 'paid'}
                                         />
                                     </CCol>
                                 </CRow>
