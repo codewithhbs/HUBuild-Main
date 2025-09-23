@@ -262,9 +262,9 @@ const Header = () => {
                     }}
                   >
                     Chat
-                    {sessionData?.user?.role === 'provider' && allChat > 0 && (
+                    {/* {sessionData?.user?.role === 'provider' && allChat > 0 && (
                       <span className="hub-header__badge">{allChat}</span>
-                    )}
+                    )} */}
                   </Link>
                 </li>
               )}
