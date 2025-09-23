@@ -1063,11 +1063,17 @@ exports.PaymentVerify = async (req, res) => {
 //     }
 // }
 
-exports.chatStart = async (userId, astrologerId) => {
+exports.chatStart = async (userId, astrologerId,room) => {
     console.log("i am chatStart", userId, astrologerId)
     try {
         const user = await User.findById(userId)
         const provider = await Provider.findById(astrologerId)
+        const check = await ChatAndPayment.findOne({ room: room })
+        // console.log("check",check)
+        if(check?.providerChatTempDeleted === true){
+            check.providerChatTempDeleted = false
+            await check.save()
+        }
         if (!user) {
             return {
                 success: false,

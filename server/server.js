@@ -159,7 +159,7 @@ io.on('connection', (socket) => {
                 await changeAvailableStatus(room, true);
 
                 // Start chat session when user joins - moved from message handler
-                const result = await chatStart(userId, astrologerId);
+                const result = await chatStart(userId, astrologerId,room);
                 if (!result.success) {
                     throw new Error(result.message);
                 }

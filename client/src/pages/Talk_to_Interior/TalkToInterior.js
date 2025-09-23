@@ -776,7 +776,7 @@ function TalkToInterior() {
             <div className="profile-card-box">
               {currentProviders &&
                 currentProviders.map((item, index) => (
-                  <div className="profile-card" key={index}>
+                  <div style={{minHeight:'162px'}} className="profile-card" key={index}>
                     <div className="left-to-left">
                       <img
                         src={
