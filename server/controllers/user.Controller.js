@@ -732,6 +732,28 @@ exports.deleteAccount = async (req, res) => {
     }
 };
 
+exports.deleteUserPermanent = async (req, res) => {
+     try {
+        const { userId } = req.params;
+
+        // const user = await User.findByIdAndDelete(userId);
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        // user.isDeleted = true; // Set isDeleted to true
+        // await user.save();
+        // const userChat = await ChatAndPayment.deleteMany({ userId: userId });
+        await User.findByIdAndDelete(userId);
+        
+        res.status(200).json({ success: true, message: "User account deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting account:", error);
+        res.status(500).json({ success: false, message: "An error occurred while deleting the account" });
+    }
+}
+
 exports.banUserToggle = async (req, res) => {
     try {
         const { userId } = req.params;

@@ -1,5 +1,5 @@
 const express = require('express');
-const { registeruser, getAllUsers, getSingleUserById, updateProfile, login, logout, deleteAccount, banUserToggle, verifyEmail, resendOtp, forgotPassword, getUserById, createPayment, PaymentVerify, getSingleUser, updateUserPassword, getTotalRechargeAmount, Changepassword, getDetailForVerification, updateUserProfileImage, getAllUser } = require('../controllers/user.Controller');
+const { registeruser, getAllUsers, getSingleUserById, updateProfile, login, logout, deleteAccount, banUserToggle, verifyEmail, resendOtp, forgotPassword, getUserById, createPayment, PaymentVerify, getSingleUser, updateUserPassword, getTotalRechargeAmount, Changepassword, getDetailForVerification, updateUserProfileImage, getAllUser, deleteUserPermanent } = require('../controllers/user.Controller');
 const { protect } = require('../middlewares/Protect');
 const { CreateProvider, GetMyProfile, addPortfolio, getAllProvider, getSingleProvider, updateProvider, updateDocuments, updatePassword, updateAvailable, updateBankDetail, updateIsBanned, deleteprovider, accountVerification, getProviderStatus, sendOtpForUpdateDetail, verifyOtpForUpdateDetail, changeProviderNumber, verifyOtpForChangeNumber, updateProfileImage, changeProviderDeactiveStatus, helpubuildverified, deleteConsultantPermanent } = require('../controllers/provider.controller');
 const multer = require('multer');
@@ -111,6 +111,7 @@ router.get('/users', getAllUsers);
 // router.get('/user/:id', getSingleUserById);
 router.get('/get-single-user/:id', getSingleUser)
 router.delete('/user-delete/:userId', deleteAccount);
+router.delete('/user-delete-permanent/:userId', deleteUserPermanent);
 router.put('/user-ban/:userId', banUserToggle);
 router.get('/get-all-user', getAllUser)
 

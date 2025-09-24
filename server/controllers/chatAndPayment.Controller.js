@@ -28,7 +28,7 @@ exports.createChatWithNew = async (req, res) => {
         const room = `${userId}_${providerId}`
         const check = await ChatAndPayment.findOne({ room: room })
         if (check) {
-            console.log("i am in checking",check.userChatTempDeleted, check.providerChatTempDeleted)
+            console.log("i am in checking", check.userChatTempDeleted, check.providerChatTempDeleted)
             if (check.userChatTempDeleted === true || check.providerChatTempDeleted === true) {
                 // console.log("i am in this ")
                 check.userChatTempDeleted = false;
@@ -150,18 +150,60 @@ exports.getChatById = async (req, res) => {
 
         // Filter for user role
         if (role === 'user' && chat.deletedDateByUser) {
-            console.log("🧹 Filtering messages for USER. Deleted after:", chat.deletedDateByUser);
-            filteredMessages = filteredMessages.filter(
-                msg => new Date(msg.timestamp).getTime() > new Date(chat.deletedDateByUser).getTime()
-            );
+            const deletedAtIST = new Date(chat.deletedDateByUser).toLocaleString("en-IN", {
+                timeZone: "Asia/Kolkata",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit"
+            });
+            console.log("🧹 Filtering messages for USER. Deleted after (IST):", deletedAtIST);
+
+            const deleteTime = new Date(chat.deletedDateByUser).getTime();
+
+            filteredMessages = filteredMessages.filter(msg => {
+                const msgTime = new Date(msg.timestamp).getTime();
+
+                // console.log("   ↳ Message:",
+                //     new Date(msg.timestamp).toLocaleString("en-IN", {
+                //         timeZone: "Asia/Kolkata",
+                //         hour: "2-digit",
+                //         minute: "2-digit",
+                //         second: "2-digit"
+                //     }),
+                //     "| Pass:", msgTime > deleteTime
+                // );
+
+                return msgTime > deleteTime;
+            });
         }
 
         // Filter for provider role
         if (role === 'provider' && chat.deletedDateByProvider) {
-            console.log("🧹 Filtering messages for PROVIDER. Deleted after:", chat.deletedDateByProvider);
-            filteredMessages = filteredMessages.filter(
-                msg => new Date(msg.timestamp).getTime() > new Date(chat.deletedDateByProvider).getTime()
-            );
+            const deletedAtIST = new Date(chat.deletedDateByProvider).toLocaleString("en-IN", {
+                timeZone: "Asia/Kolkata",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit"
+            });
+            console.log("🧹 Filtering messages for PROVIDER. Deleted after (IST):", deletedAtIST);
+
+            const deleteTime = new Date(chat.deletedDateByProvider).getTime();
+
+            filteredMessages = filteredMessages.filter(msg => {
+                const msgTime = new Date(msg.timestamp).getTime();
+
+                // console.log("   ↳ Message:",
+                //     new Date(msg.timestamp).toLocaleString("en-IN", {
+                //         timeZone: "Asia/Kolkata",
+                //         hour: "2-digit",
+                //         minute: "2-digit",
+                //         second: "2-digit"
+                //     }),
+                //     "| Pass:", msgTime > deleteTime
+                // );
+
+                return msgTime > deleteTime;
+            });
         }
 
         console.log("📩 Messages after filtering:", filteredMessages.length);
