@@ -143,7 +143,7 @@ exports.getChatById = async (req, res) => {
                 message: "Chat not found",
             });
         }
-
+        console.log("🗂️ Chat Details:", chat);
         // All messages before filtering
         let filteredMessages = chat.messages || [];
         console.log("📩 Total messages before filtering:", filteredMessages.length);
@@ -161,7 +161,12 @@ exports.getChatById = async (req, res) => {
             const deleteTime = new Date(chat.deletedDateByUser).getTime();
 
             filteredMessages = filteredMessages.filter(msg => {
-                const msgTime = new Date(msg.timestamp).getTime();
+                const msgTime = new Date(msg.timestamp).getTime(); // original timestamp in ms
+                const newTime = msgTime - 35 * 1000; // subtract 35 seconds (35*1000 ms)
+                const newDate = new Date(newTime); // convert back to Date object
+
+                console.log("newDate.toISOString()",newDate.toISOString()); // optional: see in ISO format
+
 
                 // console.log("   ↳ Message:",
                 //     new Date(msg.timestamp).toLocaleString("en-IN", {
@@ -173,7 +178,7 @@ exports.getChatById = async (req, res) => {
                 //     "| Pass:", msgTime > deleteTime
                 // );
 
-                return msgTime > deleteTime;
+                return newDate > deleteTime;
             });
         }
 
@@ -190,7 +195,9 @@ exports.getChatById = async (req, res) => {
             const deleteTime = new Date(chat.deletedDateByProvider).getTime();
 
             filteredMessages = filteredMessages.filter(msg => {
-                const msgTime = new Date(msg.timestamp).getTime();
+                const msgTime = new Date(msg.timestamp).getTime(); // original timestamp in ms
+                const newTime = msgTime - 35 * 1000; // subtract 35 seconds (35*1000 ms)
+                const newDate = new Date(newTime); // convert back to Date object
 
                 // console.log("   ↳ Message:",
                 //     new Date(msg.timestamp).toLocaleString("en-IN", {
@@ -202,7 +209,7 @@ exports.getChatById = async (req, res) => {
                 //     "| Pass:", msgTime > deleteTime
                 // );
 
-                return msgTime > deleteTime;
+                return newDate > deleteTime;
             });
         }
 
@@ -438,10 +445,13 @@ exports.deleteMessageFromRoom = async (req, res) => {
             //         message: 'Chat deleted successfully.',
             //     });
             // } else {
+
             findChat.deleteByUser = true;
             findChat.userChatTempDeleted = true;
             findChat.deletedDateByUser = new Date();
-            await findChat.save();
+            await findChat.save({ new: true });
+
+            // console.log("findChat", findChat)
             return res.status(200).json({
                 success: true,
                 message: 'Message deleted successfully by user.',
