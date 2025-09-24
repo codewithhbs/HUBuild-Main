@@ -115,32 +115,56 @@ exports.getChatById = async (req, res) => {
         const { id } = req.params;
         const { role } = req.query; // role should be passed as a query param
 
-        let chat = await ChatAndPayment.findOne({ room: id }).populate('userId').populate('providerId').populate('providerIds');
+        console.log("➡️ Incoming request:");
+        console.log("   Chat/Room ID:", id);
+        console.log("   Role:", role);
+
+        // First try to find by room
+        let chat = await ChatAndPayment.findOne({ room: id })
+            .populate('userId')
+            .populate('providerId')
+            .populate('providerIds');
+
+        console.log("🔍 Chat found by room:", chat ? "YES" : "NO");
+
+        // If not found by room, try by _id
         if (!chat) {
-            chat = await ChatAndPayment.findById(id).populate('userId').populate('providerId').populate('providerIds');
+            chat = await ChatAndPayment.findById(id)
+                .populate('userId')
+                .populate('providerId')
+                .populate('providerIds');
+            console.log("🔍 Chat found by _id:", chat ? "YES" : "NO");
         }
 
         if (!chat) {
+            console.log("❌ No chat found with given id/room");
             return res.status(404).json({
                 success: false,
                 message: "Chat not found",
             });
         }
 
-        // Filter messages according to the role and deletion timestamp
+        // All messages before filtering
         let filteredMessages = chat.messages || [];
+        console.log("📩 Total messages before filtering:", filteredMessages.length);
 
+        // Filter for user role
         if (role === 'user' && chat.deletedDateByUser) {
+            console.log("🧹 Filtering messages for USER. Deleted after:", chat.deletedDateByUser);
             filteredMessages = filteredMessages.filter(
                 msg => new Date(msg.timestamp).getTime() > new Date(chat.deletedDateByUser).getTime()
             );
         }
 
+        // Filter for provider role
         if (role === 'provider' && chat.deletedDateByProvider) {
+            console.log("🧹 Filtering messages for PROVIDER. Deleted after:", chat.deletedDateByProvider);
             filteredMessages = filteredMessages.filter(
                 msg => new Date(msg.timestamp).getTime() > new Date(chat.deletedDateByProvider).getTime()
             );
         }
+
+        console.log("📩 Messages after filtering:", filteredMessages.length);
 
         res.status(200).json({
             success: true,
@@ -152,15 +176,14 @@ exports.getChatById = async (req, res) => {
         });
 
     } catch (error) {
-        console.log("Internal server error", error);
+        console.log("💥 Internal server error:", error);
         res.status(500).json({
             success: false,
             message: "Internal server error",
             error: error.message
         });
     }
-}
-
+};
 
 exports.getChatByProviderid = async (req, res) => {
     try {
