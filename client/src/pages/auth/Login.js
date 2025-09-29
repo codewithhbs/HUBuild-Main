@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { setData } from '../../utils/sessionStoreage';
 import Swal from 'sweetalert2';
 axios.defaults.withCredentials = true;
+const API_BASE = process.env.REACT_APP_API_URL || process.env.VITE_API_URL || 'https://api.dessobuild.com';
 
 function Login() {
     const [logindata, setLoginData] = useState({
@@ -30,7 +31,10 @@ function Login() {
     const handleloginSubmit = async (e) => {
         e.preventDefault();
         try {
-            const { data } = await axios.post('https://api.dessobuild.com/api/v1/login', logindata);
+            const { data } = await axios.post(`${API_BASE}/api/v1/login`, logindata, {
+                withCredentials: true,
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
+            });
             const { token, user, message } = data;
             setData('token', token);
             setData('islogin', token ? true : false);
