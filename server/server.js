@@ -40,12 +40,6 @@ const limiter = rateLimit({
     }
 });
 
-// Middleware setup
-app.set(express.static('public'));
-app.use('/public', express.static('public'));
-app.use(cookieParser());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(cors({
     origin: (origin, callback) => {
         // Allow all origins, but echo them back explicitly
@@ -54,12 +48,22 @@ app.use(cors({
     credentials: true
 }));
 
+// Middleware setup
+app.set(express.static('public'));
+app.use('/public', express.static('public'));
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
 
 // Create HTTP server and Socket.IO instance
 const server = createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "*",
+        origin: (origin, callback) => {
+            callback(null, origin || true);
+        },
         methods: ["GET", "POST"],
         credentials: true,
     },
@@ -159,7 +163,7 @@ io.on('connection', (socket) => {
                 await changeAvailableStatus(room, true);
 
                 // Start chat session when user joins - moved from message handler
-                const result = await chatStart(userId, astrologerId,room);
+                const result = await chatStart(userId, astrologerId);
                 if (!result.success) {
                     throw new Error(result.message);
                 }
