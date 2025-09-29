@@ -18,7 +18,7 @@ const sendToken = async (user, res, status, message) => {
             maxAge: 7 * 24 * 60 * 60 * 1000
         };
 
-
+        console.log("done in send token")
         // Send token in cookie
         res.status(status).cookie('token', token, options).json({
             success: true,

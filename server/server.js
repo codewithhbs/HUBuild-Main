@@ -21,74 +21,29 @@ ConnectDB();
 
 // Initialize Express app
 const app = express();
-const PORT = process.env.PORT || 9123;
+const PORT = process.env.PORT || 8561;
+app.set("trust proxy", 1);
 
-// Configuration for rate limiting
+app.use(cors({
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl)
+        if (!origin) return callback(null, true);
+        return callback(null, true); // allow all origins dynamically
+    },
+    credentials: true
+}));
 const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000, // 1 minute window
-    limit: 200, // 200 requests per window
+    windowMs: 1 * 60 * 1000,
+    limit: 200,
     standardHeaders: 'draft-7',
     legacyHeaders: false,
     message: "Too many requests",
     statusCode: 429,
-    handler: (req, res, next) => {
-        try {
-            next();
-        } catch (error) {
-            res.status(429).send("Too many requests");
-        }
+    keyGenerator: (req, res) => {
+        return req.ip; // only use Express ip, ignore X-Forwarded-For
     }
 });
 
-// CORS configuration with explicit whitelist and credentials support
-// Support '*' to allow all, and default localhost origins in development
-const isDevEnv = process.env.NODE_ENV !== 'production';
-const envOrigins = process.env.ALLOWED_ORIGINS
-    ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()).filter(Boolean)
-    : [];
-const defaultLocalOrigins = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-    'http://localhost:4173',
-    'http://127.0.0.1:4173',
-];
-const allowAllOrigins = process.env.ALLOWED_ORIGINS === '*' || (envOrigins.length === 0 && isDevEnv);
-const allowedOrigins = allowAllOrigins ? null : [...new Set([...(isDevEnv ? defaultLocalOrigins : []), ...envOrigins])];
-
-
-const corsOptions = {
-    origin: (origin, callback) => {
-        // Allow same-origin requests or non-browser clients (no Origin header)
-        if (!origin) return callback(null, true);
-        if (allowAllOrigins) return callback(null, true);
-        if (Array.isArray(allowedOrigins) && allowedOrigins.includes(origin)) return callback(null, true);
-        return callback(new Error(`Origin ${origin} not allowed by CORS`));
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: [
-        'Content-Type',
-        'Authorization',
-        'X-Requested-With',
-        'Accept',
-        'Origin',
-        'X-CSRF-Token'
-    ],
-    exposedHeaders: ['Set-Cookie'],
-};
-
-app.use((req, res, next) => {
-    // Ensure proper caching behavior per origin for CORS
-    res.setHeader('Vary', 'Origin');
-    next();
-});
-
-app.use(cors(corsOptions));
-
-// Handle preflight early
-app.options('*', cors(corsOptions));
 
 // Middleware setup
 app.set(express.static('public'));
