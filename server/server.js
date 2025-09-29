@@ -40,13 +40,55 @@ const limiter = rateLimit({
     }
 });
 
-app.use(cors({
+// CORS configuration with explicit whitelist and credentials support
+// Support '*' to allow all, and default localhost origins in development
+const isDevEnv = process.env.NODE_ENV !== 'production';
+const envOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()).filter(Boolean)
+    : [];
+const defaultLocalOrigins = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://localhost:4173',
+    'http://127.0.0.1:4173',
+];
+const allowAllOrigins = process.env.ALLOWED_ORIGINS === '*' || (envOrigins.length === 0 && isDevEnv);
+const allowedOrigins = allowAllOrigins ? null : [...new Set([...(isDevEnv ? defaultLocalOrigins : []), ...envOrigins])];
+
+
+const corsOptions = {
     origin: (origin, callback) => {
-        // Allow all origins, but echo them back explicitly
-        callback(null, origin || true);
+        // Allow same-origin requests or non-browser clients (no Origin header)
+        if (!origin) return callback(null, true);
+        if (allowAllOrigins) return callback(null, true);
+        if (Array.isArray(allowedOrigins) && allowedOrigins.includes(origin)) return callback(null, true);
+        return callback(new Error(`Origin ${origin} not allowed by CORS`));
     },
-    credentials: true
-}));
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'X-Requested-With',
+        'Accept',
+        'Origin',
+        'X-CSRF-Token'
+    ],
+    exposedHeaders: ['Set-Cookie'],
+};
+
+app.use((req, res, next) => {
+    // Ensure proper caching behavior per origin for CORS
+    res.setHeader('Vary', 'Origin');
+    next();
+});
+
+app.use(cors(corsOptions));
+
+// Handle preflight early
+app.options('*', cors(corsOptions));
 
 // Middleware setup
 app.set(express.static('public'));
@@ -754,123 +796,123 @@ io.on('connection', (socket) => {
     });
 
     // Handle audio upload for group chat with enhanced sender info and reply support
-socket.on("manual_audio_upload", async ({ room, fileData, senderId, senderName, senderRole, timestamp, isAudio, replyTo }) => {
-    try {
-        if (!room || !fileData || !senderId || !isAudio) {
-            throw new Error("Missing required parameters for audio upload");
-        }
+    socket.on("manual_audio_upload", async ({ room, fileData, senderId, senderName, senderRole, timestamp, isAudio, replyTo }) => {
+        try {
+            if (!room || !fileData || !senderId || !isAudio) {
+                throw new Error("Missing required parameters for audio upload");
+            }
 
-        console.log(`Audio upload received in room ${room} from ${senderId}:`, fileData.name);
-        if (replyTo) {
-            console.log("Audio reply data:", replyTo);
-        }
+            console.log(`Audio upload received in room ${room} from ${senderId}:`, fileData.name);
+            if (replyTo) {
+                console.log("Audio reply data:", replyTo);
+            }
 
-        // Validate file data
-        if (!fileData.content || !fileData.name || !fileData.type) {
-            throw new Error("Invalid audio data");
-        }
+            // Validate file data
+            if (!fileData.content || !fileData.name || !fileData.type) {
+                throw new Error("Invalid audio data");
+            }
 
-        // Check file type (only audio allowed)
-        if (!fileData.type.startsWith("audio/")) {
-            socket.emit("file_upload_error", {
-                error: "Only audio files are allowed for voice notes",
-            });
-            return;
-        }
+            // Check file type (only audio allowed)
+            if (!fileData.type.startsWith("audio/")) {
+                socket.emit("file_upload_error", {
+                    error: "Only audio files are allowed for voice notes",
+                });
+                return;
+            }
 
-        // Extract base64 payload
-        let base64Payload = fileData.content;
-        const match = typeof base64Payload === 'string' ? base64Payload.match(/^data:(.*?);base64,(.*)$/) : null;
-        let buffer = null;
-        if (match && match[2]) {
-            buffer = Buffer.from(match[2], 'base64');
-        }
-        if (!buffer) {
-            throw new Error("Invalid audio payload");
-        }
-        if (buffer.length > MAX_FILE_SIZE) {
-            socket.emit("file_upload_error", { error: "Audio file size exceeds maximum allowed (5MB)" });
-            return;
-        }
+            // Extract base64 payload
+            let base64Payload = fileData.content;
+            const match = typeof base64Payload === 'string' ? base64Payload.match(/^data:(.*?);base64,(.*)$/) : null;
+            let buffer = null;
+            if (match && match[2]) {
+                buffer = Buffer.from(match[2], 'base64');
+            }
+            if (!buffer) {
+                throw new Error("Invalid audio payload");
+            }
+            if (buffer.length > MAX_FILE_SIZE) {
+                socket.emit("file_upload_error", { error: "Audio file size exceeds maximum allowed (5MB)" });
+                return;
+            }
 
-        // Upload to Cloudinary (resource_type auto handles audio)
-        const { imageUrl } = await uploadToCloudinary(buffer);
+            // Upload to Cloudinary (resource_type auto handles audio)
+            const { imageUrl } = await uploadToCloudinary(buffer);
 
-        // Create audio message object
-        const audioMessage = {
-            sender: senderId,
-            file: {
-                name: fileData.name,
-                type: fileData.type,
-                content: imageUrl,
-            },
-            senderName: senderName,
-            senderRole: senderRole,
-            timestamp: timestamp || new Date().toISOString(),
-            isAudio: true, // Mark as audio message
-        };
-
-        // Add reply data if present
-        if (replyTo) {
-            audioMessage.replyTo = {
-                messageId: replyTo.messageId,
-                text: replyTo.text,
-                senderName: replyTo.senderName,
-                senderRole: replyTo.senderRole,
-                isFile: replyTo.isFile || false,
-                isAudio: replyTo.isAudio || false,
-                timestamp: replyTo.timestamp,
-            };
-        }
-
-        // Save audio message to GroupChat DB
-        await Chat.findOneAndUpdate(
-            { _id: room },
-            {
-                $push: {
-                    messages: audioMessage,
+            // Create audio message object
+            const audioMessage = {
+                sender: senderId,
+                file: {
+                    name: fileData.name,
+                    type: fileData.type,
+                    content: imageUrl,
                 },
-            },
-            { upsert: true, new: true },
-        );
+                senderName: senderName,
+                senderRole: senderRole,
+                timestamp: timestamp || new Date().toISOString(),
+                isAudio: true, // Mark as audio message
+            };
 
-        // Prepare response data
-        const responseData = {
-            file: {
-                name: fileData.name,
-                type: fileData.type,
-                content: imageUrl,
-            },
-            sender: senderId,
-            senderId: senderId,
-            senderName: senderName,
-            senderRole: senderRole,
-            timestamp: timestamp || new Date().toISOString(),
-            isAudio: true,
-        };
+            // Add reply data if present
+            if (replyTo) {
+                audioMessage.replyTo = {
+                    messageId: replyTo.messageId,
+                    text: replyTo.text,
+                    senderName: replyTo.senderName,
+                    senderRole: replyTo.senderRole,
+                    isFile: replyTo.isFile || false,
+                    isAudio: replyTo.isAudio || false,
+                    timestamp: replyTo.timestamp,
+                };
+            }
 
-        // Add reply data to response if present
-        if (replyTo) {
-            responseData.replyTo = audioMessage.replyTo;
+            // Save audio message to GroupChat DB
+            await Chat.findOneAndUpdate(
+                { _id: room },
+                {
+                    $push: {
+                        messages: audioMessage,
+                    },
+                },
+                { upsert: true, new: true },
+            );
+
+            // Prepare response data
+            const responseData = {
+                file: {
+                    name: fileData.name,
+                    type: fileData.type,
+                    content: imageUrl,
+                },
+                sender: senderId,
+                senderId: senderId,
+                senderName: senderName,
+                senderRole: senderRole,
+                timestamp: timestamp || new Date().toISOString(),
+                isAudio: true,
+            };
+
+            // Add reply data to response if present
+            if (replyTo) {
+                responseData.replyTo = audioMessage.replyTo;
+            }
+
+            // Broadcast audio to ENTIRE room (including sender)
+            io.to(room).emit("return_message", responseData);
+
+            // Emit success confirmation to sender
+            socket.emit("file_upload_success", {
+                message: "Voice note uploaded successfully",
+                fileName: fileData.name,
+            });
+
+            console.log(`Voice note ${fileData.name} successfully uploaded and broadcasted to room ${room}`);
+        } catch (error) {
+            console.error("Audio upload error:", error.message);
+            socket.emit("file_upload_error", {
+                error: `Voice note upload failed: ${error.message}`,
+            });
         }
-
-        // Broadcast audio to ENTIRE room (including sender)
-        io.to(room).emit("return_message", responseData);
-
-        // Emit success confirmation to sender
-        socket.emit("file_upload_success", {
-            message: "Voice note uploaded successfully",
-            fileName: fileData.name,
-        });
-
-        console.log(`Voice note ${fileData.name} successfully uploaded and broadcasted to room ${room}`);
-    } catch (error) {
-        console.error("Audio upload error:", error.message);
-        socket.emit("file_upload_error", {
-            error: `Voice note upload failed: ${error.message}`,
-        });
-    }
-});
+    });
 
     // Optional: Handle file download requests
     socket.on("request_file_download", async ({ room, messageId, senderId }) => {

@@ -5,7 +5,8 @@ import toast from 'react-hot-toast';
 import { setData } from '../../utils/sessionStoreage';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
-// axios.defaults.withCredentials = true;
+axios.defaults.withCredentials = true;
+const API_BASE = process.env.REACT_APP_API_URL || process.env.VITE_API_URL || 'https://api.dessobuild.com';
 
 const PartnerLogin = () => {
     const [logindata, setLoginData] = useState({
@@ -43,12 +44,11 @@ const PartnerLogin = () => {
 
         e.preventDefault()
         try {
-            const { data } = await axios.post('https://api.dessobuild.com/api/v1/login', logindata, {
+            const { data } = await axios.post(`${API_BASE}/api/v1/login`, logindata, {
+                withCredentials: true,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*`',
-                    'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token'
+                    'Accept': 'application/json',
                 }
             });
             console.log(data)
@@ -62,7 +62,7 @@ const PartnerLogin = () => {
                             toast.error("Failed to load Razorpay SDK. Please check your connection.");
                             return;
                         }
-                        const res = await axios.post(`https://api.dessobuild.com/api/v1/buy_membership/${providerId}`);
+                        const res = await axios.post(`${API_BASE}/api/v1/buy_membership/${providerId}`, null, { withCredentials: true });
                         const order = res.data.data.razorpayOrder;
                         const amount = res.data.data.discountAmount;
                         const providerData = res.data.data.provider;
@@ -78,12 +78,12 @@ const PartnerLogin = () => {
                                 handler: async function (response) {
                                     // This runs on successful payment
                                     try {
-                                        const { data } = await axios.post("https://api.dessobuild.com/api/v1/membership_payment_verify", {
+                                        const { data } = await axios.post(`${API_BASE}/api/v1/membership_payment_verify`, {
                                             razorpay_payment_id: response.razorpay_payment_id,
                                             razorpay_order_id: response.razorpay_order_id,
                                             razorpay_signature: response.razorpay_signature,
                                             providerId: providerId
-                                        });
+                                        }, { withCredentials: true });
 
                                         const { token, user, message } = data
                                         setData('token', token)

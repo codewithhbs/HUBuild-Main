@@ -7,13 +7,14 @@ const sendToken = async (user, res, status, message) => {
             expiresIn: process.env.JWT_EXPIRES_TIME
         })
 
+        const isProduction = process.env.NODE_ENV === 'production';
+        const cookieDomain = process.env.COOKIE_DOMAIN || undefined; // e.g. .dessobuild.com
         const options = {
             httpOnly: true,
-            secure: true,
-            // production 
-            sameSite: 'None',
-            // local 
-            // sameSite: 'Lax',
+            secure: isProduction, // only secure in production over HTTPS
+            sameSite: isProduction ? 'None' : 'Lax',
+            domain: cookieDomain,
+            path: '/',
             maxAge: 7 * 24 * 60 * 60 * 1000
         };
 
