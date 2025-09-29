@@ -52,19 +52,19 @@ exports.createCall = async (req, res) => {
             });
         }
 
-        if (provider.is_on_chat) {
-            return res.status(400).json({
-                success: false,
-                message: "This Consultant is already on chat. Please choose another Consultant to make a call.",
-            });
-        }
+        // if (provider.is_on_chat) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: "This Consultant is already on chat. Please choose another Consultant to make a call.",
+        //     });
+        // }
 
-        if (provider.is_on_call) {
-            return res.status(400).json({
-                success: false,
-                message: "Another User  already on a call with this Consultant. Please choose another Consultant to make a call.",
-            });
-        }
+        // if (provider.is_on_call) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: "Another User  already on a call with this Consultant. Please choose another Consultant to make a call.",
+        //     });
+        // }
 
         const userNumber = user?.PhoneNumber;
         const providerNumber = provider?.mobileNumber;

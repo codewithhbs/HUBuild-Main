@@ -535,7 +535,7 @@ const ChatDemo = () => {
         const prohibitedPatterns = [
             /\b\d{10}\b/, // Phone number pattern
             /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/, // Email pattern
-            /18\+|\bsex\b|\bxxx\b|\bcall\b|\bphone\b|\bmobile|\bteliphone\b|\bnudes\b|\bporn\b|\bsex\scall\b|\btext\b|\bwhatsapp\b|\bskype\b|\btelegram\b|\bfacetime\b|\bvideo\schat\b|\bdial\snumber\b|\bmessage\b/i, // Keywords related to 18+ content and phone connections
+            /18\+|\bsex\b|\bxxx\b|\bcall\b|\bphone\b|\bmobile|\bteliphone\b|\bnudes\b|\bporn\b|\bsex\scall\b|\btext\b|\bwhatsapp\b|\bskype\b|\btelegram\b|\bfacetime\b|\bvideo\schat\b|\bdial\snumber\b/i, // Keywords related to 18+ content and phone connections
         ]
 
         return !prohibitedPatterns.some((pattern) => pattern.test(messageText))
