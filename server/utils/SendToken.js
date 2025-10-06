@@ -8,18 +8,24 @@ const sendToken = async (user, res, status, message) => {
         })
 
         const isProduction = process.env.NODE_ENV === 'production';
-        const cookieDomain = process.env.COOKIE_DOMAIN || undefined; // e.g. .dessobuild.com
+
+        // const cookieDomain = process.env.COOKIE_DOMAIN || undefined; // e.g. .dessobuild.com
         const options = {
             httpOnly: true,
-            secure: isProduction, // only secure in production over HTTPS
+            secure: isProduction,          // only secure in production
             sameSite: isProduction ? 'None' : 'Lax',
-            domain: cookieDomain,
+            domain: isProduction ? '.dessobuild.com' : undefined,
             path: '/',
-            maxAge: 7 * 24 * 60 * 60 * 1000
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 1 week
         };
+
+
 
         console.log("done in send token")
         // Send token in cookie
+        res.clearCookie('token', { domain: '.dessobuild.com', path: '/' });
+
+        // Send token
         res.status(status).cookie('token', token, options).json({
             success: true,
             message,

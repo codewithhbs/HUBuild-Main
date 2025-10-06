@@ -625,7 +625,8 @@ const ChatDemo = () => {
             }
 
             if (!validateMessageContent(trimmedMessage)) {
-                toast.error("Your message contains prohibited content (phone numbers, emails, or 18+ content)")
+                toast.error("Your message contains invalid content. Please remove any personal information or inappropriate material.");
+                // toast.error("Your message contains prohibited content (phone numbers, emails, or 18+ content)")
                 return
             }
 
